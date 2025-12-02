@@ -1,0 +1,275 @@
+textarea {
+  /*resize: vertical;*/
+  line-height: 1.2;
+}
+
+textarea.chave {
+  resize: none;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  word-break: break-all;
+}
+
+textarea.mensagem {
+  resize: none;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  word-break: normal;
+}
+
+textarea.chave::placeholder {
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.botao-custom:active {
+  box-shadow: none !important;
+  transform: scale(0.99);
+  opacity: 0.80;
+}
+
+.icone-custom:active {
+  color: #747474;
+  transform: scale(0.95);
+}
+
+.text-pressed:active {
+  color: rgb(196, 196, 250);
+  transform: scale(0.99);
+}
+
+.caixa-texto {
+  position: relative;
+}
+
+textarea.form-control:focus {
+  background-color: #dadada !important;
+  border-color: inherit !important;
+  box-shadow: none !important;
+}
+
+textarea.deadinput:focus {
+  border-color: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+textarea.form-control {
+  transition: background-color .2s ease;
+}
+
+input.form-control:focus {
+  background-color: #dadada !important;
+  border-color: inherit !important;
+  box-shadow: none !important;
+}
+
+.w-340 {
+  width: 340px !important;
+  min-width: unset !important;
+  max-width: unset !important;
+}
+
+.apagando {
+  background-color: #ffe6e6 !important;
+  transition: background-color 0.25s ease;
+}
+
+.dropdown-faded:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#txtMsgEntrada, #txtChave, #txtChaveBottom, #txtMsgBottom, #inputFraseSegredo, #inputMdlNomeSalvarCifragem, #inputMdlObsSalvarCifragem, #inputlNomeCifraAberta, #inputObsCifraAberta, #txtMsgAberta {
+  cursor: text !important;
+}
+
+#formCheck-1, #formCheck-2, #formCheck-3, #formCheck-4, #fieldCheck-1, #fieldCheck-2, #fieldCheck-3, #fieldCheck-4 {
+  cursor: pointer !important;
+}
+
+#txtChave {
+  white-space: normal;
+  word-break: break-all;
+}
+
+#txtChave.digitando {
+  background-color: #f0f0f0;
+  transition: background-color 0.3s;
+}
+
+#txtMsgEntrada {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+#inputFraseSegredo {
+  resize: none;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  word-break: normal;
+}
+
+#passphraseStrengthWrapper {
+  margin-top: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.passphrase-strength-bg {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background-color: #e0e0e0;
+  overflow: hidden;
+}
+
+#passphraseStrengthFill {
+  width: 0%;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+#passphraseStrengthFill.strength-0 {
+  background-color: #e63946;
+}
+
+#passphraseStrengthFill.strength-1 {
+  background-color: #f77f00;
+}
+
+#passphraseStrengthFill.strength-2 {
+  background-color: #ffbf00;
+}
+
+#passphraseStrengthFill.strength-3 {
+  background-color: #4ce15b;
+}
+
+#passphraseStrengthFill.strength-4 {
+  background-color: #9bb9d6;
+}
+
+#divColunaEsqCardCifra {
+  flex: 1 1 auto;
+}
+
+#divListaCifra {
+  scrollbar-width: none;
+}
+
+#divListaCifra::-webkit-scrollbar {
+  display: none;
+}
+
+#divListaCifra {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#divTmpltCardCifra.d-none {
+  display: none !important;
+}
+
+#divColunaEsqCardCifra {
+  cursor: pointer;
+}
+
+.modal-confirma-excluir {
+  max-width: 340px;
+  width: 340px;
+  margin-top: 80px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#divTmpltCardCifra {
+  display: none;
+}
+
+#txtCardNomeCifra, #txtCardTextoCifra, #txtCardChaveCifra {
+  cursor: pointer;
+}
+
+.card-cifra {
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+}
+
+.card-cifra input {
+  pointer-events: none;
+}
+
+.card-cifra.card-pressed {
+  background-color: #eeeeee;
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+#passphraseStrengthWrapper {
+  margin-top: 0.5rem;
+}
+
+.passphrase-strength-label {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+}
+
+#passphraseStrengthWrapper.is-active {
+  opacity: 1;
+}
+
+/* Destaque rápido quando copia texto do textarea */
+
+.textarea-highlight {
+  background-color: #fff3cd !important;
+  transition: background-color 0.4s ease-out;
+}
+
+/* (Opcional) se quiser também aproveitar a classe "copiado" usada em copiarTextoDoTextarea */
+
+.copiado {
+  background-color: #d4edda !important;
+  transition: background-color 0.3s ease-out;
+}
+
+/* Estilos para o modal QR Scanner */
+
+#qrScannerContainer {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+#qrVideo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Overlay com instrução / área de foco */
+
+#qrOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(0,0,0,0.5), transparent 60%);
+  color: #fff;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
