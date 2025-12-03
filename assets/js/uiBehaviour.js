@@ -1973,6 +1973,10 @@ function handleQrDecoded(qrText) {
 
     // Aqui você pode disparar qualquer lógica extra, se precisar (ex: revalidar botões)
     console.log('[Cifrei] Campos preenchidos a partir do QR com sucesso.');
+
+    //Atualiza o estado do #btnDecifrar
+    txtChave.dispatchEvent(new Event('input', { bubbles: true }));
+    txtMsgEntrada.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
 // Para o scanner e libera recursos
