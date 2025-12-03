@@ -20,6 +20,13 @@ textarea.mensagem {
 textarea.chave::placeholder {
   word-break: normal;
   overflow-wrap: break-word;
+  color: #aeaeae;
+  opacity: 1;
+}
+
+textarea.mensagem::placeholder {
+  color: #aeaeae;
+  opacity: 1;
 }
 
 .clickable {
@@ -47,7 +54,7 @@ textarea.chave::placeholder {
 }
 
 textarea.form-control:focus {
-  background-color: #dadada !important;
+  background-color: #eeeeee !important;
   border-color: inherit !important;
   box-shadow: none !important;
 }
@@ -272,4 +279,3 @@ input.form-control:focus {
   font-size: 0.9rem;
   text-align: center;
 }
-

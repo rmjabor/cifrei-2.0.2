@@ -999,6 +999,7 @@ function setupCifraAbertaPage() {
     inputNome.value = data.name || '';
     if (divNome && !data.name) {
       divNome.classList.add('d-none');
+      btnEditar.classList.add('d-none');
     }
   }
 
