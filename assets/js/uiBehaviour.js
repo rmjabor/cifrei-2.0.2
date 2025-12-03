@@ -1959,11 +1959,13 @@ function handleQrDecoded(qrText) {
 
     // Em ambas as páginas, sempre preenche a chave
     txtChave.value = chave;
+    txtChave.dispatchEvent(new Event('input', { bubbles: true }));
 
     // Na página de decifrar, também preenche o texto cifrado, se houver
     if (qrScannerPageType === 'decifrar' && txtMsgEntrada) {
         if (ciphertext && ciphertext.length > 0) {
             txtMsgEntrada.value = ciphertext;
+            txtMsgEntrada.dispatchEvent(new Event('input', { bubbles: true }));
         } else {
             // Se quiser, você pode decidir se isso é erro ou não.
             // Por enquanto, só deixamos vazio.
@@ -1974,9 +1976,7 @@ function handleQrDecoded(qrText) {
     // Aqui você pode disparar qualquer lógica extra, se precisar (ex: revalidar botões)
     console.log('[Cifrei] Campos preenchidos a partir do QR com sucesso.');
 
-    //Atualiza o estado do #btnDecifrar
-    txtChave.dispatchEvent(new Event('input', { bubbles: true }));
-    txtMsgEntrada.dispatchEvent(new Event('input', { bubbles: true }));
+
 }
 
 // Para o scanner e libera recursos
