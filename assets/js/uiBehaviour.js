@@ -1476,11 +1476,6 @@ function openQrCodeModal() {
 
   const label = getCifraNameForQr();
 
-  const labelEl = document.getElementById('qrCifraLabel');
-  if (labelEl) {
-    labelEl.textContent = label;
-  }
-
   const finalCanvas = document.getElementById('qrCanvasFinal');
   if (!finalCanvas) {
     console.error('[Cifrei] qrCanvasFinal não encontrado.');
@@ -1489,69 +1484,117 @@ function openQrCodeModal() {
 
   // Gerar QR numa div temporária
   const tempDiv = document.createElement('div');
-  const size = 256;
+
+  const qrSize     = 256; // tamanho do QR em si
+  const outerMargin = 20; // margem externa
+  const logoWidth  = 38;
+  const logoHeight = 52;
+  const logoGap    = 20;  // distância entre logo e QR
+  const textHeight = 40;  // espaço para o nome da cifra
 
   new QRCode(tempDiv, {
     text: payload,
-    width: size,
-    height: size,
+    width: qrSize,
+    height: qrSize,
     correctLevel: QRCode.CorrectLevel.M
   });
 
-  // Deixar a lib renderizar
   setTimeout(() => {
-    const qrImg = tempDiv.querySelector('img');
-    const qrCanvas = tempDiv.querySelector('canvas');
+    const qrImgEl    = tempDiv.querySelector('img');
+    const qrCanvasEl = tempDiv.querySelector('canvas');
 
-    if (!qrImg && !qrCanvas) {
+    if (!qrImgEl && !qrCanvasEl) {
       console.error('[Cifrei] QR não gerado.');
       return;
     }
 
-    const textHeight = 40; // espaço embaixo pro nome
-    finalCanvas.width = size;
-    finalCanvas.height = size + textHeight;
+    // Função que efetivamente desenha tudo no canvas final
+    function drawAll(qrImg, logoImg) {
+      const canvasWidth  = qrSize + outerMargin * 2;
+      const qrY          = outerMargin + logoHeight + logoGap;
+      const canvasHeight = qrY + qrSize + textHeight + outerMargin;
 
-    const ctx = finalCanvas.getContext('2d');
+      finalCanvas.width  = canvasWidth;
+      finalCanvas.height = canvasHeight;
 
-    // Fundo branco
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+      const ctx = finalCanvas.getContext('2d');
 
-    // Desenhar o QR
-    if (qrCanvas) {
-      ctx.drawImage(qrCanvas, 0, 0, size, size);
-    } else if (qrImg) {
-      // img.src é um dataURL, desenha no canvas
-      const img = new Image();
-      img.onload = function () {
-        ctx.drawImage(img, 0, 0, size, size);
-        drawQrLabelOnCanvas(ctx, label, size, textHeight);
-      };
-      img.src = qrImg.src;
-      // mostrar modal depois, no onload
+      // Fundo branco
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+      // Desenhar logo centralizada no topo
+      const logoX = (canvasWidth - logoWidth) / 2;
+      const logoY = outerMargin;
+
+      if (logoImg) {
+        ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
+      }
+
+      // Desenhar QR
+      const qrX = outerMargin;
+      ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+      // Borda em volta de tudo
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(
+        1,
+        1,
+        canvasWidth - 2,
+        canvasHeight - 2
+      );
+
+      // Texto (nome da cifra) abaixo do QR
+      drawQrLabelOnCanvas(ctx, label, canvasWidth, qrY, qrSize, textHeight);
+
+      // Abre o modal no fim
       showQrModal();
-      return;
     }
 
-    // Desenhar o texto (nome da cifra) abaixo
-    drawQrLabelOnCanvas(ctx, label, size, textHeight);
+    // Cria uma imagem do QR gerado pela lib
+    const qrImg = new Image();
+    qrImg.onload = function () {
+      // Agora carrega a logo
+      const logoImg = new Image();
+      logoImg.onload = function () {
+        drawAll(qrImg, logoImg);
+      };
+      // AJUSTE AQUI se o caminho da imagem for outro
+      logoImg.src = 'assets/img/Img_C_ifre_i.png';
+    };
 
-    // abrir o modal
-    showQrModal();
+    if (qrCanvasEl) {
+      qrImg.src = qrCanvasEl.toDataURL('image/png');
+    } else if (qrImgEl) {
+      qrImg.src = qrImgEl.src;
+    }
 
   }, 0);
 }
 
-function drawQrLabelOnCanvas(ctx, label, size, textHeight) {
+function drawQrLabelOnCanvas(ctx, label, canvasWidth, qrY, qrSize, textHeight) {
   ctx.fillStyle = '#000000';
   ctx.font = '12px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  const y = size + textHeight / 2;
-  ctx.fillText(label, size / 2, y);
+  const centerX = canvasWidth / 2;
+  const y = qrY + qrSize + textHeight / 2;
+
+  let text = label || 'Cifra sem nome';
+
+  // Normaliza/remover acentos se quiser evitar coisas estranhas
+  text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  const maxChars = 40;
+  if (text.length > maxChars) {
+    text = text.slice(0, maxChars - 3) + '...';
+  }
+
+  ctx.fillText(text, centerX, y);
 }
+
 
 function showQrModal() {
   const modalEl = document.getElementById('qrCodeModal');
@@ -1570,16 +1613,31 @@ function setupQrDownloadButton() {
   if (!btnDownload || !finalCanvas) return;
 
   btnDownload.addEventListener('click', function () {
-    const dataUrl = finalCanvas.toDataURL('image/jpeg', 0.9); // ou 'image/png'
+    const dataUrl = finalCanvas.toDataURL('image/jpeg', 0.9);
+
+    // Pega o nome da cifra
+    let name = getCifraNameForQr() || 'cifra-sem-nome';
+
+    // Normaliza/remover acentos
+    name = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    // Troca espaços por hífen e remove caracteres inválidos pra arquivo
+    name = name
+      .trim()
+      .replace(/\s+/g, '_')               // espaços -> underline
+      .replace(/[^a-zA-Z0-9\-.]+/g, ''); // tira caracteres estranhos
+
+    const filename = 'QR-Cifrei_' + name + '.jpg';
 
     const a = document.createElement('a');
     a.href = dataUrl;
-    a.download = 'cifrei-qr.jpg';
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   });
 }
+
 
 
 // 9) Reset geral da página cifrar após salvar/atualizar
