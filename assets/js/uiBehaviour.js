@@ -14,9 +14,12 @@ document.addEventListener('DOMContentLoaded', function () {
   setupFraseSegredoDecModal();
   setupCopiarMsgAberta();
   setupDecifrarPageForDecryption();
+  setupEditarPageForDecryption()
   setupCifraAbertaPage();
   setupEditarCifraPage();
   setupQrDownloadButton();
+  setupClipboardModal();        // liga eventos do modal #confirmaUsarCifra
+  initClipboardWatcherForPage(); // lê clipboard em cifrar/decifrar e, se for o caso, abre o modal
   
   // se você já tiver setupCifragemPageBottom em outro trecho, mantém a chamada:
   if (typeof setupCifragemPageBottom === 'function') {
@@ -853,30 +856,58 @@ function setupFraseSegredoDecModal() {
   });
 }
 
+function getCamposDecifragem() {
+  // Na decifrar.html:
+  //   chave  -> #txtChave
+  //   texto  -> #txtMsgEntrada
+  //
+  // Na editarcifra.html:
+  //   chave  -> #txtChaveBottom
+  //   texto  -> #txtMsgBottom
+
+  const inputChave = document.querySelector('#txtChave, #txtChaveBottom');
+  const inputMsg   = document.querySelector('#txtMsgEntrada, #txtMsgBottom');
+
+  if (!inputChave || !inputMsg) {
+    console.warn('[Cifrei] Campos de decifragem não encontrados na página atual.');
+    return null;
+  }
+
+  return {
+    chave: inputChave.value.trim(),
+    msgCifrada: inputMsg.value.trim()
+  };
+}
+
 //
 // Página decifrar.html – preparar contexto ao clicar em "Decifrar"
 //
+//
+// Página decifrar.html e editarcifra.html – preparar contexto ao clicar em "Decifrar"
+//
 function setupDecifrarPageForDecryption() {
   const btnDecifrar = document.getElementById('btnDecifrar');
-  const campoKey    = document.getElementById('txtChave');
-  const campoMsg    = document.getElementById('txtMsgEntrada');
-  const dropdown    = document.getElementById('dpdownChave');
 
-  if (!btnDecifrar || !campoKey || !campoMsg) {
-    // Não estamos na decifrar.html
+  // Se não há botão, não é nenhuma das duas páginas
+  if (!btnDecifrar) {
     return;
   }
 
+  // ELEMENTOS ESPECÍFICOS DA decifrar.html
+  const campoKeyDecifrar  = document.getElementById('txtChave');
+  const campoMsgDecifrar  = document.getElementById('txtMsgEntrada');
+  const dropdown          = document.getElementById('dpdownChave');
+
   // 🔹 Comportamento ESPECÍFICO da decifrar.html:
   // quando muda o dpdownChave, carregar key75 + ciphertext (se houver)
-  if (dropdown && typeof getCifragemRecordById === 'function') {
+  if (dropdown && campoKeyDecifrar && campoMsgDecifrar && typeof getCifragemRecordById === 'function') {
     dropdown.addEventListener('change', async function () {
       const id = dropdown.value;
 
       // se nada selecionado, limpa só a mensagem
       if (!id) {
-        campoMsg.value = '';
-        campoMsg.dispatchEvent(new Event('input'));
+        campoMsgDecifrar.value = '';
+        campoMsgDecifrar.dispatchEvent(new Event('input'));
         return;
       }
 
@@ -886,37 +917,52 @@ function setupDecifrarPageForDecryption() {
         return;
       }
 
-      // garante que a chave fique sincronizada com o registro (mesmo que
-      // o setupDropdownChave já preencha via dataset.key75)
+      // garante que a chave fique sincronizada com o registro
       if (rec.key75) {
-        campoKey.value = rec.key75;
-        campoKey.dispatchEvent(new Event('input'));
+        campoKeyDecifrar.value = rec.key75;
+        campoKeyDecifrar.dispatchEvent(new Event('input'));
       }
 
-      // aqui entra o que você queria: preencher o ciphertext, quando existir
+      // preenche o ciphertext, quando existir
       if (rec.ciphertext) {
-        campoMsg.value = rec.ciphertext;
+        campoMsgDecifrar.value = rec.ciphertext;
       } else {
-        campoMsg.value = '';
+        campoMsgDecifrar.value = '';
       }
-      campoMsg.dispatchEvent(new Event('input'));
+      campoMsgDecifrar.dispatchEvent(new Event('input'));
     });
   }
 
-
+  // 🔹 Clique em "Decifrar" – funciona nas DUAS páginas
   btnDecifrar.addEventListener('click', async function (event) {
     event.preventDefault();
 
-    const key75      = (campoKey.value || '').trim();
-    const ciphertext = (campoMsg.value || '').trim();
+    const campos = getCamposDecifragem();
+    if (!campos) {
+      alert('Não encontrei os campos de chave e texto cifrado.');
+      return;
+    }
 
+    const key75      = campos.chave;
+    const ciphertext = campos.msgCifrada;
     const radio4   = document.getElementById('formCheck-4');
-
+    const editCtx  = window.cifreiEditarRecordForDecryption || null;
 
     let ctx = null;
 
-    // Caso: cifra INCOMPLETA salva (radio4 marcado e select com um id)
-    if (radio4 && radio4.checked && dropdown && dropdown.value) {
+    // 1) Caso: decifragem iniciada a partir da editarcifra.html
+    if (editCtx && editCtx.id != null) {
+      ctx = {
+        type:       'saved-complete',
+        id:         editCtx.id,
+        name:       editCtx.name  || '',
+        notes:      editCtx.notes || '',
+        key75:      key75,
+        ciphertext: ciphertext
+      };
+
+    // 2) Caso: cifra INCOMPLETA salva (radio4 + dropdown na decifrar.html)
+    } else if (radio4 && radio4.checked && dropdown && dropdown.value) {
       const id = Number(dropdown.value);
       let rec = null;
 
@@ -937,8 +983,9 @@ function setupDecifrarPageForDecryption() {
         key75:      key75,
         ciphertext: ciphertext
       };
+
+    // 3) Caso geral: decifragem MANUAL (sem vínculo com banco)
     } else {
-      // Caso: decifragem MANUAL (não associada a cifra salva)
       ctx = {
         type:       'manual',
         id:         null,
@@ -952,17 +999,61 @@ function setupDecifrarPageForDecryption() {
     // guarda contexto global para o modal usar
     window.cifreiDecifragemContext = ctx;
 
+
     // abre o modal de frase-segredo dec
     const modalEl = document.getElementById('fraseSegredoDec');
     if (modalEl && window.bootstrap && bootstrap.Modal) {
       const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
       modalInstance.show();
     } else {
-      console.warn('[Cifrei] Modal fraseSegredoDec não encontrado ou Bootstrap ausente na decifrar.html.');
+      console.warn('[Cifrei] Modal fraseSegredoDec não encontrado ou Bootstrap ausente.');
     }
   });
 
+  // continua valendo para a página de decifrar
   initQrScanner('decifrar');
+}
+
+
+//
+// Preparar decifragem na editarcifra.html
+//
+function setupEditarPageForDecryption() {
+
+  const btnDecifrar = document.getElementById('btnDecifrarEditar'); 
+  // 👉 Use o ID real do botão que você criou na editarcifra.html
+  if (!btnDecifrar) return; // se não existe, não estamos na editarcifra.html
+
+  btnDecifrar.addEventListener('click', function (event) {
+    event.preventDefault();
+
+    const campos = getCamposDecifragem();
+    if (!campos) {
+      alert('Não encontrei chave ou texto cifrado.');
+      return;
+    }
+
+    const { chave, msgCifrada } = campos;
+
+    // contexto para o modal
+    window.cifreiDecifragemContext = {
+      type: 'manual',   // ou 'saved-incomplete', se quiser buscar no DB
+      id: null,
+      name: '',
+      notes: '',
+      key75: chave,
+      ciphertext: msgCifrada
+    };
+
+    // abre o modal de frase-segredo
+    const modalEl = document.getElementById('fraseSegredoDec');
+    if (modalEl && window.bootstrap && bootstrap.Modal) {
+      const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modalInstance.show();
+    } else {
+      console.warn('[Cifrei] Modal fraseSegredoDec não encontrado na editarcifra.html.');
+    }
+  });
 }
 
 //
@@ -985,31 +1076,38 @@ function setupCifraAbertaPage() {
 
   const data = getDecifragemTempData();
   if (!data) {
+    if (btnEditar) {
+      btnEditar.classList.add('d-none');  // 🔹 some com o botão se não há dados
+    }
     console.warn('[Cifrei] Nenhum dado de decifragem encontrado para cifraaberta.html.');
     return;
   }
+
 
   // Preenche campos principais
   txtKey.value   = data.key75      || '';
   txtMsgC.value  = data.ciphertext || '';
   txtPlain.value = data.plaintext  || '';
 
-  // Nome da cifra (quando existir)
-  if (inputNome) {
-    inputNome.value = data.name || '';
-    if (divNome && !data.name) {
-      divNome.classList.add('d-none');
-      btnEditar.classList.add('d-none');
-    }
+// === Nome da cifra ===
+if (inputNome && divNome) {
+  if (data.name && data.name.trim() !== '') {
+    inputNome.value = data.name.trim();
+    divNome.classList.remove('d-none');
+  } else {
+    divNome.classList.add('d-none');
   }
+}
 
-  // Observações (quando existirem)
-  if (inputObs) {
-    inputObs.value = data.notes || '';
-    if (divObs && !data.notes) {
-      divObs.classList.add('d-none');
-    }
+// === Observações ===
+if (inputObs && divObs) {
+  if (data.notes && data.notes.trim() !== '') {
+    inputObs.value = data.notes.trim();
+    divObs.classList.remove('d-none');
+  } else {
+    divObs.classList.add('d-none');
   }
+}
 
   // Botão Editar → vai para editarcifra.html com base no id salvo
   if (btnEditar) {
@@ -1029,8 +1127,8 @@ function setupCifraAbertaPage() {
         window.location.href = 'editarcifra.html';
       });
     } else {
-      // Se não há id (decifragem manual), opcionalmente esconde o botão
-      // btnEditar.classList.add('d-none');
+      // Se não há id (decifragem manual), esconde o botão
+      btnEditar.classList.add('d-none');
       console.warn('[Cifrei] Cifra aberta sem id associado; edição via banco não disponível.');
     }
   }
@@ -1060,6 +1158,7 @@ function setupEditarCifraPage() {
 
   let originalRecord = null;
   btnEditar.disabled = true;
+  btnEditar.classList.add('d-none');
 
   // --- Carregar registro para edição ---
   async function carregarDadosEdicao() {
@@ -1095,6 +1194,15 @@ function setupEditarCifraPage() {
       }
 
       originalRecord = rec;
+      btnEditar.classList.remove('d-none');
+
+    // Disponibiliza o registro atual para outros fluxos (ex.: decifragem)
+      window.cifreiEditarRecordForDecryption = {
+      id:    rec.id,
+      name:  rec.name  || '',
+      notes: rec.notes || ''
+      };
+
 
       // Preenche campos
       if (inputNome) inputNome.value = rec.name || '';
@@ -1721,6 +1829,7 @@ function buildCifreiQrPayload() {
   return parts.join('|');
 }
 
+
 // =================== QR SCANNER (CÂMERA) ===================
 
 // Estado global do scanner
@@ -2025,3 +2134,308 @@ function showQrInvalidMessage() {
         fallbackRadio.dispatchEvent(new Event('change'));
     }
 }
+
+// ====== CLIPBOARD / CIFREI: detecção de chave/cifra ======
+
+const CIFREI_BASE_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*()-_=+";
+
+function isCifreiKey(str) {
+  if (!str || str.length !== CIFREI_BASE_CHARS.length) return false;
+
+  const seen = new Set();
+  for (const ch of str) {
+    if (!CIFREI_BASE_CHARS.includes(ch)) return false;
+    if (seen.has(ch)) return false;
+    seen.add(ch);
+  }
+
+  // Tem que ter exatamente os mesmos 75 caracteres
+  return seen.size === CIFREI_BASE_CHARS.length;
+}
+
+/**
+ * Detecta se o texto do clipboard contém:
+ * - uma chave Cifrei pura (75 chars únicos)
+ * - ou um payload CIFREI|<key75> ou CIFREI|<key75>|<ciphertext>
+ *
+ * Retorna:
+ *   null se não for nada Cifrei
+ *   { type: 'chave' | 'cifra-completa', key, ciphertext }
+ */
+function detectCifreiFromClipboard(rawText) {
+  if (!rawText) return null;
+
+  const text = rawText.trim();
+  if (!text) return null;
+
+  // 1) Formato CIFREI|key|ciphertext (ou só CIFREI|key)
+  if (text.startsWith('CIFREI|')) {
+    const parts = text.split('|');
+
+    if (parts.length >= 2) {
+      const key = parts[1];
+
+      if (isCifreiKey(key)) {
+        let ciphertext = '';
+
+        if (parts.length >= 3) {
+          // Junta o resto, caso o ciphertext contenha '|'
+          ciphertext = parts.slice(2).join('|');
+        }
+
+        if (ciphertext && ciphertext.trim() !== '') {
+          return { type: 'cifra-completa', key, ciphertext };
+        } else {
+          return { type: 'chave', key, ciphertext: '' };
+        }
+      }
+    }
+  }
+
+  // 2) Chave pura (75 chars sem repetição)
+  if (isCifreiKey(text)) {
+    return { type: 'chave', key: text, ciphertext: '' };
+  }
+
+  return null;
+}
+
+// ====== CLIPBOARD: lembrar apenas o último texto perguntado ======
+
+function getLastClipboardAsked() {
+  try {
+    return localStorage.getItem('cifreiLastClipboardAsked') || '';
+  } catch (e) {
+    console.error('[Cifrei] Erro ao ler último clipboard perguntado:', e);
+    return '';
+  }
+}
+
+function setLastClipboardAsked(text) {
+  if (!text) {
+    try {
+      localStorage.removeItem('cifreiLastClipboardAsked');
+    } catch (e) {
+      console.error('[Cifrei] Erro ao limpar último clipboard perguntado:', e);
+    }
+    return;
+  }
+
+  try {
+    localStorage.setItem('cifreiLastClipboardAsked', text);
+  } catch (e) {
+    console.error('[Cifrei] Erro ao salvar último clipboard perguntado:', e);
+  }
+}
+
+// Contexto atual do modal de clipboard
+let cifreiClipboardPendingAction = null;
+
+function setupClipboardModal() {
+  const modalEl = document.getElementById('confirmaUsarCifra');
+  const btnOk   = document.getElementById('btnOkUsarCifra');
+  const btnSair = document.getElementById('btnSairUsarCifra');
+
+  if (!modalEl || !btnOk || !btnSair) {
+    // Se o modal não existe nesta página, não faz nada.
+    return;
+  }
+
+  const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+  btnOk.addEventListener('click', function (event) {
+    event.preventDefault();
+
+    if (cifreiClipboardPendingAction) {
+      applyClipboardCifreiAction(cifreiClipboardPendingAction);
+      setLastClipboardAsked(cifreiClipboardPendingAction.rawText);
+    }
+
+    cifreiClipboardPendingAction = null;
+    bsModal.hide();
+  });
+
+  btnSair.addEventListener('click', function (event) {
+    event.preventDefault();
+
+    if (cifreiClipboardPendingAction) {
+      // Mesmo dizendo "não", já marcamos como perguntado
+      setLastClipboardAsked(cifreiClipboardPendingAction.rawText);
+    }
+
+    cifreiClipboardPendingAction = null;
+    bsModal.hide();
+  });
+}
+
+/**
+ * Aplica a chave/cifra nos campos da página, conforme o contexto.
+ */
+function applyClipboardCifreiAction(action) {
+  let { pageType, info, rawText } = action;
+  if (!info || !info.key) return;
+
+  // 🔹 "Farejar" a página pelo DOM
+  const hasDecifrarMarkers =
+    document.getElementById('dpdownChave') ||  // típico da decifrar.html
+    document.getElementById('formCheck-4');    // também só na decifrar
+
+  const hasCifrarMarkers =
+    document.getElementById('cifragemPageTop') || // típico da cifrar.html
+    document.getElementById('cifragemPageBottom');
+
+  if (hasDecifrarMarkers) {
+    pageType = 'decifrar';
+  } else if (hasCifrarMarkers && !hasDecifrarMarkers) {
+    pageType = 'cifrar';
+  }
+
+  // === CIFRAR.HTML: só usamos a chave ===
+  if (pageType === 'cifrar') {
+    const campoChave = document.getElementById('txtChave');
+    if (campoChave) {
+      campoChave.value = info.key;
+      campoChave.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    return;
+  }
+
+  // === DECIFRAR.HTML: chave + (se houver) texto cifrado ===
+  if (pageType === 'decifrar') {
+    const campoChave = document.getElementById('txtChave');
+    const campoMsg   = document.getElementById('txtMsgEntrada');
+
+    if (campoChave) {
+      campoChave.value = info.key;
+      campoChave.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    // 1) ciphertext principal vindo do detectCifreiFromClipboard
+    let ciphertext = (info.ciphertext || '').trim();
+
+    // 2) Se ainda está vazio, tenta extrair direto do rawText (CIFREI|key|ciphertext)
+    if (!ciphertext && typeof rawText === 'string') {
+      const text = rawText.trim();
+      if (text.startsWith('CIFREI|')) {
+        const parts = text.split('|');
+        if (parts.length >= 3) {
+          ciphertext = parts.slice(2).join('|').trim();
+        }
+      }
+    }
+
+    // 3) Se temos ciphertext não-vazio, preenche #txtMsgEntrada
+    if (campoMsg && ciphertext) {
+      campoMsg.value = ciphertext;
+      campoMsg.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    return;
+  }
+
+  // Se por algum motivo não conseguimos classificar a página,
+  // pelo menos garantimos a chave
+  const fallbackCampoChave = document.getElementById('txtChave');
+  if (fallbackCampoChave) {
+    fallbackCampoChave.value = info.key;
+    fallbackCampoChave.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+}
+
+
+// ====== CLIPBOARD: integração com cifrar.html e decifrar.html ======
+
+function initClipboardWatcherForPage() {
+  if (!navigator.clipboard || !navigator.clipboard.readText) {
+    console.warn('[Cifrei] navigator.clipboard.readText não disponível.');
+    return;
+  }
+
+  const path = (window.location && window.location.pathname) ? window.location.pathname : '';
+
+  let pageType = null;
+  if (path.endsWith('cifrar.html')) {
+    pageType = 'cifrar';
+  } else if (path.endsWith('decifrar.html')) {
+    pageType = 'decifrar';
+  }
+
+  if (!pageType) {
+    return; // não é nenhuma das duas páginas
+  }
+
+  let alreadyTriggered = false;
+
+  async function handleUserGesture() {
+    if (alreadyTriggered) return;
+    alreadyTriggered = true;
+
+    // Remove os listeners assim que disparar uma vez
+    document.removeEventListener('pointerdown', handleUserGesture);
+    document.removeEventListener('keydown', handleUserGesture);
+
+    try {
+      console.log('[Cifrei] Vou tentar ler o clipboard...');
+      const text = await navigator.clipboard.readText();
+      console.log('[Cifrei] Texto lido do clipboard:', text);
+
+      if (!text || !text.trim()) return;
+
+      const lastAsked = getLastClipboardAsked();
+      if (lastAsked && lastAsked === text) {
+        // Já perguntamos sobre esse texto enquanto ele estava no clipboard
+        return;
+      }
+
+      const info = detectCifreiFromClipboard(text);
+      if (!info) {
+        // Se o clipboard atual não é Cifrei, "zera" o último perguntado
+        setLastClipboardAsked('');
+        return;
+      }
+
+      // Regras para não encher o saco se já tem dados preenchidos
+      if (pageType === 'cifrar') {
+        const campoChave = document.getElementById('txtChave');
+        if (!campoChave) return;
+
+        if (campoChave.value && campoChave.value.trim() !== '') {
+          // Usuário já tem uma chave, não vamos atrapalhar
+          setLastClipboardAsked(text);
+          return;
+        }
+      } else if (pageType === 'decifrar') {
+        const campoChave = document.getElementById('txtChave');
+        const campoMsg   = document.getElementById('txtMsgEntrada');
+        if (!campoChave || !campoMsg) return;
+
+        if (campoChave.value.trim() && campoMsg.value.trim()) {
+          setLastClipboardAsked(text);
+          return;
+        }
+      }
+
+      // Guarda contexto e abre o modal bonitinho
+      const modalEl = document.getElementById('confirmaUsarCifra');
+      if (!modalEl) return;
+
+      cifreiClipboardPendingAction = {
+        pageType,
+        info,
+        rawText: text
+      };
+
+      const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      bsModal.show();
+
+    } catch (err) {
+      console.warn('[Cifrei] Não foi possível ler a área de transferência:', err);
+    }
+  }
+
+  // Aguarda o primeiro gesto do usuário na página
+  document.addEventListener('pointerdown', handleUserGesture);
+  document.addEventListener('keydown', handleUserGesture);
+}
+
