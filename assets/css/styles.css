@@ -22,11 +22,13 @@ textarea.chave::placeholder {
   overflow-wrap: break-word;
   color: #aeaeae;
   opacity: 1;
+  font-size: 13px;
 }
 
 textarea.mensagem::placeholder {
   color: #aeaeae;
   opacity: 1;
+  font-size: 13px;
 }
 
 .clickable {
