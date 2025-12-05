@@ -62,7 +62,7 @@ textarea.form-control:focus {
 }
 
 textarea.deadinput:focus {
-  border-color: none !important;
+  /*border-color: none !important;*/
   box-shadow: none !important;
   outline: none !important;
 }
