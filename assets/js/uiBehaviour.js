@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
   setupQrDownloadButton();
   setupClipboardModal();        // liga eventos do modal #confirmaUsarCifra
   initClipboardWatcherForPage(); // lê clipboard em cifrar/decifrar e, se for o caso, abre o modal
+  setupPasswordGeneratorModal();
   
   // se você já tiver setupCifragemPageBottom em outro trecho, mantém a chamada:
   if (typeof setupCifragemPageBottom === 'function') {
@@ -2439,3 +2440,33 @@ function initClipboardWatcherForPage() {
   document.addEventListener('keydown', handleUserGesture);
 }
 
+function setupPasswordGeneratorModal() {
+  const trigger = document.getElementById("icnSenhaAleat");
+  const modalEl = document.getElementById("gerarSenhaAleat");
+
+  if (!trigger || !modalEl || !window.bootstrap || !bootstrap.Modal) return;
+
+  const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+  trigger.addEventListener("click", function () {
+    bsModal.show();
+  });
+
+modalEl.addEventListener("shown.bs.modal", function () {
+
+  if (typeof resetPasswordPopup === "function") {
+    resetPasswordPopup();
+  }
+
+  if (typeof initPasswordGenerator === "function") {
+    initPasswordGenerator();
+  }
+
+});
+
+  modalEl.addEventListener("hidden.bs.modal", function () {
+    if (typeof resetPasswordPopup === "function") {
+      resetPasswordPopup();
+    }
+  });
+}
