@@ -34,9 +34,15 @@ function setVal(id, val) {
   if (el) el.value = val;
 }
 
-function sanitizeNumericInput(id, maxDigits) {
+function sanitizeNumericInput(id, maxDigits, options = {}) {
   const el = document.getElementById(id);
   if (!el) return;
+
+  const {
+    clampOnInput = false,
+    clampOnBlur = true,
+    clampOnlyWhenMaxDigitsReached = false
+  } = options;
 
   el.setAttribute("maxlength", String(maxDigits));
 
@@ -45,9 +51,28 @@ function sanitizeNumericInput(id, maxDigits) {
     if (maxDigits) v = v.slice(0, maxDigits);
     this.value = v;
 
-    enforcePasswordRules();
-    generatePassword();
+    if (clampOnInput) {
+      const shouldClamp =
+        !clampOnlyWhenMaxDigitsReached || v.length >= maxDigits;
+
+      if (shouldClamp) {
+        enforcePasswordRules();
+        generatePassword();
+      }
+    }
   });
+
+  if (clampOnBlur) {
+    el.addEventListener("blur", function () {
+      if (this.value === "") {
+        if (id === "inputCaracTotais") this.value = "8";
+        else this.value = "0";
+      }
+
+      enforcePasswordRules();
+      generatePassword();
+    });
+  }
 }
 
 function enforcePasswordRules() {
@@ -170,10 +195,26 @@ function initPasswordGenerator() {
     if (!document.getElementById(id)) return;
   }
 
-  sanitizeNumericInput("inputCaracTotais", 2);
-  sanitizeNumericInput("inputMaiusc", 1);
-  sanitizeNumericInput("inputNumero", 1);
-  sanitizeNumericInput("inputEspec", 1);
+sanitizeNumericInput("inputCaracTotais", 2, {
+  clampOnInput: true,
+  clampOnBlur: true,
+  clampOnlyWhenMaxDigitsReached: true
+});
+
+sanitizeNumericInput("inputMaiusc", 1, {
+  clampOnInput: true,
+  clampOnBlur: true
+});
+
+sanitizeNumericInput("inputNumero", 1, {
+  clampOnInput: true,
+  clampOnBlur: true
+});
+
+sanitizeNumericInput("inputEspec", 1, {
+  clampOnInput: true,
+  clampOnBlur: true
+});
 
   document.getElementById("divIconeRefresh").addEventListener("click", generatePassword);
   document.getElementById("btnUsarSenhaGerada").addEventListener("click", useGeneratedPassword);
