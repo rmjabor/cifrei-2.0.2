@@ -2308,8 +2308,8 @@ let cifreiClipboardPendingAction = null;
 
 function setupClipboardModal() {
   const modalEl = document.getElementById('confirmaUsarCifra');
-  const btnOk   = document.getElementById('btnOkUsarCifra');
-  const btnSair = document.getElementById('btnSairUsarCifra');
+  const btnOk   = document.getElementById('btnOkUsarCifra') || document.getElementById('btnOkUsarCifra-1');
+  const btnSair = document.getElementById('btnSairUsarCifra') || document.getElementById('btnSairUsarCifra-1');
 
   if (!modalEl || !btnOk || !btnSair) {
     // Se o modal não existe nesta página, não faz nada.
@@ -2350,19 +2350,22 @@ function applyClipboardCifreiAction(action) {
   let { pageType, info, rawText } = action;
   if (!info || !info.key) return;
 
-  // 🔹 "Farejar" a página pelo DOM
-  const hasDecifrarMarkers =
-    document.getElementById('dpdownChave') ||  // típico da decifrar.html
-    document.getElementById('formCheck-4');    // também só na decifrar
+  // Prioriza o tipo de página já identificado pelo pathname.
+  // Só faz fallback para o DOM se ele vier ausente ou inválido.
+  if (pageType !== 'cifrar' && pageType !== 'decifrar') {
+    const hasCifrarMarkers =
+      document.getElementById('cifragemPageTop') ||
+      document.getElementById('cifragemPageBottom');
 
-  const hasCifrarMarkers =
-    document.getElementById('cifragemPageTop') || // típico da cifrar.html
-    document.getElementById('cifragemPageBottom');
+    const hasDecifrarMarkers =
+      document.getElementById('btnDecifrar') ||
+      document.getElementById('fraseSegredoDec');
 
-  if (hasDecifrarMarkers) {
-    pageType = 'decifrar';
-  } else if (hasCifrarMarkers && !hasDecifrarMarkers) {
-    pageType = 'cifrar';
+    if (hasCifrarMarkers && !hasDecifrarMarkers) {
+      pageType = 'cifrar';
+    } else if (hasDecifrarMarkers) {
+      pageType = 'decifrar';
+    }
   }
 
   // === CIFRAR.HTML: só usamos a chave ===
