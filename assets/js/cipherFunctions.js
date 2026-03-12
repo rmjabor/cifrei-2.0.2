@@ -1,208 +1,221 @@
 // cipherFunctions.js
-// Funções "core" de criptografia do Cifrei 2.0
+// Criptografia compacta do Cifrei
 
-// ---------------------------------------------
-// 1) Conjunto de caracteres válidos (75 chars)
-// ---------------------------------------------
-// espaço + 26 minúsculas + 26 maiúsculas + 10 dígitos + 13 especiais
-// ! @ # $ % & * ( ) - _ = +
-const ALL_CHARS_75 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*()-_=+";
+const CIFREI_KEY_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+const CIFREI_KEY_MIN_LENGTH = 8;
+const CIFREI_KEY_MAX_LENGTH = 25;
+const CIFREI_CODE_VERSION = 1;
+const CIFREI_GCM_IV_LENGTH = 12;
+const CIFREI_KDF_SALT_LENGTH = 16;
+const CIFREI_KDF_ITERATIONS = 310000;
 
-// ---------------------------------------------
-// 2) Geração de chave aleatória (75 caracteres)
-// ---------------------------------------------
-function generateKey() {
-  const arr = ALL_CHARS_75.split("");
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr.join("");
-}
-
-// ---------------------------------------------
-// 3) Derivação determinística da BASE (passphrase → PBKDF2 → Fisher-Yates)
-// ---------------------------------------------
-// ---------------------------------------------
-// Helper para garantir acesso ao Web Crypto (subtle)
-// ---------------------------------------------
-
-function getSubtleCrypto() {
-  const globalCrypto =
+function getCryptoObject() {
+  return (
     (typeof window !== 'undefined' && window.crypto) ||
     (typeof self !== 'undefined' && self.crypto) ||
-    null;
+    null
+  );
+}
+
+function getSubtleCrypto() {
+  const globalCrypto = getCryptoObject();
 
   if (!globalCrypto || !globalCrypto.subtle) {
     throw new Error(
-      "Web Crypto API (crypto.subtle) indisponível.\n" +
-      "Abra o Cifrei em um contexto seguro (https:// ou http://localhost).\n" +
-      "O Cifrei 2.0 não funciona via file://"
+      "Web Crypto API indisponível. Abra o Cifrei em https:// ou http://localhost."
     );
   }
 
   return globalCrypto.subtle;
 }
 
-async function deriveBytesFromPassphrase(
-  passphrase,
-  salt = "cifrei2-salt-v1",
-  length = 512
-) {
+function getSecureRandomBytes(length) {
+  const cryptoObj = getCryptoObject();
+  if (!cryptoObj || typeof cryptoObj.getRandomValues !== 'function') {
+    throw new Error('Fonte criptográfica aleatória indisponível.');
+  }
+
+  const bytes = new Uint8Array(length);
+  cryptoObj.getRandomValues(bytes);
+  return bytes;
+}
+
+function bytesToBase64Url(bytes) {
+  let binary = '';
+  const chunkSize = 0x8000;
+
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+
+  return btoa(binary)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/g, '');
+}
+
+function base64UrlToBytes(base64url) {
+  const normalized = String(base64url || '')
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+
+  const paddingLength = (4 - (normalized.length % 4)) % 4;
+  const padded = normalized + '='.repeat(paddingLength);
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  return bytes;
+}
+
+function normalizeSecretInput(value) {
+  return String(value || '').trim().normalize('NFC');
+}
+
+function sanitizeKeyInput(value) {
+  return String(value || '')
+    .replace(/[^A-Za-z0-9_-]/g, '')
+    .slice(0, CIFREI_KEY_MAX_LENGTH);
+}
+
+function isValidKey(value) {
+  const key = sanitizeKeyInput(value);
+  return key.length >= CIFREI_KEY_MIN_LENGTH && key.length <= CIFREI_KEY_MAX_LENGTH;
+}
+
+function generateKey() {
+  const randomBytes = getSecureRandomBytes(CIFREI_KEY_MAX_LENGTH);
+  let result = '';
+
+  for (let i = 0; i < CIFREI_KEY_MAX_LENGTH; i++) {
+    result += CIFREI_KEY_ALPHABET[randomBytes[i] % CIFREI_KEY_ALPHABET.length];
+  }
+
+  return result;
+}
+
+async function deriveAesKeyFromPassphraseAndKey(passphrase, chave, saltBytes) {
+  const subtle = getSubtleCrypto();
   const enc = new TextEncoder();
-const subtle = getSubtleCrypto();
+  const keyMaterialString = `CIFREI4|${normalizeSecretInput(passphrase)}|${sanitizeKeyInput(chave)}`;
 
-const passKey = await subtle.importKey(
-  "raw",
-  enc.encode(passphrase),
-  { name: "PBKDF2" },
-  false,
-  ["deriveBits"]
-);
+  const keyMaterial = await subtle.importKey(
+    'raw',
+    enc.encode(keyMaterialString),
+    { name: 'PBKDF2' },
+    false,
+    ['deriveKey']
+  );
 
-  const params = {
-    name: "PBKDF2",
-    salt: enc.encode(salt),
-    iterations: 200000,
-    hash: "SHA-256"
-  };
-
-  const bits = await crypto.subtle.deriveBits(params, passKey, length * 8);
-  return new Uint8Array(bits);
+  return subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: saltBytes,
+      iterations: CIFREI_KDF_ITERATIONS,
+      hash: 'SHA-256'
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
 }
 
-function byteStreamRandom(byteArray) {
-  let idx = 0;
-  return function (maxExclusive) {
-    if (idx + 4 > byteArray.length) idx = 0;
-
-    const v =
-      (byteArray[idx] << 24) |
-      (byteArray[idx + 1] << 16) |
-      (byteArray[idx + 2] << 8) |
-      byteArray[idx + 3];
-
-    idx += 4;
-    return (v >>> 0) % maxExclusive;
-  };
-}
-
-function shuffleDeterministic(arr, randFn) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = randFn(i + 1);
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a.join("");
-}
-
-async function generateBaseFromPassphrase(passphrase) {
-  const bytes = await deriveBytesFromPassphrase(passphrase, "cifrei2-salt-v1", 512);
-  const rand = byteStreamRandom(bytes);
-  return shuffleDeterministic(ALL_CHARS_75.split(""), rand);
-}
-
-// ---------------------------------------------
-// 4) Normalização de textos para cifrar/decifrar
-// ---------------------------------------------
-function normalizePlainTextForEncrypt(text) {
-  if (!text) return "";
-  let t = text.replace(/\s+/g, " "); // múltiplos espaços
-  t = t.trim();
-  return t;
-}
-
-function denormalizePlainTextAfterDecrypt(text) {
-  if (!text) return "";
-  let  t = text.replace(/\s+/g, " ");
-  t = t.trim();
-  return t;
-}
-
-// ---------------------------------------------
-// 5) Validação da chave
-// ---------------------------------------------
-function isValidKey75(chave) {
-  if (!chave || chave.length !== ALL_CHARS_75.length) return false;
-  const set = new Set(chave.split(""));
-  if (set.size !== ALL_CHARS_75.length) return false;
-
-  for (const c of ALL_CHARS_75) {
-    if (!set.has(c)) return false;
-  }
-  return true;
-}
-
-// ---------------------------------------------
-// 6) Função de CIFRAGEM: encrypt
-//
-//    - textoAberto → string
-//    - chave → permutação dos 75 chars
-//    - passphrase → string
-// ---------------------------------------------
 async function encrypt(textoAberto, chave, passphrase) {
-  const pass = (passphrase || "").trim();
-  if (!pass) {
-    throw new Error("Passphrase inválida ou vazia.");
-  }
+  const normalizedSecret = normalizeSecretInput(passphrase);
+  const normalizedKey = sanitizeKeyInput(chave);
 
-  if (!isValidKey75(chave)) {
-    throw new Error("Chave inválida para Cifrei 2.0 (75 caracteres sem repetição).");
-  }
+  if (!normalizedSecret) throw new Error('Frase segredo inválida ou vazia.');
+  if (!isValidKey(normalizedKey)) throw new Error('Chave inválida.');
 
-  const base = await generateBaseFromPassphrase(pass);
+  const subtle = getSubtleCrypto();
+  const enc = new TextEncoder();
+  const salt = getSecureRandomBytes(CIFREI_KDF_SALT_LENGTH);
+  const iv = getSecureRandomBytes(CIFREI_GCM_IV_LENGTH);
+  const aesKey = await deriveAesKeyFromPassphraseAndKey(normalizedSecret, normalizedKey, salt);
 
-  const normalizada = normalizePlainTextForEncrypt(textoAberto || "");
-  if (!normalizada) return "";
+  const cipherBuffer = await subtle.encrypt(
+    {
+      name: 'AES-GCM',
+      iv,
+      additionalData: enc.encode('C4'),
+      tagLength: 128
+    },
+    aesKey,
+    enc.encode(String(textoAberto || '').normalize('NFC'))
+  );
 
-  const mapa = {};
-  for (let i = 0; i < base.length; i++) {
-    mapa[base[i]] = chave[i];
-  }
+  const cipherBytes = new Uint8Array(cipherBuffer);
+  const payload = new Uint8Array(1 + salt.length + iv.length + cipherBytes.length);
+  payload[0] = CIFREI_CODE_VERSION;
+  payload.set(salt, 1);
+  payload.set(iv, 1 + salt.length);
+  payload.set(cipherBytes, 1 + salt.length + iv.length);
 
-  let resultado = "";
-  for (const ch of normalizada) {
-    resultado += mapa[ch] || "";
-  }
-
-  return resultado;
+  return bytesToBase64Url(payload);
 }
 
-// ---------------------------------------------
-// 7) Função de DECIFRAGEM: decrypt
-// ---------------------------------------------
+function tryParseCompactCode(textoCifrado) {
+  const payload = base64UrlToBytes(String(textoCifrado || '').trim());
+  const minimumLength = 1 + CIFREI_KDF_SALT_LENGTH + CIFREI_GCM_IV_LENGTH + 16;
+  if (payload.length < minimumLength) throw new Error('Código muito curto.');
+  if (payload[0] !== CIFREI_CODE_VERSION) throw new Error('Versão de código incompatível.');
+
+  return {
+    salt: payload.slice(1, 1 + CIFREI_KDF_SALT_LENGTH),
+    iv: payload.slice(1 + CIFREI_KDF_SALT_LENGTH, 1 + CIFREI_KDF_SALT_LENGTH + CIFREI_GCM_IV_LENGTH),
+    ciphertext: payload.slice(1 + CIFREI_KDF_SALT_LENGTH + CIFREI_GCM_IV_LENGTH)
+  };
+}
+
+async function decryptLegacyCIFREI3(textoCifrado, chave, passphrase) {
+  const normalizedKey = sanitizeKeyInput(chave);
+  if (!isValidKey(normalizedKey)) throw new Error('Chave inválida.');
+  const encodedPayload = textoCifrado.slice('CIFREI3.'.length);
+  const payloadBytes = base64UrlToBytes(encodedPayload);
+  const payload = JSON.parse(new TextDecoder().decode(payloadBytes));
+
+  const salt = base64UrlToBytes(payload.salt);
+  const iv = base64UrlToBytes(payload.iv);
+  const ciphertextBytes = base64UrlToBytes(payload.ct);
+  const aesKey = await deriveAesKeyFromPassphraseAndKey(passphrase, normalizedKey, salt);
+  const subtle = getSubtleCrypto();
+  const enc = new TextEncoder();
+
+  const plainBuffer = await subtle.decrypt(
+    { name: 'AES-GCM', iv, additionalData: enc.encode('CIFREI3'), tagLength: 128 },
+    aesKey,
+    ciphertextBytes
+  );
+
+  return new TextDecoder().decode(plainBuffer);
+}
+
 async function decrypt(textoCifrado, chave, passphrase) {
-  const pass = (passphrase || "").trim();
-  if (!pass) {
-    throw new Error("Passphrase inválida ou vazia.");
+  const normalizedSecret = normalizeSecretInput(passphrase);
+  const normalizedKey = sanitizeKeyInput(chave);
+
+  if (!normalizedSecret) throw new Error('Frase segredo inválida ou vazia.');
+  if (!isValidKey(normalizedKey)) throw new Error('Chave inválida.');
+
+  if (String(textoCifrado || '').startsWith('CIFREI3.')) {
+    return decryptLegacyCIFREI3(String(textoCifrado || '').trim(), normalizedKey, normalizedSecret);
   }
 
-  if (!isValidKey75(chave)) {
-    throw new Error("Chave inválida para Cifrei 2.0 (75 caracteres sem repetição).");
-  }
+  const parsed = tryParseCompactCode(textoCifrado);
+  const aesKey = await deriveAesKeyFromPassphraseAndKey(normalizedSecret, normalizedKey, parsed.salt);
+  const subtle = getSubtleCrypto();
+  const enc = new TextEncoder();
 
-  const base = await generateBaseFromPassphrase(pass);
+  const plainBuffer = await subtle.decrypt(
+    { name: 'AES-GCM', iv: parsed.iv, additionalData: enc.encode('C4'), tagLength: 128 },
+    aesKey,
+    parsed.ciphertext
+  );
 
-  const mapaInverso = {};
-  for (let i = 0; i < base.length; i++) {
-    mapaInverso[chave[i]] = base[i];
-  }
-
-  let intermediaria = "";
-  for (const ch of (textoCifrado || "")) {
-    intermediaria += mapaInverso[ch] || "";
-  }
-
-  return denormalizePlainTextAfterDecrypt(intermediaria);
+  return new TextDecoder().decode(plainBuffer);
 }
-
-// ---------------------------------------------
-// Exposição opcional (se quiser usar via módulos)
-// ---------------------------------------------
-// export {
-//   generateKey,
-//   encrypt,
-//   decrypt,
-//   isValidKey75,
-//   generateBaseFromPassphrase
-// };

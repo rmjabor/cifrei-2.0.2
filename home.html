@@ -15,7 +15,18 @@
 </head>
 
 <body style="padding-left: 1px;position: static;margin-top: 80px;">
-    <div class="modal fade" role="dialog" tabindex="-1" id="fraseSegredoDec" style="background: transparent;margin-top: 50px;">
+    <div class="modal fade" role="dialog" tabindex="-1" data-bs-backdrop="static" id="informaErroDec" style="background: transparent;margin-top: 80px;" area-hiden="true">
+        <div class="modal-dialog modal-confirma-excluir" role="document" id="dlgConfirmaExcluirCifra">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-center" style="background: #ffffff;border-radius: 0px 0px 0px 0px;border-style: none;border-top-left-radius: 10px;border-top-right-radius: 10px;"><img src="assets/img/Img_C_ifre_i.png" width="38" height="52"></div>
+                <div class="modal-body" style="background: #ffffff;padding: 0px;padding-top: 0px;height: auto;">
+                    <p style="font-size: 13px;text-align: center;margin-bottom: 0px;font-family: 'Open Sans', sans-serif;width: calc(100% - 30px);min-width: 200px;max-width: 290px;margin-right: auto;margin-left: auto;line-height: 1.2;color: #383839;padding: 4px;">Não foi possível validar a decifragem. Verifique a frase segredo, a chave e o código.</p>
+                </div>
+                <div class="modal-footer d-flex justify-content-center" style="background: #ffffff;border-bottom-right-radius: 10px;border-bottom-left-radius: 10px;border-style: none;height: 80px;padding-top: 8px;padding-bottom: 16px;"><button class="btn btn-light" id="btnOk" type="button" data-bs-dismiss="modal" style="font-family: 'Open Sans', sans-serif;font-size: 16px;background: #fd641d;color: rgb(255,255,255);width: 90px;border-style: none;box-shadow: 1px 1px 3px #a7a7a7;margin-right: 10px;">Entendi</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" data-bs-backdrop="static" id="fraseSegredoDec" style="background: transparent;margin-top: 50px;">
         <div class="modal-dialog mx-auto w-340" role="document">
             <div class="modal-content">
                 <div class="modal-header d-flex justify-content-center" style="background: #ffffff;border-radius: 0px 0px 0px 0px;border-style: none;border-top-left-radius: 10px;border-top-right-radius: 10px;"><img src="assets/img/Img_C_ifre_i.png" width="38" height="52"></div>
@@ -27,7 +38,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" role="dialog" tabindex="-1" id="confirmaExcluirCifra" style="background: transparent;margin-top: 80px;" area-hiden="true">
+    <div class="modal fade" role="dialog" tabindex="-1" data-bs-backdrop="static" id="confirmaExcluirCifra" style="background: transparent;margin-top: 80px;" area-hiden="true">
         <div class="modal-dialog modal-confirma-excluir" role="document" id="dlgConfirmaExcluirCifra">
             <div class="modal-content">
                 <div class="modal-header d-flex justify-content-center" style="background: #ffffff;border-radius: 0px 0px 0px 0px;border-style: none;border-top-left-radius: 10px;border-top-right-radius: 10px;"><img src="assets/img/Img_C_ifre_i.png" width="38" height="52"></div>

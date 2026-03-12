@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
   setupPassphraseStrength();
   setupFraseSegredoModal();
   setupFraseSegredoDecModal();
+  setupDecryptErrorModal();
   setupCopiarMsgAberta();
   setupDecifrarPageForDecryption();
   setupEditarPageForDecryption()
@@ -206,7 +207,7 @@ async function refreshChaveDropdownFromDB(dropdown, radio4) {
       const opt = document.createElement('option');
       opt.value = String(rec.id);
       opt.textContent = rec.name || '(sem nome)';
-      opt.dataset.key75 = rec.key75 || '';
+      opt.dataset.key75 = rec.key75 || rec.key || '';
       dropdown.appendChild(opt);
     });
 
@@ -274,7 +275,7 @@ function setupDropdownChave() {
         const opt = document.createElement('option');
         opt.value = String(rec.id);
         opt.textContent = rec.name || '(sem nome)';
-        opt.dataset.key75 = rec.key75 || '';
+        opt.dataset.key75 = rec.key75 || rec.key || '';
         dropdown.appendChild(opt);
       });
 
@@ -785,6 +786,34 @@ function setupFraseSegredoModal() {
   initQrScanner('cifrar');
 }
 
+
+function showDecryptErrorModal() {
+  const modalEl = document.getElementById('informaErroDec');
+  if (modalEl && window.bootstrap && bootstrap.Modal) {
+    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modalInstance.show();
+    return;
+  }
+
+  alert('Não foi possível decifrar. Verifique a frase segredo, a chave e o código.');
+}
+
+function setupDecryptErrorModal() {
+  const modalEl = document.getElementById('informaErroDec');
+  if (!modalEl || !window.bootstrap || !bootstrap.Modal) return;
+
+  const btnOk = document.getElementById('btnOK');
+  const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+  if (btnOk && !btnOk.dataset.cifreiBound) {
+    btnOk.dataset.cifreiBound = '1';
+    btnOk.addEventListener('click', function (event) {
+      event.preventDefault();
+      modalInstance.hide();
+    });
+  }
+}
+
 //
 // Modal da frase-segredo para DECIFRAR
 //
@@ -853,6 +882,10 @@ function setupFraseSegredoDecModal() {
       window.location.href = 'cifraaberta.html';
     } catch (err) {
       console.error('[Cifrei] Erro ao decifrar:', err);
+      input.value = '';
+      atualizarEstadoBotao();
+      bsModal.hide();
+      showDecryptErrorModal();
     }
   });
 }
@@ -2040,7 +2073,7 @@ function handleQrDecoded(qrText) {
     }
 
     const partes = qrText.split('|');
-    // Esperado: ["CIFREI", "<chave 75 chars>", "<ciphertext opcional>"]
+    // Esperado: ["CIFREI", "<chave>", "<código opcional>"]
     if (partes.length < 2) {
         console.warn('[Cifrei] Estrutura do QR inesperada:', partes);
         showQrInvalidMessage();
@@ -2050,10 +2083,8 @@ function handleQrDecoded(qrText) {
     const chave = partes[1] || '';
     const ciphertext = partes[2] || '';
 
-    // Opcional: validar tamanho da chave (75 chars)
-    if (chave.length !== 75) {
-        console.warn('[Cifrei] Chave com tamanho inesperado:', chave.length);
-        // Ainda assim, podemos tratar como inválido (mais seguro)
+    if (typeof isValidKey === 'function' && !isValidKey(chave)) {
+        console.warn('[Cifrei] Chave com formato inesperado:', chave);
         showQrInvalidMessage();
         return;
     }
@@ -2138,26 +2169,16 @@ function showQrInvalidMessage() {
 
 // ====== CLIPBOARD / CIFREI: detecção de chave/cifra ======
 
-const CIFREI_BASE_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*()-_=+";
-
 function isCifreiKey(str) {
-  if (!str || str.length !== CIFREI_BASE_CHARS.length) return false;
-
-  const seen = new Set();
-  for (const ch of str) {
-    if (!CIFREI_BASE_CHARS.includes(ch)) return false;
-    if (seen.has(ch)) return false;
-    seen.add(ch);
-  }
-
-  // Tem que ter exatamente os mesmos 75 caracteres
-  return seen.size === CIFREI_BASE_CHARS.length;
+  if (typeof isValidKey === 'function') return isValidKey(str);
+  const sanitized = String(str || '').replace(/[^A-Za-z0-9_-]/g, '');
+  return sanitized.length >= 8 && sanitized.length <= 25 && sanitized === str;
 }
 
 /**
  * Detecta se o texto do clipboard contém:
- * - uma chave Cifrei pura (75 chars únicos)
- * - ou um payload CIFREI|<key75> ou CIFREI|<key75>|<ciphertext>
+ * - uma chave Cifrei pura (8 a 25 chars Base64URL)
+ * - ou um payload CIFREI|<key> ou CIFREI|<key>|<ciphertext>
  *
  * Retorna:
  *   null se não for nada Cifrei
@@ -2193,7 +2214,7 @@ function detectCifreiFromClipboard(rawText) {
     }
   }
 
-  // 2) Chave pura (75 chars sem repetição)
+  // 2) Chave pura (8 a 25 chars Base64URL)
   if (isCifreiKey(text)) {
     return { type: 'chave', key: text, ciphertext: '' };
   }
