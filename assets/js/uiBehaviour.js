@@ -2304,29 +2304,33 @@ function setLastClipboardAsked(text) {
 }
 
 // Contexto atual do modal de clipboard
+// Contexto atual do modal de clipboard
 let cifreiClipboardPendingAction = null;
 
 function setupClipboardModal() {
   const modalEl = document.getElementById('confirmaUsarCifra');
-  const btnOk   = document.getElementById('btnOkUsarCifra') || document.getElementById('btnOkUsarCifra-1');
-  const btnSair = document.getElementById('btnSairUsarCifra') || document.getElementById('btnSairUsarCifra-1');
+  const btnOk =
+    document.getElementById('btnOkUsarCifra') ||
+    document.getElementById('btnOkUsarCifra-1');
+  const btnSair =
+    document.getElementById('btnSairUsarCifra') ||
+    document.getElementById('btnSairUsarCifra-1');
 
   if (!modalEl || !btnOk || !btnSair) {
-    // Se o modal não existe nesta página, não faz nada.
     return;
   }
 
   const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  let shouldApplyOnHide = false;
 
   btnOk.addEventListener('click', function (event) {
     event.preventDefault();
 
     if (cifreiClipboardPendingAction) {
-      applyClipboardCifreiAction(cifreiClipboardPendingAction);
       setLastClipboardAsked(cifreiClipboardPendingAction.rawText);
+      shouldApplyOnHide = true;
     }
 
-    cifreiClipboardPendingAction = null;
     bsModal.hide();
   });
 
@@ -2334,12 +2338,24 @@ function setupClipboardModal() {
     event.preventDefault();
 
     if (cifreiClipboardPendingAction) {
-      // Mesmo dizendo "não", já marcamos como perguntado
       setLastClipboardAsked(cifreiClipboardPendingAction.rawText);
     }
 
+    shouldApplyOnHide = false;
     cifreiClipboardPendingAction = null;
     bsModal.hide();
+  });
+
+  modalEl.addEventListener('hidden.bs.modal', function () {
+    if (!shouldApplyOnHide || !cifreiClipboardPendingAction) return;
+
+    shouldApplyOnHide = false;
+
+    // pequeno atraso para deixar o DOM estabilizar
+    setTimeout(() => {
+      applyClipboardCifreiAction(cifreiClipboardPendingAction);
+      cifreiClipboardPendingAction = null;
+    }, 30);
   });
 }
 
@@ -2347,80 +2363,66 @@ function setupClipboardModal() {
  * Aplica a chave/cifra nos campos da página, conforme o contexto.
  */
 function applyClipboardCifreiAction(action) {
-  let { pageType, info, rawText } = action;
-  if (!info || !info.key) return;
+  if (!action || !action.info || !action.info.key) return;
 
-  // Prioriza o tipo de página já identificado pelo pathname.
-  // Só faz fallback para o DOM se ele vier ausente ou inválido.
-  if (pageType !== 'cifrar' && pageType !== 'decifrar') {
-    const hasCifrarMarkers =
-      document.getElementById('cifragemPageTop') ||
-      document.getElementById('cifragemPageBottom');
+  const info = action.info;
+  const rawText = action.rawText || '';
 
-    const hasDecifrarMarkers =
-      document.getElementById('btnDecifrar') ||
-      document.getElementById('fraseSegredoDec');
+  const campoChave = document.getElementById('txtChave');
+  const campoMsg = document.getElementById('txtMsgEntrada');
 
-    if (hasCifrarMarkers && !hasDecifrarMarkers) {
-      pageType = 'cifrar';
-    } else if (hasDecifrarMarkers) {
-      pageType = 'decifrar';
-    }
+  if (!campoChave) return;
+
+  // Detecta a página real pelo DOM, sem depender só do pageType salvo
+  let resolvedPageType = action.pageType;
+
+  if (document.getElementById('btnDecifrar')) {
+    resolvedPageType = 'decifrar';
+  } else if (document.getElementById('btnCifrar')) {
+    resolvedPageType = 'cifrar';
   }
 
-  // === CIFRAR.HTML: só usamos a chave ===
-  if (pageType === 'cifrar') {
-    const campoChave = document.getElementById('txtChave');
-    if (campoChave) {
-      campoChave.value = info.key;
-      campoChave.dispatchEvent(new Event('input', { bubbles: true }));
-    }
+  // Extrai a cifra de forma robusta
+  let ciphertext = '';
 
-    return;
-  }
-
-  // === DECIFRAR.HTML: chave + (se houver) texto cifrado ===
-  if (pageType === 'decifrar') {
-    const campoChave = document.getElementById('txtChave');
-    const campoMsg   = document.getElementById('txtMsgEntrada');
-
-    if (campoChave) {
-      campoChave.value = info.key;
-      campoChave.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-
-    // 1) ciphertext principal vindo do detectCifreiFromClipboard
-    let ciphertext = (info.ciphertext || '').trim();
-
-    // 2) Se ainda está vazio, tenta extrair direto do rawText (CIFREI|key|ciphertext)
-    if (!ciphertext && typeof rawText === 'string') {
-      const text = rawText.trim();
-      if (text.startsWith('CIFREI|')) {
-        const parts = text.split('|');
-        if (parts.length >= 3) {
-          ciphertext = parts.slice(2).join('|').trim();
-        }
+  if (typeof info.ciphertext === 'string' && info.ciphertext.trim()) {
+    ciphertext = info.ciphertext.trim();
+  } else if (typeof rawText === 'string') {
+    const text = rawText.trim();
+    if (text.startsWith('CIFREI|')) {
+      const parts = text.split('|');
+      if (parts.length >= 3) {
+        ciphertext = parts.slice(2).join('|').trim();
       }
     }
+  }
 
-    // 3) Se temos ciphertext não-vazio, preenche #txtMsgEntrada
-    if (campoMsg && ciphertext) {
-      campoMsg.value = ciphertext;
+  if (resolvedPageType === 'cifrar') {
+    campoChave.value = info.key || '';
+    campoChave.dispatchEvent(new Event('input', { bubbles: true }));
+    campoChave.dispatchEvent(new Event('change', { bubbles: true }));
+    return;
+  }
+
+  if (resolvedPageType === 'decifrar') {
+    campoChave.value = info.key || '';
+    campoChave.dispatchEvent(new Event('input', { bubbles: true }));
+    campoChave.dispatchEvent(new Event('change', { bubbles: true }));
+
+    if (campoMsg) {
+      campoMsg.value = ciphertext || '';
       campoMsg.dispatchEvent(new Event('input', { bubbles: true }));
+      campoMsg.dispatchEvent(new Event('change', { bubbles: true }));
     }
 
     return;
   }
 
-  // Se por algum motivo não conseguimos classificar a página,
-  // pelo menos garantimos a chave
-  const fallbackCampoChave = document.getElementById('txtChave');
-  if (fallbackCampoChave) {
-    fallbackCampoChave.value = info.key;
-    fallbackCampoChave.dispatchEvent(new Event('input', { bubbles: true }));
-  }
+  // fallback
+  campoChave.value = info.key || '';
+  campoChave.dispatchEvent(new Event('input', { bubbles: true }));
+  campoChave.dispatchEvent(new Event('change', { bubbles: true }));
 }
-
 
 // ====== CLIPBOARD: integração com cifrar.html e decifrar.html ======
 
@@ -2433,14 +2435,19 @@ function initClipboardWatcherForPage() {
   const path = (window.location && window.location.pathname) ? window.location.pathname : '';
 
   let pageType = null;
+
   if (path.endsWith('cifrar.html')) {
     pageType = 'cifrar';
   } else if (path.endsWith('decifrar.html')) {
     pageType = 'decifrar';
+  } else if (document.getElementById('btnCifrar')) {
+    pageType = 'cifrar';
+  } else if (document.getElementById('btnDecifrar')) {
+    pageType = 'decifrar';
   }
 
   if (!pageType) {
-    return; // não é nenhuma das duas páginas
+    return;
   }
 
   let alreadyTriggered = false;
