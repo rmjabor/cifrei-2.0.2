@@ -2170,9 +2170,58 @@ function showQrInvalidMessage() {
 // ====== CLIPBOARD / CIFREI: detecção de chave/cifra ======
 
 function isCifreiKey(str) {
-  if (typeof isValidKey === 'function') return isValidKey(str);
-  const sanitized = String(str || '').replace(/[^A-Za-z0-9_-]/g, '');
-  return sanitized.length >= 8 && sanitized.length <= 25 && sanitized === str;
+  const candidate = String(str || '').trim();
+
+  if (typeof isValidKey === 'function') return isValidKey(candidate);
+
+  return (
+    candidate.length >= 8 &&
+    candidate.length <= 25 &&
+    /^[A-Za-z0-9_-]+$/.test(candidate)
+  );
+}
+
+function isPlausibleCifreiCiphertext(str) {
+  const candidate = String(str || '').trim();
+  if (!candidate) return false;
+
+  // Formato legado: CIFREI3.<payloadBase64Url>
+  if (candidate.startsWith('CIFREI3.')) {
+    const encodedPayload = candidate.slice('CIFREI3.'.length);
+
+    if (!/^[A-Za-z0-9_-]+$/.test(encodedPayload)) return false;
+
+    try {
+      const payloadBytes = base64UrlToBytes(encodedPayload);
+      const payload = JSON.parse(new TextDecoder().decode(payloadBytes));
+
+      return !!(
+        payload &&
+        typeof payload === 'object' &&
+        typeof payload.salt === 'string' && payload.salt &&
+        typeof payload.iv === 'string' && payload.iv &&
+        typeof payload.ct === 'string' && payload.ct
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Formato compacto atual: payload Base64URL com versão + salt + iv + ciphertext
+  if (!/^[A-Za-z0-9_-]+$/.test(candidate)) return false;
+
+  try {
+    if (typeof tryParseCompactCode === 'function') {
+      tryParseCompactCode(candidate);
+      return true;
+    }
+
+    const payload = base64UrlToBytes(candidate);
+    const minimumLength = 1 + 16 + 12 + 16;
+    return payload && payload.length >= minimumLength && payload[0] === 1;
+  } catch (e) {
+    return false;
+  }
 }
 
 /**
@@ -2206,6 +2255,10 @@ function detectCifreiFromClipboard(rawText) {
         }
 
         if (ciphertext && ciphertext.trim() !== '') {
+          if (!isPlausibleCifreiCiphertext(ciphertext)) {
+            return null;
+          }
+
           return { type: 'cifra-completa', key, ciphertext };
         } else {
           return { type: 'chave', key, ciphertext: '' };

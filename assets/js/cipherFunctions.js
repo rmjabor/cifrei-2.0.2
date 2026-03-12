@@ -83,8 +83,13 @@ function sanitizeKeyInput(value) {
 }
 
 function isValidKey(value) {
-  const key = sanitizeKeyInput(value);
-  return key.length >= CIFREI_KEY_MIN_LENGTH && key.length <= CIFREI_KEY_MAX_LENGTH;
+  const key = String(value || '').trim();
+
+  return (
+    key.length >= CIFREI_KEY_MIN_LENGTH &&
+    key.length <= CIFREI_KEY_MAX_LENGTH &&
+    /^[A-Za-z0-9_-]+$/.test(key)
+  );
 }
 
 function generateKey() {
