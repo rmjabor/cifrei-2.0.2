@@ -282,6 +282,36 @@ input.form-control:focus {
   text-align: center;
 }
 
+.divInputPadrao {
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+
+.inputPadrao {
+  height: 45px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 5px 6px 45px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #fd641d;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Open Sans', sans-serif;
+  color: #424242;
+  flex-grow: 1;
+  box-sizing: border-box;
+  line-height: 1;
+  resize: none;
+  overflow: hidden !important;
+}
+
+.inputPadrao::placeholder {
+  color: #b5b5b5;
+  opacity: 1;
+}
+
 .inputGerarSenha {
   height: 35px;
   width: 45px;
@@ -292,23 +322,6 @@ input.form-control:focus {
   border-radius: 6px;
   font-size: 14px;
   line-height: 1;
-  resize: none;
-  overflow: hidden !important;
-}
-
-.inputSenhaAleat {
-  height: 35px;
-  width: 100%;
-  min-width: 0;
-  padding: 6px 6px 6px 45px;
-  border-style: solid;
-  border-width: 1px;
-  border-color: #fd641d;
-  border-radius: 6px;
-  font-size: 13px;
-  flex-grow: 1;
-  box-sizing: border-box;
-  line-height: 1.2;
   resize: none;
   overflow: hidden !important;
 }
@@ -331,5 +344,43 @@ input.form-control:focus {
 .modal.show .modal-dialog {
   transform: translate3d(0, 0, 0) scale(1) !important;
   opacity: 1 !important;
+}
+
+.body-padrao {
+  width: 100%;
+  max-width: 600px;
+  min-width: 320px;
+  padding: 0px 20px 30px 20px;
+  box-sizing: border-box;
+}
+
+.icnInputPadrao {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  margin-left: 10px;
+  font-size: 25px;
+  line-height: 1;
+  text-align: center;
+  color: #424242;
+  z-index: 1;
+}
+
+.btnPadrao {
+  width: 100%;
+  border-style: none;
+  border-radius: 3;
+  height: 45px;
+  text-align: center;
+  box-shadow: 1px 1px 3px 0px #a7a7a7, 1px 1px 3px 0px #a7a7a7;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 15 px;
+  color: #ffffff;
+}
+
+.btnPadrao:active {
+  box-shadow: none !important;
+  transform: scale(0.99);
+  opacity: 0.80;
 }
 
