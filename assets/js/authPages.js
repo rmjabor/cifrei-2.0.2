@@ -630,7 +630,9 @@
       updateResetButton();
 
       if (error) {
-        showEnterNotice(getFriendlyAuthErrorMessage(error, 'Não foi possível enviar o link de redefinição de senha.'));
+         console.error('[Cifrei] resetPasswordForEmail error:', error);
+//        showEnterNotice(getFriendlyAuthErrorMessage(error, 'Não foi possível enviar o link de redefinição de senha.'));
+          showEnterNotice(error.message || 'Não foi possível enviar o link de redefinição de senha.');
         return;
       }
 
