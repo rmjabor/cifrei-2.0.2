@@ -258,6 +258,39 @@
     window.alert(message);
   }
 
+  function createModalNoticeController(modalId, textId) {
+    const element = qs(modalId);
+    const textElement = qs(textId);
+    const modal = getBootstrapModal(element);
+    let onHidden = null;
+
+    element?.addEventListener('hidden.bs.modal', () => {
+      const callback = onHidden;
+      onHidden = null;
+      if (typeof callback === 'function') callback();
+    });
+
+    return {
+      show(message, options = {}) {
+        const { onClose = null } = options;
+        if (!modal || !textElement) {
+          showInfo(message);
+          if (typeof onClose === 'function') onClose();
+          return;
+        }
+        textElement.textContent = message;
+        onHidden = typeof onClose === 'function' ? onClose : null;
+        modal.show();
+      },
+      hide() {
+        modal?.hide();
+      },
+      element,
+      modal,
+      textElement
+    };
+  }
+
   function getBaseRedirectUrl() {
     const path = window.location.pathname;
     const lastSlash = path.lastIndexOf('/');
@@ -390,15 +423,12 @@
     const generatePasswordButton = qs('btnGeneratePw');
     const termsCheck = qs('checkLiEconcordo');
     const submitButton = qs('btnCadastrar');
-    const signupNoticeModalElement = qs('mdlAvisosCadastro');
-    const signupNoticeModal = getBootstrapModal(signupNoticeModalElement);
-    const signupNoticeText = qs('txtAvisosCadastro');
-    let redirectAfterSignupNotice = false;
+    const signupNotice = createModalNoticeController('mdlAvisosCadastro', 'txtAvisosCadastro');
 
     if (!emailInput || !firstNameInput || !lastNameInput || !passwordInput || !submitButton) return;
     if (!supabase) {
       setButtonEnabledState(submitButton, false);
-      showInfo('Não foi possível inicializar a conexão com o Supabase.');
+      signupNotice.show('Não foi possível inicializar a conexão com o Supabase.');
       return;
     }
 
@@ -419,24 +449,12 @@
     });
 
     function showSignupNotice(message, { redirectToLogin = false } = {}) {
-      if (!signupNoticeModal || !signupNoticeText) {
-        showInfo(message);
-        if (redirectToLogin) {
+      signupNotice.show(message, {
+        onClose: redirectToLogin ? () => {
           window.location.href = 'entrar.html';
-        }
-        return;
-      }
-
-      signupNoticeText.textContent = message;
-      redirectAfterSignupNotice = redirectToLogin;
-      signupNoticeModal.show();
+        } : null
+      });
     }
-
-    signupNoticeModalElement?.addEventListener('hidden.bs.modal', () => {
-      if (!redirectAfterSignupNotice) return;
-      redirectAfterSignupNotice = false;
-      window.location.href = 'entrar.html';
-    });
 
     function isPasswordValid() {
       return isAsciiPrintablePassword(passwordInput.value)
@@ -506,7 +524,7 @@
         if (message.includes('Já existe um usuário')) {
           showSignupNotice('Já existe um usuário cadastrado com este e-mail. Digite outro e-mail, por favor.');
         } else {
-          showInfo(message);
+          showSignupNotice(message);
         }
         updateButtonState();
         return;
@@ -538,8 +556,7 @@
     const keepConnectedCheck = qs('checkManterConect');
     const submitButton = qs('btnEntrar');
     const signupButton = qs('btnCadastre');
-    const noticeLabel = qs('txtAvisosEntrar') || qs('lblErroLogin');
-    const noticeModal = getBootstrapModal(qs('mdlAvisosEntrar') || qs('mdlErroLogin'));
+    const enterNotice = createModalNoticeController('mdlAvisosEntrar', 'txtAvisosEntrar');
     const resetModal = getBootstrapModal(qs('mdlRedefSenha'));
     const resetEmailInput = qs('inputEmailLinkRedef');
     const sendResetButton = qs('btnEnviarLink');
@@ -547,7 +564,7 @@
     if (!emailInput || !passwordInput || !submitButton) return;
     if (!supabase) {
       setButtonEnabledState(submitButton, false);
-      showInfo('Não foi possível inicializar a conexão com o Supabase.');
+      enterNotice.show('Não foi possível inicializar a conexão com o Supabase.');
       return;
     }
 
@@ -578,17 +595,12 @@
       setButtonEnabledState(sendResetButton, looksLikeEmail(resetEmailInput?.value));
     }
 
-    function showEnterNotice(text) {
-      if (noticeLabel) noticeLabel.textContent = text;
-      if (noticeModal) {
-        noticeModal.show();
-      } else {
-        showInfo(text);
-      }
+    function showEnterNotice(text, options = {}) {
+      enterNotice.show(text, options);
     }
 
-    function showLoginError(text) {
-      showEnterNotice(text);
+    function showLoginError(text, options = {}) {
+      showEnterNotice(text, options);
     }
 
     emailInput.addEventListener('input', updateLoginButton);
@@ -691,11 +703,12 @@
     const showPasswordIcon = qs('icnMostrarSenhaResetPw');
     const generatePasswordButton = qs('btnGenerateResetPw');
     const submitButton = qs('btnConfirmarResetPw');
+    const resetNotice = createModalNoticeController('mdlAvisosResetPw', 'txtAvisosResetPw');
 
     if (!passwordInput || !submitButton) return;
     if (!supabase) {
       setButtonEnabledState(submitButton, false);
-      showInfo('Não foi possível inicializar a conexão com o Supabase.');
+      resetNotice.show('Não foi possível inicializar a conexão com o Supabase.');
       return;
     }
 
@@ -704,6 +717,10 @@
       warningLabelId: 'lblAvisoProbResetPw',
       onStateChange: updateButtonState
     });
+
+    function showResetNotice(message, options = {}) {
+      resetNotice.show(message, options);
+    }
 
     function isPasswordValid() {
       return isAsciiPrintablePassword(passwordInput.value)
@@ -730,8 +747,11 @@
 
     const { data: sessionData } = await supabase.auth.getSession();
     if (!sessionData?.session) {
-      showInfo('Abra esta página pelo link de redefinição enviado ao seu e-mail.');
-      window.location.href = 'entrar.html';
+      showResetNotice('Abra esta página pelo link de redefinição enviado ao seu e-mail.', {
+        onClose: () => {
+          window.location.href = 'entrar.html';
+        }
+      });
       return;
     }
 
@@ -748,7 +768,7 @@
       });
 
       if (error) {
-        showInfo(getFriendlyAuthErrorMessage(error, 'Não foi possível redefinir a senha.'));
+        showResetNotice(getFriendlyAuthErrorMessage(error, 'Não foi possível redefinir a senha.'));
         updateButtonState();
         return;
       }
@@ -759,8 +779,11 @@
         sessionStorage.removeItem(STORAGE_KEYS.RESET_EMAIL);
       }
       await supabase.auth.signOut();
-      showInfo('Senha redefinida com sucesso. Faça login novamente.');
-      window.location.href = 'entrar.html';
+      showResetNotice('Senha redefinida com sucesso. Faça login novamente.', {
+        onClose: () => {
+          window.location.href = 'entrar.html';
+        }
+      });
     });
 
     updateButtonState();
