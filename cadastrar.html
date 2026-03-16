@@ -16,14 +16,14 @@
 </head>
 
 <body class="d-flex flex-column body-padrao">
-    <div class="modal fade" role="dialog" tabindex="-1" data-bs-backdrop="static" id="erroEmailJaExiste" style="background: transparent;margin-top: 80px;" area-hiden="true">
+    <div class="modal fade" role="dialog" tabindex="-1" data-bs-backdrop="static" id="mdlAvisosCadastro" style="background: transparent;margin-top: 80px;" area-hiden="true">
         <div class="modal-dialog modal-confirma-excluir" role="document" id="dlgConfirmaExcluirCifra">
             <div class="modal-content">
                 <div class="modal-header d-flex justify-content-center" style="background: #ffffff;border-radius: 0px 0px 0px 0px;border-style: none;border-top-left-radius: 10px;border-top-right-radius: 10px;"><img src="assets/img/Img_C_ifre_i.png" width="38" height="52"></div>
                 <div class="modal-body" style="background: #ffffff;padding: 0px;padding-top: 0px;height: auto;">
-                    <p style="font-size: 13px;text-align: center;margin-bottom: 0px;font-family: 'Open Sans', sans-serif;width: calc(100% - 30px);min-width: 200px;max-width: 290px;margin-right: auto;margin-left: auto;line-height: 1.2;color: #383839;padding: 4px;">Já existe um usuário cadastrado com este e-mail. Digite outro e-mail, por favor.</p>
+                    <p id="txtAvisosCadastro" style="font-size: 13px;text-align: center;margin-bottom: 0px;font-family: 'Open Sans', sans-serif;width: calc(100% - 30px);min-width: 200px;max-width: 290px;margin-right: auto;margin-left: auto;line-height: 1.2;color: #383839;padding: 4px;">Já existe um usuário cadastrado com este e-mail. Digite outro e-mail, por favor.</p>
                 </div>
-                <div class="modal-footer d-flex justify-content-center" style="background: #ffffff;border-bottom-right-radius: 10px;border-bottom-left-radius: 10px;border-style: none;height: 80px;padding-top: 8px;padding-bottom: 16px;"><button class="btn btn-light" id="btnOkErroEmail" type="button" data-bs-dismiss="modal" style="font-family: 'Open Sans', sans-serif;font-size: 16px;background: #fd641d;color: rgb(255,255,255);width: 90px;border-style: none;box-shadow: 1px 1px 3px #a7a7a7;margin-right: 10px;">OK</button></div>
+                <div class="modal-footer d-flex justify-content-center" style="background: #ffffff;border-bottom-right-radius: 10px;border-bottom-left-radius: 10px;border-style: none;height: 80px;padding-top: 8px;padding-bottom: 16px;"><button class="btn btn-light" id="btnOkAvisosCadastro" type="button" data-bs-dismiss="modal" style="font-family: 'Open Sans', sans-serif;font-size: 16px;background: #fd641d;color: rgb(255,255,255);width: 90px;border-style: none;box-shadow: 1px 1px 3px #a7a7a7;margin-right: 10px;">OK</button></div>
             </div>
         </div>
     </div><img src="assets/img/Logo-Cifrei.png" width="207" height="99" style="width: 138px;height: 71px;margin-right: auto;margin-left: auto;margin-top: 50px;">

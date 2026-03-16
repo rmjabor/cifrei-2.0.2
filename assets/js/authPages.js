@@ -390,7 +390,10 @@
     const generatePasswordButton = qs('btnGeneratePw');
     const termsCheck = qs('checkLiEconcordo');
     const submitButton = qs('btnCadastrar');
-    const emailExistsModal = getBootstrapModal(qs('erroEmailJaExiste'));
+    const signupNoticeModalElement = qs('mdlAvisosCadastro');
+    const signupNoticeModal = getBootstrapModal(signupNoticeModalElement);
+    const signupNoticeText = qs('txtAvisosCadastro');
+    let redirectAfterSignupNotice = false;
 
     if (!emailInput || !firstNameInput || !lastNameInput || !passwordInput || !submitButton) return;
     if (!supabase) {
@@ -413,6 +416,26 @@
       firstNameInputId: 'inputNomeCadastro',
       lastNameInputId: 'inputSobrenomeCadastro',
       onStateChange: updateButtonState
+    });
+
+    function showSignupNotice(message, { redirectToLogin = false } = {}) {
+      if (!signupNoticeModal || !signupNoticeText) {
+        showInfo(message);
+        if (redirectToLogin) {
+          window.location.href = 'entrar.html';
+        }
+        return;
+      }
+
+      signupNoticeText.textContent = message;
+      redirectAfterSignupNotice = redirectToLogin;
+      signupNoticeModal.show();
+    }
+
+    signupNoticeModalElement?.addEventListener('hidden.bs.modal', () => {
+      if (!redirectAfterSignupNotice) return;
+      redirectAfterSignupNotice = false;
+      window.location.href = 'entrar.html';
     });
 
     function isPasswordValid() {
@@ -481,7 +504,7 @@
       if (error) {
         const message = getFriendlyAuthErrorMessage(error, 'Não foi possível concluir o cadastro.');
         if (message.includes('Já existe um usuário')) {
-          emailExistsModal?.show();
+          showSignupNotice('Já existe um usuário cadastrado com este e-mail. Digite outro e-mail, por favor.');
         } else {
           showInfo(message);
         }
@@ -491,14 +514,15 @@
 
       const identities = data?.user?.identities;
       if (Array.isArray(identities) && identities.length === 0) {
-        emailExistsModal?.show();
+        showSignupNotice('Já existe um usuário cadastrado com este e-mail. Digite outro e-mail, por favor.');
         updateButtonState();
         return;
       }
 
       sessionStorage.setItem(STORAGE_KEYS.PENDING_LOGIN_EMAIL, payload.email);
-      showInfo('Cadastro realizado. Verifique seu e-mail para confirmar a conta antes de entrar.');
-      window.location.href = 'entrar.html';
+      showSignupNotice('Cadastro realizado. Verifique seu e-mail para confirmar a conta antes de entrar.', {
+        redirectToLogin: true
+      });
     });
 
     updateButtonState();
