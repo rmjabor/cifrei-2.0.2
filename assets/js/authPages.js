@@ -538,8 +538,8 @@
     const keepConnectedCheck = qs('checkManterConect');
     const submitButton = qs('btnEntrar');
     const signupButton = qs('btnCadastre');
-    const errorLabel = qs('lblErroLogin');
-    const errorModal = getBootstrapModal(qs('mdlErroLogin'));
+    const noticeLabel = qs('txtAvisosEntrar') || qs('lblErroLogin');
+    const noticeModal = getBootstrapModal(qs('mdlAvisosEntrar') || qs('mdlErroLogin'));
     const resetModal = getBootstrapModal(qs('mdlRedefSenha'));
     const resetEmailInput = qs('inputEmailLinkRedef');
     const sendResetButton = qs('btnEnviarLink');
@@ -578,9 +578,17 @@
       setButtonEnabledState(sendResetButton, looksLikeEmail(resetEmailInput?.value));
     }
 
+    function showEnterNotice(text) {
+      if (noticeLabel) noticeLabel.textContent = text;
+      if (noticeModal) {
+        noticeModal.show();
+      } else {
+        showInfo(text);
+      }
+    }
+
     function showLoginError(text) {
-      if (errorLabel) errorLabel.textContent = text;
-      errorModal?.show();
+      showEnterNotice(text);
     }
 
     emailInput.addEventListener('input', updateLoginButton);
@@ -622,13 +630,13 @@
       updateResetButton();
 
       if (error) {
-        showInfo(getFriendlyAuthErrorMessage(error, 'Não foi possível enviar o link de redefinição de senha.'));
+        showEnterNotice(getFriendlyAuthErrorMessage(error, 'Não foi possível enviar o link de redefinição de senha.'));
         return;
       }
 
       sessionStorage.setItem(STORAGE_KEYS.RESET_EMAIL, email);
       resetModal?.hide();
-      showInfo('Enviamos o link de redefinição de senha para o e-mail informado.');
+      showEnterNotice('Enviamos o link de redefinição de senha para o e-mail informado.');
     });
 
     submitButton.addEventListener('click', async () => {

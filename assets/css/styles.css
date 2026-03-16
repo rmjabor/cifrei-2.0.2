@@ -380,7 +380,16 @@ input.form-control:focus {
 
 .btnPadrao:active {
   box-shadow: none !important;
-  transform: scale(0.99);
+  transform: translateY(2px);
   opacity: 0.80;
+}
+
+.btnPadrao:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(0.2);
+  /*Opcional: tira um pouco da vibração da cor;*/
 }
 
