@@ -110,6 +110,7 @@ records.forEach(rec => {
       const ctx = { id: rec.id };
       try {
         localStorage.setItem('cifreiEditarContext', JSON.stringify(ctx));
+        console.log('[Cifrei] cifreiEditarContext salvo:', ctx);
       } catch (e) {
         console.error('[Cifrei] Erro ao salvar contexto de edição:', e);
       }
