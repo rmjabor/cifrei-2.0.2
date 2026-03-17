@@ -1,198 +1,156 @@
 // storage.js
 // Camada de persistência do Cifrei 3.0 usando Supabase
 
-const CIFREI_TABLE_NAME = 'cifragem_records';
-
-function getCifreiSupabaseClient() {
-  return window.cifreiSupabase || window.supabaseClient || null;
+function ensureSupabaseClient() {
+  if (!window.supabase) {
+    throw new Error('Cliente Supabase não encontrado em window.supabase.');
+  }
+  return window.supabase;
 }
 
-async function getAuthenticatedUserOrThrow() {
-  const supabase = getCifreiSupabaseClient();
-  if (!supabase) {
-    throw new Error('Supabase client não inicializado.');
-  }
-
+async function getAuthenticatedUserId() {
+  const supabase = ensureSupabaseClient();
   const { data, error } = await supabase.auth.getUser();
-  if (error) {
-    throw error;
-  }
 
-  const user = data?.user || null;
-  if (!user?.id) {
+  if (error) throw error;
+  if (!data || !data.user || !data.user.id) {
     throw new Error('Usuário não autenticado.');
   }
 
-  return { supabase, user };
+  return data.user.id;
 }
 
-function mapDbRowToLegacyRecord(row) {
-  if (!row) return null;
+function mapDbRecordToApp(rec) {
+  if (!rec) return null;
 
   return {
-    id: row.id,
-    name: row.name || '',
-    key75: row.key75 || '',
-    ciphertext: row.ciphertext || '',
-    notes: row.notes || '',
-    createdAt: row.created_at || null,
-    updatedAt: row.updated_at || null
+    id: rec.id,
+    user_id: rec.user_id,
+    name: rec.name || '',
+    key75: rec.key75 || '',
+    ciphertext: rec.ciphertext || '',
+    notes: rec.notes || '',
+    createdAt: rec.created_at || null,
+    updatedAt: rec.updated_at || null
   };
 }
 
-function buildDbPayload(data) {
-  const payload = {};
-
-  if (Object.prototype.hasOwnProperty.call(data, 'name')) {
-    payload.name = data.name == null ? null : String(data.name);
-  }
-  if (Object.prototype.hasOwnProperty.call(data, 'key75')) {
-    payload.key75 = String(data.key75 || '');
-  }
-  if (Object.prototype.hasOwnProperty.call(data, 'ciphertext')) {
-    payload.ciphertext = String(data.ciphertext || '');
-  }
-  if (Object.prototype.hasOwnProperty.call(data, 'notes')) {
-    payload.notes = data.notes == null ? '' : String(data.notes);
-  }
-
-  return payload;
-}
-
-// Procura uma cifra pelo nome exato (case-sensitive do app; comparação depende da collation do banco)
 async function findCifragemByName(name) {
-  const { supabase, user } = await getAuthenticatedUserOrThrow();
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
 
   const { data, error } = await supabase
-    .from(CIFREI_TABLE_NAME)
-    .select('id, name, key75, ciphertext, notes, created_at, updated_at')
-    .eq('user_id', user.id)
+    .from('cifragem_records')
+    .select('*')
+    .eq('user_id', userId)
     .eq('name', name)
-    .order('created_at', { ascending: true })
-    .limit(1);
+    .limit(1)
+    .maybeSingle();
 
-  if (error) {
-    throw error;
-  }
-
-  return mapDbRowToLegacyRecord(data?.[0] || null);
+  if (error) throw error;
+  return mapDbRecordToApp(data);
 }
 
-// Conta quantos registros existem (para sugerir "Cifra #N")
 async function getCifragemCount() {
-  const { supabase, user } = await getAuthenticatedUserOrThrow();
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
 
   const { count, error } = await supabase
-    .from(CIFREI_TABLE_NAME)
+    .from('cifragem_records')
     .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id);
+    .eq('user_id', userId);
 
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return count || 0;
 }
 
-// Retorna o nome padrão sugerido: "Cifra #N"
 async function getNextCifragemDefaultName() {
   const count = await getCifragemCount();
   const nextNumber = (count || 0) + 1;
   return `Cifra #${nextNumber}`;
 }
 
-// Salva um registro de cifragem
-// data: { name, key75, ciphertext, notes }
 async function saveCifragemRecord(data) {
-  const { supabase, user } = await getAuthenticatedUserOrThrow();
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
 
-  const payload = buildDbPayload(data);
-  payload.user_id = user.id;
+  const payload = {
+    user_id: userId,
+    name: data.name || '',
+    key75: data.key75 || '',
+    ciphertext: data.ciphertext || '',
+    notes: data.notes || ''
+  };
 
-  const { data: insertedRow, error } = await supabase
-    .from(CIFREI_TABLE_NAME)
+  const { data: inserted, error } = await supabase
+    .from('cifragem_records')
     .insert(payload)
-    .select('id, name, key75, ciphertext, notes, created_at, updated_at')
+    .select('id')
     .single();
 
-  if (error) {
-    throw error;
-  }
-
-  const record = mapDbRowToLegacyRecord(insertedRow);
-  return record?.id || null;
+  if (error) throw error;
+  return inserted.id;
 }
 
-// Atualiza um registro existente pelo id
 async function updateCifragemRecord(id, { name, key75, ciphertext, notes }) {
-  const { supabase, user } = await getAuthenticatedUserOrThrow();
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
 
-  const payload = buildDbPayload({ name, key75, ciphertext, notes });
+  const payload = {
+    name: name || '',
+    key75: key75 || '',
+    ciphertext: ciphertext || '',
+    notes: notes || ''
+  };
 
   const { error } = await supabase
-    .from(CIFREI_TABLE_NAME)
+    .from('cifragem_records')
     .update(payload)
     .eq('id', id)
-    .eq('user_id', user.id);
+    .eq('user_id', userId);
 
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return true;
 }
 
-// Exclui um registro de cifragem pelo id
 async function deleteCifragemRecord(id) {
-  const { supabase, user } = await getAuthenticatedUserOrThrow();
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
 
   const { error } = await supabase
-    .from(CIFREI_TABLE_NAME)
+    .from('cifragem_records')
     .delete()
     .eq('id', id)
-    .eq('user_id', user.id);
+    .eq('user_id', userId);
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 }
 
-// Retorna todas as cifras salvas, ordenadas por nome (crescente)
 async function getAllCifragemRecordsSortedByName() {
-  const { supabase, user } = await getAuthenticatedUserOrThrow();
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
 
   const { data, error } = await supabase
-    .from(CIFREI_TABLE_NAME)
-    .select('id, name, key75, ciphertext, notes, created_at, updated_at')
-    .eq('user_id', user.id)
-    .order('name', { ascending: true, nullsFirst: false })
-    .order('created_at', { ascending: true });
+    .from('cifragem_records')
+    .select('*')
+    .eq('user_id', userId)
+    .order('name', { ascending: true });
 
-  if (error) {
-    throw error;
-  }
-
-  return (data || []).map(mapDbRowToLegacyRecord);
+  if (error) throw error;
+  return (data || []).map(mapDbRecordToApp);
 }
 
-// Busca um registro específico pelo id
 async function getCifragemRecordById(id) {
-  const { supabase, user } = await getAuthenticatedUserOrThrow();
-
-  if (id == null || id === '') {
-    return null;
-  }
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
 
   const { data, error } = await supabase
-    .from(CIFREI_TABLE_NAME)
-    .select('id, name, key75, ciphertext, notes, created_at, updated_at')
+    .from('cifragem_records')
+    .select('*')
     .eq('id', id)
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .maybeSingle();
 
-  if (error) {
-    throw error;
-  }
-
-  return mapDbRowToLegacyRecord(data || null);
+  if (error) throw error;
+  return mapDbRecordToApp(data);
 }

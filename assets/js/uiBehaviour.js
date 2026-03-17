@@ -221,8 +221,8 @@ async function refreshChaveDropdownFromDB(dropdown, radio4) {
 }
 
 async function getCifragemRecordById(id) {
-  const targetId = String(id || '').trim();
-  if (!targetId) return null;
+  const recordId = String(id || '').trim();
+  if (!recordId) return null;
 
   if (typeof getAllCifragemRecordsSortedByName !== 'function') {
     console.warn('[Cifrei] getAllCifragemRecordsSortedByName não disponível.');
@@ -231,7 +231,7 @@ async function getCifragemRecordById(id) {
 
   try {
     const list = await getAllCifragemRecordsSortedByName();
-    return list.find(r => String(r.id) === targetId) || null;
+    return list.find(r => String(r.id) === recordId) || null;
   } catch (e) {
     console.error('[Cifrei] Erro ao buscar registro por id:', e);
     return null;
@@ -997,13 +997,13 @@ function setupDecifrarPageForDecryption() {
 
     // 2) Caso: cifra INCOMPLETA salva (radio4 + dropdown na decifrar.html)
     } else if (radio4 && radio4.checked && dropdown && dropdown.value) {
-      const id = Number(dropdown.value);
+      const id = String(dropdown.value);
       let rec = null;
 
       if (typeof getAllCifragemRecordsSortedByName === 'function') {
         try {
           const list = await getAllCifragemRecordsSortedByName();
-          rec = list.find(r => r.id === id) || null;
+          rec = list.find(r => String(r.id) === id) || null;
         } catch (e) {
           console.error('[Cifrei] Erro ao buscar registro para decifragem incompleta:', e);
         }
@@ -1145,9 +1145,9 @@ if (inputObs && divObs) {
 
   // Botão Editar → vai para editarcifra.html com base no id salvo
   if (btnEditar) {
-    const recId = (data.id != null) ? Number(data.id) : null;
+    const recId = (data.id != null) ? String(data.id) : null;
 
-    if (recId != null && !Number.isNaN(recId)) {
+    if (recId) {
       btnEditar.addEventListener('click', function (event) {
         event.preventDefault();
 
@@ -1203,14 +1203,14 @@ function setupEditarCifraPage() {
       if (raw) {
         const ctx = JSON.parse(raw);
         if (ctx && ctx.id != null) {
-          ctxId = Number(ctx.id);
+          ctxId = String(ctx.id);
         }
       }
     } catch (e) {
       console.error('[Cifrei] Erro ao ler contexto de edição do localStorage:', e);
     }
 
-    if (ctxId == null || Number.isNaN(ctxId)) {
+    if (!ctxId) {
       console.warn('[Cifrei] Nenhum id válido encontrado para edição.');
       return;
     }
