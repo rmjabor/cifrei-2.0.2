@@ -1,32 +1,37 @@
 /// uiBehaviour.js - versão enxuta Cifrei 2.0
 
 document.addEventListener('DOMContentLoaded', function () {
-  setupApagarMensagem();
-  setupApagarChave();
-  setupApagarMsgEditar();
-  setupOrigemChaveRadios();
-  setupDropdownChave();
-  setupGenerateKeyButton();
-  setupCifragemNavigation();
-  setupIndexLogoNavigation()
-  setupPassphraseStrength();
-  setupFraseSegredoModal();
-  setupFraseSegredoDecModal();
-  setupDecryptErrorModal();
-  setupCopiarMsgAberta();
-  setupDecifrarPageForDecryption();
-  setupEditarPageForDecryption()
-  setupCifraAbertaPage();
-  setupEditarCifraPage();
-  setupQrDownloadButton();
-  setupClipboardModal();        // liga eventos do modal #confirmaUsarCifra
-  initClipboardWatcherForPage(); // lê clipboard em cifrar/decifrar e, se for o caso, abre o modal
-  setupPasswordGeneratorModal();
-  
-  // se você já tiver setupCifragemPageBottom em outro trecho, mantém a chamada:
-  if (typeof setupCifragemPageBottom === 'function') {
-    setupCifragemPageBottom();
+  function safeInit(nome, fn) {
+    try {
+      if (typeof fn === 'function') fn();
+    } catch (err) {
+      console.error('[Cifrei] Falha em ' + nome + ':', err);
+    }
   }
+
+  // Mantém cada setup isolado para um erro em uma página não derrubar as demais.
+  safeInit('setupApagarMensagem', setupApagarMensagem);
+  safeInit('setupApagarChave', setupApagarChave);
+  safeInit('setupApagarMsgEditar', setupApagarMsgEditar);
+  safeInit('setupOrigemChaveRadios', setupOrigemChaveRadios);
+  safeInit('setupDropdownChave', setupDropdownChave);
+  safeInit('setupGenerateKeyButton', setupGenerateKeyButton);
+  safeInit('setupCifragemNavigation', setupCifragemNavigation);
+  safeInit('setupIndexLogoNavigation', setupIndexLogoNavigation);
+  safeInit('setupPassphraseStrength', setupPassphraseStrength);
+  safeInit('setupFraseSegredoModal', setupFraseSegredoModal);
+  safeInit('setupFraseSegredoDecModal', setupFraseSegredoDecModal);
+  safeInit('setupDecryptErrorModal', setupDecryptErrorModal);
+  safeInit('setupCopiarMsgAberta', setupCopiarMsgAberta);
+  safeInit('setupDecifrarPageForDecryption', setupDecifrarPageForDecryption);
+  safeInit('setupEditarPageForDecryption', setupEditarPageForDecryption);
+  safeInit('setupCifraAbertaPage', setupCifraAbertaPage);
+  safeInit('setupEditarCifraPage', setupEditarCifraPage);
+  safeInit('setupQrDownloadButton', setupQrDownloadButton);
+  safeInit('setupClipboardModal', setupClipboardModal);
+  safeInit('initClipboardWatcherForPage', initClipboardWatcherForPage);
+  safeInit('setupPasswordGeneratorModal', setupPasswordGeneratorModal);
+  safeInit('setupCifragemPageBottom', setupCifragemPageBottom);
 });
 
 function animarTextarea(element) {
@@ -224,27 +229,18 @@ async function getCifragemRecordById(id) {
   const recordId = String(id || '').trim();
   if (!recordId) return null;
 
-  if (window.cifreiStorage && typeof window.cifreiStorage.getCifragemRecordById === 'function') {
-    try {
-      return await window.cifreiStorage.getCifragemRecordById(recordId);
-    } catch (e) {
-      console.error('[Cifrei] Erro ao buscar registro por id no storage:', e);
-      return null;
-    }
+  if (typeof getAllCifragemRecordsSortedByName !== 'function') {
+    console.warn('[Cifrei] getAllCifragemRecordsSortedByName não disponível.');
+    return null;
   }
 
-  if (typeof getAllCifragemRecordsSortedByName === 'function') {
-    try {
-      const list = await getAllCifragemRecordsSortedByName();
-      return list.find(r => String(r.id) === recordId) || null;
-    } catch (e) {
-      console.error('[Cifrei] Erro ao buscar registro por id na lista local:', e);
-      return null;
-    }
+  try {
+    const list = await getAllCifragemRecordsSortedByName();
+    return list.find(r => String(r.id) === recordId) || null;
+  } catch (e) {
+    console.error('[Cifrei] Erro ao buscar registro por id:', e);
+    return null;
   }
-
-  console.warn('[Cifrei] Nenhum método disponível para buscar registro por id.');
-  return null;
 }
 
 function setupDropdownChave() {
@@ -425,12 +421,16 @@ function setupCifragemPageBottom() {
   const inputNome      = document.getElementById('inputMdlNomeSalvarCifragem');
   const inputObs       = document.getElementById('inputMdlObsSalvarCifragem');
 
-  
-  // Começa sempre com a página de baixo oculta
-    // 5.0 Comportamento específico da página de cifragem (tem pageBottom)
+  // Só deve rodar na cifrar.html, não em cifraaberta/editarcifra.
+  if (!pageTop || !pageBottom || !btnSalvar || !inputNome || !inputObs) {
+    return;
+  }
+
+  // Começa sempre com a página de baixo oculta.
+  pageBottom.classList.add('d-none');
+
+  // 5.0 Comportamento específico da página de cifragem
   if (pageBottom && pageTop) {
-    // Começa sempre com a página de baixo oculta
-    pageBottom.classList.add('d-none');
 
     // 5.1 Voltar para a página de cima (sem resetar a pageTop)
     if (icnVoltar) {
@@ -468,16 +468,21 @@ function setupCifragemPageBottom() {
 
   // 5.3 Label do botão Salvar / Salvar somente a chave
   if (btnSalvar && chkSalvarChave) {
-    // garante estrutura: ícone + span de texto
+    // garante estrutura: mantém o SVG existente e recria o texto do botão
     let labelSpan = btnSalvar.querySelector('#lblBtnSalvarCifragem');
     if (!labelSpan) {
       labelSpan = document.createElement('span');
       labelSpan.id = 'lblBtnSalvarCifragem';
-      btnSalvar.appendChild(labelSpan);
+      const icon = btnSalvar.querySelector('svg');
+      if (icon && icon.nextSibling) {
+        btnSalvar.insertBefore(labelSpan, icon.nextSibling);
+      } else {
+        btnSalvar.appendChild(labelSpan);
+      }
     }
 
     function setSalvarLabel(texto) {
-      labelSpan.textContent = ' ' + texto;
+      labelSpan.textContent = ' ' + texto;
     }
 
     setSalvarLabel('Salvar Cifra');
@@ -811,7 +816,7 @@ function setupDecryptErrorModal() {
   const modalEl = document.getElementById('informaErroDec');
   if (!modalEl || !window.bootstrap || !bootstrap.Modal) return;
 
-  const btnOk = document.getElementById('btnOK');
+  const btnOk = document.getElementById('btnOK') || document.getElementById('btnOk');
   const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
 
   if (btnOk && !btnOk.dataset.cifreiBound) {
@@ -1192,11 +1197,12 @@ function setupEditarCifraPage() {
   const pEditada  = document.getElementById('editadaEm');
   const btnEditar = document.getElementById('btnEditarCifra');
 
-  if (!inputNome || !txtChave || !txtMsg || !inputObs || !btnEditar) return;
+  // Só deve rodar na editarcifra.html. A cifraaberta.html reutiliza vários IDs,
+  // mas não possui os parágrafos de metadados criada/editada.
+  if (!inputNome || !txtChave || !txtMsg || !inputObs || !btnEditar || !pCriada || !pEditada) return;
 
   let originalRecord = null;
   btnEditar.disabled = true;
-  btnEditar.classList.add('d-none');
 
   async function carregarDadosEdicao() {
     let ctxId = null;
@@ -1232,7 +1238,6 @@ function setupEditarCifraPage() {
       }
 
       originalRecord = rec;
-      btnEditar.classList.remove('d-none');
 
       window.cifreiEditarRecordForDecryption = {
         id: rec.id,
@@ -1785,6 +1790,7 @@ function setupQrDownloadButton() {
 function resetCifrarPageAfterSave() {
   const pageTop        = document.getElementById('cifragemPageTop');
   const pageBottom     = document.getElementById('cifragemPageBottom');
+
   const txtChave       = document.getElementById('txtChave');
   const txtMsgEntrada  = document.getElementById('txtMsgEntrada');
   const txtChaveBottom = document.getElementById('txtChaveBottom');
@@ -1793,7 +1799,7 @@ function resetCifrarPageAfterSave() {
   const inputObs       = document.getElementById('inputMdlObsSalvarCifragem');
   const dropdown       = document.getElementById('dpdownChave');
   const radio1         = document.getElementById('formCheck-1');
-  const radio4         = document.getElementById('formCheck-4');
+  const radio4         = document.getElementById('formCheck-4');   // 🔹 novo
   const chkSalvarChave = document.getElementById('formCheckSalvarChave');
 
   if (txtChave) {
@@ -1808,15 +1814,23 @@ function resetCifrarPageAfterSave() {
 
   if (txtChaveBottom) txtChaveBottom.value = '';
   if (txtMsgBottom)   txtMsgBottom.value   = '';
+
   if (inputNome) inputNome.value = '';
   if (inputObs)  inputObs.value  = '';
-  if (chkSalvarChave) chkSalvarChave.checked = false;
 
+  if (chkSalvarChave) {
+    chkSalvarChave.checked = false;
+  }
+
+  // 🔹 Em vez de só mexer no selectedIndex, recarrega do IndexedDB
   if (dropdown) {
     if (typeof refreshChaveDropdownFromDB === 'function') {
+      // repopula o select com todas as cifras, incluindo a última salva
       refreshChaveDropdownFromDB(dropdown, radio4);
     } else {
+      // fallback, caso a função não exista por algum motivo
       dropdown.selectedIndex = 0;
+      dropdown.dispatchEvent(new Event('change'));
     }
   }
 
@@ -1826,8 +1840,333 @@ function resetCifrarPageAfterSave() {
   }
 
   if (pageBottom) pageBottom.classList.add('d-none');
-  if (pageTop) pageTop.classList.remove('d-none');
+  if (pageTop)    pageTop.classList.remove('d-none');
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function buildCifreiQrPayload() {
+  const campoKey = document.getElementById('txtChaveBottom');
+  const campoMsg = document.getElementById('txtMsgBottom');
+
+  const key75 = campoKey ? campoKey.value.trim() : '';
+  const ciphertext = campoMsg ? campoMsg.value.trim() : '';
+
+  if (!key75) {
+    alert('Não há chave para gerar o QR (campo txtChave está vazio).');
+    return null;
+  }
+
+  const parts = ['CIFREI', key75];
+  if (ciphertext) {
+    parts.push(ciphertext);
+  }
+
+  return parts.join('|');
+}
+
+
+// =================== QR SCANNER (CÂMERA) ===================
+
+// Estado global do scanner
+let qrScannerStream = null;
+let qrScannerActive = false;
+let qrScannerDetector = null;
+let qrScannerPageType = null; // "cifrar" ou "decifrar"
+
+// Inicializa o scanner em uma página específica
+// Chame: initQrScanner("cifrar") ou initQrScanner("decifrar")
+function initQrScanner(pageType) {
+    const qrRadio = document.querySelector('#formCheck-2'); // ID que você mencionou
+
+    if (!qrRadio) {
+        console.warn('[Cifrei] Radio #formCheck-2 não encontrado nesta página.');
+        return;
+    }
+
+    qrScannerPageType = pageType;
+
+    qrRadio.addEventListener('change', function () {
+        // Só dispara quando o radio ficar selecionado
+        if (qrRadio.checked) {
+            startQrScanner();
+        }
+    });
+
+    // Também podemos garantir que, ao fechar o modal manualmente, o scanner pare
+    const qrModalEl = document.getElementById('mdlQrScanner');
+    if (qrModalEl) {
+        // Quando o modal fechar (X, Cancelar, erro, etc.)
+      qrModalEl.addEventListener('hide.bs.modal', function () {
+          stopQrScanner(false); // interrompe câmera sem aplicar alterações
+          
+          // 🔹 Sempre voltar o radio para #formCheck-1
+          const fallbackRadio = document.getElementById('formCheck-1');
+          if (fallbackRadio) {
+              fallbackRadio.checked = true;
+              fallbackRadio.dispatchEvent(new Event('change'));
+    }
+});
+
+    }
+}
+
+// Inicia o scanner de QR code
+function startQrScanner() {
+    const qrModalEl = document.getElementById('mdlQrScanner');
+    const video = document.getElementById('qrVideo');
+
+    if (!qrModalEl || !video) {
+        console.error('[Cifrei] Elementos do modal de QR não encontrados.');
+        alert('Não foi possível iniciar a câmera para leitura do QR code.');
+        return;
+    }
+
+    // Evita iniciar de novo se já estiver ativo
+    if (qrScannerActive) {
+        return;
+    }
+
+    // Abre o modal
+    const qrModal = bootstrap.Modal.getOrCreateInstance(qrModalEl);
+    qrModal.show();
+
+    // Checa suporte ao BarcodeDetector (API nativa do navegador)
+    qrScannerActive = true;
+
+    // Se houver BarcodeDetector, usamos; senão, vamos cair no fallback com jsQR
+    if ('BarcodeDetector' in window) {
+        qrScannerDetector = new BarcodeDetector({ formats: ['qr_code'] });
+    } else {
+        qrScannerDetector = null;
+        console.warn('[Cifrei] BarcodeDetector indisponível, usando fallback com jsQR (canvas).');
+    }
+
+
+// Primeiro tentamos com "environment" como IDEAL (funciona bem em celular)
+// e costuma cair na câmera única no notebook
+const constraintsPreferEnv = {
+    video: {
+        facingMode: { ideal: 'environment' }  // traseira no celular, qualquer no notebook
+    },
+    audio: false
+};
+
+  navigator.mediaDevices.getUserMedia(constraintsPreferEnv)
+      .catch(function (err) {
+          console.warn('[Cifrei] Erro com facingMode=environment, tentando genérico:', err);
+
+          // Fallback: qualquer câmera disponível (útil para notebook)
+          return navigator.mediaDevices.getUserMedia({
+              video: true,
+              audio: false
+          });
+      })
+      .then(function (stream) {
+          const video = document.getElementById('qrVideo');
+
+          qrScannerStream = stream;
+          video.srcObject = stream;
+          video.play().catch(function (err) {
+              console.error('[Cifrei] Erro ao dar play no vídeo:', err);
+          });
+
+          video.addEventListener('loadedmetadata', function onLoaded() {
+              video.removeEventListener('loadedmetadata', onLoaded);
+              scanQrLoop();
+          });
+
+
+      })
+      .catch(function (err) {
+          console.error('[Cifrei] Erro ao acessar câmera (fallback também falhou):', err);
+          alert('Não foi possível acessar a câmera. Verifique as permissões do navegador.');
+          stopQrScanner(false);
+      });
+
+}
+
+// Loop de leitura do QR code
+function scanQrLoop() {
+    if (!qrScannerActive) return;
+
+    const video  = document.getElementById('qrVideo');
+    const canvas = document.getElementById('qrCanvas');
+
+    if (!video || !canvas) {
+        console.error('[Cifrei] Vídeo ou canvas do scanner não encontrados.');
+        stopQrScanner(false);
+        return;
+    }
+
+    // Garante que o vídeo já tem dados suficientes
+    if (video.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) {
+        requestAnimationFrame(scanQrLoop);
+        return;
+    }
+
+    // --- MODO 1: BarcodeDetector nativo, se disponível ---
+    if (qrScannerDetector) {
+        qrScannerDetector.detect(video)
+            .then(function (barcodes) {
+                if (!qrScannerActive) return;
+
+                if (barcodes && barcodes.length > 0) {
+                    const rawValue = barcodes[0].rawValue || '';
+                    console.log('[Cifrei] QR lido (BarcodeDetector):', rawValue);
+                    handleQrDecoded(rawValue);
+                } else {
+                    requestAnimationFrame(scanQrLoop);
+                }
+            })
+            .catch(function (err) {
+                console.error('[Cifrei] Erro ao detectar QR (BarcodeDetector):', err);
+                requestAnimationFrame(scanQrLoop);
+            });
+
+        return; // importante sair aqui
+    }
+
+    // --- MODO 2: Fallback com canvas + jsQR ---
+    if (window.jsQR) {
+        const ctx = canvas.getContext('2d');
+
+        // Ajusta o canvas ao tamanho do vídeo
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Desenha o frame atual do vídeo no canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Pega os pixels e passa pro jsQR
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+        if (code && code.data) {
+            console.log('[Cifrei] QR lido (jsQR):', code.data);
+            handleQrDecoded(code.data);
+        } else {
+            // Nada encontrado, tenta de novo
+            requestAnimationFrame(scanQrLoop);
+        }
+    } else {
+        console.error('[Cifrei] Nenhum método de leitura de QR disponível (nem BarcodeDetector, nem jsQR).');
+        alert('Não foi possível ativar a leitura de QR code neste navegador.');
+        stopQrScanner(false);
+    }
+}
+
+// Trata o texto lido do QR
+function handleQrDecoded(qrText) {
+    // Paramos o scanner antes de mexer na página
+    stopQrScanner(true); // true = vai aplicar alterações se o QR for válido
+
+    if (!qrText || typeof qrText !== 'string') {
+        console.warn('[Cifrei] QR vazio ou inválido.');
+        showQrInvalidMessage();
+        return;
+    }
+
+    // Valida prefixo CIFREI
+    if (!qrText.startsWith('CIFREI|')) {
+        console.warn('[Cifrei] QR não começa com CIFREI.');
+        showQrInvalidMessage();
+        return;
+    }
+
+    const partes = qrText.split('|');
+    // Esperado: ["CIFREI", "<chave>", "<código opcional>"]
+    if (partes.length < 2) {
+        console.warn('[Cifrei] Estrutura do QR inesperada:', partes);
+        showQrInvalidMessage();
+        return;
+    }
+
+    const chave = partes[1] || '';
+    const ciphertext = partes[2] || '';
+
+    if (typeof isValidKey === 'function' && !isValidKey(chave)) {
+        console.warn('[Cifrei] Chave com formato inesperado:', chave);
+        showQrInvalidMessage();
+        return;
+    }
+
+    // Agora preenche os campos de acordo com a página
+    const txtChave = document.getElementById('txtChave');
+    const txtMsgEntrada = document.getElementById('txtMsgEntrada');
+
+    if (!txtChave) {
+        console.error('[Cifrei] Campo #txtChave não encontrado.');
+        showQrInvalidMessage();
+        return;
+    }
+
+    // Em ambas as páginas, sempre preenche a chave
+    txtChave.value = chave;
+    txtChave.dispatchEvent(new Event('input', { bubbles: true }));
+
+    // Na página de decifrar, também preenche o texto cifrado, se houver
+    if (qrScannerPageType === 'decifrar' && txtMsgEntrada) {
+        if (ciphertext && ciphertext.length > 0) {
+            txtMsgEntrada.value = ciphertext;
+            txtMsgEntrada.dispatchEvent(new Event('input', { bubbles: true }));
+        } else {
+            // Se quiser, você pode decidir se isso é erro ou não.
+            // Por enquanto, só deixamos vazio.
+            console.log('[Cifrei] QR válido, mas sem ciphertext.');
+        }
+    }
+
+    // Aqui você pode disparar qualquer lógica extra, se precisar (ex: revalidar botões)
+    console.log('[Cifrei] Campos preenchidos a partir do QR com sucesso.');
+
+
+}
+
+// Para o scanner e libera recursos
+// applyChanges: se true, significa que paramos porque lemos um QR; se false, foi cancelamento/timeout.
+function stopQrScanner(applyChanges) {
+    if (!qrScannerActive) return;
+
+    qrScannerActive = false;
+
+    // Para a câmera
+    if (qrScannerStream) {
+        qrScannerStream.getTracks().forEach(function (track) {
+            track.stop();
+        });
+        qrScannerStream = null;
+    }
+
+    // Fecha o modal (se ainda estiver aberto)
+    const qrModalEl = document.getElementById('mdlQrScanner');
+    if (qrModalEl) {
+        const qrModal = bootstrap.Modal.getInstance(qrModalEl) || bootstrap.Modal.getOrCreateInstance(qrModalEl);
+        qrModal.hide();
+    }
+
+    // Se foi cancelamento/timeout (applyChanges === false), não mexemos nos campos.
+    if (!applyChanges) {
+        console.log('[Cifrei] Scanner encerrado sem alterações na página.');
+    }
+}
+
+// Mensagem de QR inválido
+function showQrInvalidMessage() {
+    alert('QR code inválido!');
+
+    // Fecha modal + volta radio para formCheck-1
+    const qrModalEl = document.getElementById('mdlQrScanner');
+    if (qrModalEl) {
+        const modal = bootstrap.Modal.getInstance(qrModalEl);
+        if (modal) modal.hide();
+    }
+
+    const fallbackRadio = document.getElementById('formCheck-1');
+    if (fallbackRadio) {
+        fallbackRadio.checked = true;
+        fallbackRadio.dispatchEvent(new Event('change'));
+    }
 }
 
 // ====== CLIPBOARD / CIFREI: detecção de chave/cifra ======
