@@ -2,10 +2,17 @@
 // Camada de persistência do Cifrei 3.0 usando Supabase
 
 function ensureSupabaseClient() {
-  if (!window.supabase) {
-    throw new Error('Cliente Supabase não encontrado em window.supabase.');
+  const client = window.cifreiSupabase || window.supabaseClient || null;
+
+  if (!client) {
+    throw new Error('Cliente Supabase não inicializado. Verifique supabaseClient.js.');
   }
-  return window.supabase;
+
+  if (!client.auth || typeof client.auth.getUser !== 'function') {
+    throw new Error('Objeto encontrado não é um client válido do Supabase.');
+  }
+
+  return client;
 }
 
 async function getAuthenticatedUserId() {

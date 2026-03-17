@@ -261,4 +261,3 @@ function handleAbrirCifraParaDecifrar(rec) {
     window.location.href = 'decifrar.html';
   }
 }
-

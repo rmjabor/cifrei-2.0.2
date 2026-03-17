@@ -1183,7 +1183,6 @@ function setupEditarCifraPage() {
   const pEditada  = document.getElementById('editadaEm');
   const btnEditar = document.getElementById('btnEditarCifra');
 
-  // Detecta editarcifra.html pelos campos estruturais, não por um ícone auxiliar.
   if (!inputNome || !txtChave || !txtMsg || !inputObs || !btnEditar) return;
 
   let originalRecord = null;
@@ -1196,7 +1195,6 @@ function setupEditarCifraPage() {
     try {
       const raw = localStorage.getItem('cifreiEditarContext');
       console.log('[Cifrei] cifreiEditarContext raw =', raw);
-
       if (raw) {
         const ctx = JSON.parse(raw);
         if (ctx && ctx.id != null) {
@@ -1219,7 +1217,6 @@ function setupEditarCifraPage() {
 
     try {
       const rec = await getCifragemRecordById(ctxId);
-
       if (!rec) {
         console.warn('[Cifrei] Registro não encontrado para edição (id=' + ctxId + ').');
         return;
@@ -1242,7 +1239,7 @@ function setupEditarCifraPage() {
       if (pCriada && rec.createdAt) {
         try {
           pCriada.textContent = 'Criada em: ' + new Date(rec.createdAt).toLocaleString('pt-BR');
-        } catch {
+        } catch (e) {
           pCriada.textContent = 'Criada em: ' + rec.createdAt;
         }
       }
@@ -1251,7 +1248,7 @@ function setupEditarCifraPage() {
         if (rec.updatedAt) {
           try {
             pEditada.textContent = 'Editada em: ' + new Date(rec.updatedAt).toLocaleString('pt-BR');
-          } catch {
+          } catch (e) {
             pEditada.textContent = 'Editada em: ' + rec.updatedAt;
           }
           pEditada.classList.remove('d-none');
@@ -1270,20 +1267,24 @@ function setupEditarCifraPage() {
     }
   }
 
+
+
+  // --- Lógica de habilitação do botão ---
   function atualizarEstadoBotao() {
-    if (!originalRecord) {
-      btnEditar.disabled = true;
+    if (!btnEditar || !originalRecord) {
+      if (btnEditar) btnEditar.disabled = true;
       return;
     }
 
-    const nomeAtual = (inputNome.value || '').trim();
-    const msgAtual  = txtMsg.value || '';
-    const obsAtual  = (inputObs.value || '').trim();
+    const nomeAtual = (inputNome?.value || '').trim();
+    const msgAtual  = (txtMsg?.value || '');
+    const obsAtual  = (inputObs?.value || '').trim();
 
     const nomeOriginal = (originalRecord.name || '').trim();
     const msgOriginal  = originalRecord.ciphertext || '';
     const obsOriginal  = (originalRecord.notes || '').trim();
 
+    // regra: nome não pode ser vazio
     if (!nomeAtual) {
       btnEditar.disabled = true;
       return;
@@ -1292,84 +1293,109 @@ function setupEditarCifraPage() {
     const mudouNome = nomeAtual !== nomeOriginal;
     const mudouObs  = obsAtual !== obsOriginal;
 
-    const apagouMsg = msgAtual.trim() === '' && msgOriginal.trim() !== '';
-    const mudouMsg  = msgAtual !== msgOriginal;
+    // ciphertext: só pode apagar
+    const apagouMsg  = msgAtual.trim() === '' && msgOriginal.trim() !== '';
+    const mudouMsg   = msgAtual !== msgOriginal;
     const msgAlteradaSemPermissao = mudouMsg && !apagouMsg;
 
     if (msgAlteradaSemPermissao) {
+      // usuário alterou o texto cifrado de forma diferente de "apagar tudo"
       btnEditar.disabled = true;
       return;
     }
 
-    btnEditar.disabled = !(mudouNome || mudouObs || apagouMsg);
+    const houveMudanca = mudouNome || mudouObs || apagouMsg;
+
+    btnEditar.disabled = !houveMudanca;
   }
 
-  inputNome.addEventListener('input', atualizarEstadoBotao);
-  txtMsg.addEventListener('input', atualizarEstadoBotao);
-  inputObs.addEventListener('input', atualizarEstadoBotao);
+  if (inputNome) inputNome.addEventListener('input', atualizarEstadoBotao);
+  if (txtMsg)    txtMsg.addEventListener('input', atualizarEstadoBotao);
+  if (inputObs)  inputObs.addEventListener('input', atualizarEstadoBotao);
 
-  btnEditar.addEventListener('click', async function (event) {
-    event.preventDefault();
+  // --- Clique em Editar: salvar alterações ---
+  if (btnEditar) {
+    btnEditar.addEventListener('click', async function (event) {
+      event.preventDefault();
 
-    if (!originalRecord) return;
+      if (!originalRecord) return;
 
-    atualizarEstadoBotao();
-    if (btnEditar.disabled) return;
+      atualizarEstadoBotao();
+      if (btnEditar.disabled) return;
 
-    const nomeAtual = (inputNome.value || '').trim();
-    const msgAtual  = txtMsg.value || '';
-    const obsAtual  = (inputObs.value || '').trim();
+      const nomeAtual = (inputNome?.value || '').trim();
+      const msgAtual  = (txtMsg?.value || '');
+      const obsAtual  = (inputObs?.value || '').trim();
 
-    const msgOriginal = originalRecord.ciphertext || '';
-    const apagouMsg   = msgAtual.trim() === '' && msgOriginal.trim() !== '';
-    const mudouMsg    = msgAtual !== msgOriginal;
+      const msgOriginal = originalRecord.ciphertext || '';
+      const apagouMsg   = msgAtual.trim() === '' && msgOriginal.trim() !== '';
+      const mudouMsg    = msgAtual !== msgOriginal;
 
-    if (mudouMsg && !apagouMsg) {
-      console.warn('[Cifrei] Alteração de ciphertext não permitida (apenas apagar).');
-      btnEditar.disabled = true;
-      return;
-    }
-
-    const novoCiphertext = apagouMsg ? '' : msgOriginal;
-
-    if (typeof updateCifragemRecord !== 'function') {
-      console.error('[Cifrei] updateCifragemRecord não disponível.');
-      return;
-    }
-
-    try {
-      await updateCifragemRecord(originalRecord.id, {
-        name: nomeAtual,
-        key75: originalRecord.key75,
-        ciphertext: novoCiphertext,
-        notes: obsAtual
-      });
-
-      originalRecord.name = nomeAtual;
-      originalRecord.ciphertext = novoCiphertext;
-      originalRecord.notes = obsAtual;
-      originalRecord.updatedAt = new Date().toISOString();
-
-      if (pEditada) {
-        pEditada.textContent = 'Editada em: ' + new Date(originalRecord.updatedAt).toLocaleString('pt-BR');
-        pEditada.classList.remove('d-none');
+      if (mudouMsg && !apagouMsg) {
+        console.warn('[Cifrei] Alteração de ciphertext não permitida (apenas apagar).');
+        btnEditar.disabled = true;
+        return;
       }
 
-      btnEditar.disabled = true;
-    } catch (err) {
-      console.error('[Cifrei] Erro ao atualizar cifra:', err);
-    }
-  });
+      const novoCiphertext = apagouMsg ? '' : msgOriginal;
 
-  function atualizarVisibilidadeIconeCopiar() {
-    const icone = document.getElementById('icnCopiarMsg');
-    if (!icone) return;
-    icone.style.display = txtMsg.value.trim() === '' ? 'none' : 'inline-block';
+      if (typeof updateCifragemRecord !== 'function') {
+        console.error('[Cifrei] updateCifragemRecord não disponível.');
+        return;
+      }
+
+      try {
+        await updateCifragemRecord(originalRecord.id, {
+          name:       nomeAtual,
+          key75:      originalRecord.key75,
+          ciphertext: novoCiphertext,
+          notes:      obsAtual
+        });
+
+        // updateCifragemRecord já atualiza updatedAt no banco.
+        const agora = new Date();
+
+        // Atualiza o objeto em memória
+        originalRecord.name       = nomeAtual;
+        originalRecord.ciphertext = novoCiphertext;
+        originalRecord.notes      = obsAtual;
+        originalRecord.updatedAt  = agora.toISOString();
+
+        // Atualiza o <p> "Editada em:"
+        if (pEditada) {
+          pEditada.textContent = 'Editada em: ' + agora.toLocaleString('pt-BR');
+          pEditada.classList.remove('d-none');
+        }
+
+        // feedback visual: desabilita botão
+        btnEditar.disabled = true;
+      } catch (err) {
+        console.error('[Cifrei] Erro ao atualizar cifra:', err);
+      }
+    });
   }
 
-  txtMsg.addEventListener('input', atualizarVisibilidadeIconeCopiar);
+  function atualizarVisibilidadeIconeCopiar() {
+    const txt = document.getElementById("txtMsgBottom");
+    const icone = document.getElementById("icnCopiarMsg");
+
+    if (!txt || !icone) return;
+
+    if (txt.value.trim() === "") {
+        icone.style.display = "none";
+    } else {
+        icone.style.display = "inline-block";
+    }
+}
+  // === Ícone copiar deve aparecer sumir conforme texto ===
+  const txtMsgBottom = document.getElementById("txtMsgBottom");
+  if (txtMsgBottom) {
+      txtMsgBottom.addEventListener("input", atualizarVisibilidadeIconeCopiar);
+  }
+
   atualizarVisibilidadeIconeCopiar();
 
+  // dispara carregamento inicial
   carregarDadosEdicao();
 
   const btnShowQr = document.getElementById('btnShowQrFromCifrar');
@@ -1377,6 +1403,7 @@ function setupEditarCifraPage() {
     btnShowQr.addEventListener('click', openQrCodeModal);
   }
 }
+
 
 function setupCifragemNavigation() {
   const voltarTop = document.getElementById('voltarCifragemTop');
