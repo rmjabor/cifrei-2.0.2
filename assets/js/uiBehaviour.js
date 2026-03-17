@@ -221,8 +221,8 @@ async function refreshChaveDropdownFromDB(dropdown, radio4) {
 }
 
 async function getCifragemRecordById(id) {
-  const numericId = Number(id);
-  if (!numericId) return null;
+  const targetId = String(id || '').trim();
+  if (!targetId) return null;
 
   if (typeof getAllCifragemRecordsSortedByName !== 'function') {
     console.warn('[Cifrei] getAllCifragemRecordsSortedByName não disponível.');
@@ -231,7 +231,7 @@ async function getCifragemRecordById(id) {
 
   try {
     const list = await getAllCifragemRecordsSortedByName();
-    return list.find(r => r.id === numericId) || null;
+    return list.find(r => String(r.id) === targetId) || null;
   } catch (e) {
     console.error('[Cifrei] Erro ao buscar registro por id:', e);
     return null;

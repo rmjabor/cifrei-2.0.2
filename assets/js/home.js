@@ -186,7 +186,7 @@ function setupExcluirCifraModal() {
     }
 
     try {
-      await deleteCifragemRecord(Number(cifraIdToDelete));
+      await deleteCifragemRecord(cifraIdToDelete);
       cifraIdToDelete   = null;
       cifraNameToDelete = '';
 

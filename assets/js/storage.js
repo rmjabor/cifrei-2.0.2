@@ -1,86 +1,97 @@
 // storage.js
-// Banco local do Cifrei 2.0 usando IndexedDB
+// Camada de persistência do Cifrei 3.0 usando Supabase
 
-const CIFREI_DB_NAME    = 'Cifrei2DB';
-const CIFREI_DB_VERSION = 1;
-const CIFREI_STORE_NAME = 'cifragemRecords';
+const CIFREI_TABLE_NAME = 'cifragem_records';
 
-// Abre (ou cria) o banco
-function openCifreiDb() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(CIFREI_DB_NAME, CIFREI_DB_VERSION);
-
-    request.onupgradeneeded = function (event) {
-      const db = event.target.result;
-
-      if (!db.objectStoreNames.contains(CIFREI_STORE_NAME)) {
-        const store = db.createObjectStore(CIFREI_STORE_NAME, {
-          keyPath: 'id',
-          autoIncrement: true // id sequencial
-        });
-
-        store.createIndex('name', 'name', { unique: false });
-        store.createIndex('createdAt', 'createdAt', { unique: false });
-      }
-    };
-
-    request.onsuccess = function (event) {
-      resolve(event.target.result);
-    };
-
-    request.onerror = function (event) {
-      reject(event.target.error);
-    };
-  });
+function getCifreiSupabaseClient() {
+  return window.cifreiSupabase || window.supabaseClient || null;
 }
 
-// Procura uma cifra pelo nome exato (case-sensitive)
+async function getAuthenticatedUserOrThrow() {
+  const supabase = getCifreiSupabaseClient();
+  if (!supabase) {
+    throw new Error('Supabase client não inicializado.');
+  }
+
+  const { data, error } = await supabase.auth.getUser();
+  if (error) {
+    throw error;
+  }
+
+  const user = data?.user || null;
+  if (!user?.id) {
+    throw new Error('Usuário não autenticado.');
+  }
+
+  return { supabase, user };
+}
+
+function mapDbRowToLegacyRecord(row) {
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    name: row.name || '',
+    key75: row.key75 || '',
+    ciphertext: row.ciphertext || '',
+    notes: row.notes || '',
+    createdAt: row.created_at || null,
+    updatedAt: row.updated_at || null
+  };
+}
+
+function buildDbPayload(data) {
+  const payload = {};
+
+  if (Object.prototype.hasOwnProperty.call(data, 'name')) {
+    payload.name = data.name == null ? null : String(data.name);
+  }
+  if (Object.prototype.hasOwnProperty.call(data, 'key75')) {
+    payload.key75 = String(data.key75 || '');
+  }
+  if (Object.prototype.hasOwnProperty.call(data, 'ciphertext')) {
+    payload.ciphertext = String(data.ciphertext || '');
+  }
+  if (Object.prototype.hasOwnProperty.call(data, 'notes')) {
+    payload.notes = data.notes == null ? '' : String(data.notes);
+  }
+
+  return payload;
+}
+
+// Procura uma cifra pelo nome exato (case-sensitive do app; comparação depende da collation do banco)
 async function findCifragemByName(name) {
-  const db = await openCifreiDb();
+  const { supabase, user } = await getAuthenticatedUserOrThrow();
 
-  return new Promise((resolve, reject) => {
-    const tx    = db.transaction(CIFREI_STORE_NAME, 'readonly');
-    const store = tx.objectStore(CIFREI_STORE_NAME);
-    let index;
+  const { data, error } = await supabase
+    .from(CIFREI_TABLE_NAME)
+    .select('id, name, key75, ciphertext, notes, created_at, updated_at')
+    .eq('user_id', user.id)
+    .eq('name', name)
+    .order('created_at', { ascending: true })
+    .limit(1);
 
-    try {
-      index = store.index('name');
-    } catch (e) {
-      console.error('[Cifrei] Índice "name" não encontrado na store.', e);
-      reject(e);
-      return;
-    }
+  if (error) {
+    throw error;
+  }
 
-    const req = index.get(name);
-
-    req.onsuccess = function () {
-      resolve(req.result || null);
-    };
-
-    req.onerror = function () {
-      reject(req.error);
-    };
-  });
+  return mapDbRowToLegacyRecord(data?.[0] || null);
 }
-
 
 // Conta quantos registros existem (para sugerir "Cifra #N")
 async function getCifragemCount() {
-  const db = await openCifreiDb();
+  const { supabase, user } = await getAuthenticatedUserOrThrow();
 
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(CIFREI_STORE_NAME, 'readonly');
-    const store = tx.objectStore(CIFREI_STORE_NAME);
-    const countRequest = store.count();
+  const { count, error } = await supabase
+    .from(CIFREI_TABLE_NAME)
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id);
 
-    countRequest.onsuccess = function () {
-      resolve(countRequest.result || 0);
-    };
+  if (error) {
+    throw error;
+  }
 
-    countRequest.onerror = function () {
-      reject(countRequest.error);
-    };
-  });
+  return count || 0;
 }
 
 // Retorna o nome padrão sugerido: "Cifra #N"
@@ -93,151 +104,95 @@ async function getNextCifragemDefaultName() {
 // Salva um registro de cifragem
 // data: { name, key75, ciphertext, notes }
 async function saveCifragemRecord(data) {
-  const db = await openCifreiDb();
+  const { supabase, user } = await getAuthenticatedUserOrThrow();
 
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(CIFREI_STORE_NAME, 'readwrite');
-    const store = tx.objectStore(CIFREI_STORE_NAME);
+  const payload = buildDbPayload(data);
+  payload.user_id = user.id;
 
-    const nowIso = new Date().toISOString();
+  const { data: insertedRow, error } = await supabase
+    .from(CIFREI_TABLE_NAME)
+    .insert(payload)
+    .select('id, name, key75, ciphertext, notes, created_at, updated_at')
+    .single();
 
-    const record = {
-      // id é autoIncrement, deixamos sem definir
-      name:        data.name,
-      key75:       data.key75,
-      ciphertext:  data.ciphertext,  // pode ser "" se salvar só a chave
-      notes:       data.notes || '',
-      createdAt:   nowIso,
-      updatedAt:   null
-    };
+  if (error) {
+    throw error;
+  }
 
-    const req = store.add(record);
-
-    req.onsuccess = function () {
-      resolve(req.result); // id gerado
-    };
-
-    req.onerror = function () {
-      reject(req.error);
-    };
-  });
+  const record = mapDbRowToLegacyRecord(insertedRow);
+  return record?.id || null;
 }
 
 // Atualiza um registro existente pelo id
 async function updateCifragemRecord(id, { name, key75, ciphertext, notes }) {
-  const db = await openCifreiDb();
+  const { supabase, user } = await getAuthenticatedUserOrThrow();
 
-  return new Promise((resolve, reject) => {
-    const tx    = db.transaction(CIFREI_STORE_NAME, 'readwrite');
-    const store = tx.objectStore(CIFREI_STORE_NAME);
+  const payload = buildDbPayload({ name, key75, ciphertext, notes });
 
-    const getReq = store.get(id);
+  const { error } = await supabase
+    .from(CIFREI_TABLE_NAME)
+    .update(payload)
+    .eq('id', id)
+    .eq('user_id', user.id);
 
-    getReq.onsuccess = function () {
-      const rec = getReq.result;
-      if (!rec) {
-        reject(new Error('Registro não encontrado para update (id=' + id + ')'));
-        return;
-      }
+  if (error) {
+    throw error;
+  }
 
-      rec.name       = name;
-      rec.key75      = key75;
-      rec.ciphertext = ciphertext;
-      rec.notes      = notes || '';
-      rec.updatedAt  = new Date().toISOString();
-
-      const putReq = store.put(rec);
-
-      putReq.onsuccess = function () {
-        resolve(true);
-      };
-
-      putReq.onerror = function () {
-        reject(putReq.error);
-      };
-    };
-
-    getReq.onerror = function () {
-      reject(getReq.error);
-    };
-  });
+  return true;
 }
-
 
 // Exclui um registro de cifragem pelo id
 async function deleteCifragemRecord(id) {
-  const db = await openCifreiDb();
+  const { supabase, user } = await getAuthenticatedUserOrThrow();
 
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(CIFREI_STORE_NAME, 'readwrite');
-    const store = tx.objectStore(CIFREI_STORE_NAME);
+  const { error } = await supabase
+    .from(CIFREI_TABLE_NAME)
+    .delete()
+    .eq('id', id)
+    .eq('user_id', user.id);
 
-    const req = store.delete(id);
-
-    req.onsuccess = function () {
-      resolve();
-    };
-
-    req.onerror = function () {
-      reject(req.error);
-    };
-  });
+  if (error) {
+    throw error;
+  }
 }
 
 // Retorna todas as cifras salvas, ordenadas por nome (crescente)
 async function getAllCifragemRecordsSortedByName() {
-  const db = await openCifreiDb();
+  const { supabase, user } = await getAuthenticatedUserOrThrow();
 
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(CIFREI_STORE_NAME, 'readonly');
-    const store = tx.objectStore(CIFREI_STORE_NAME);
+  const { data, error } = await supabase
+    .from(CIFREI_TABLE_NAME)
+    .select('id, name, key75, ciphertext, notes, created_at, updated_at')
+    .eq('user_id', user.id)
+    .order('name', { ascending: true, nullsFirst: false })
+    .order('created_at', { ascending: true });
 
-    let source;
+  if (error) {
+    throw error;
+  }
 
-    // Se o índice "name" existir, usamos ele para ordenar
-    if (store.indexNames.contains('name')) {
-      source = store.index('name');
-    } else {
-      source = store;
-    }
-
-    const records = [];
-    const request = source.openCursor(null, 'next');
-
-    request.onsuccess = function (event) {
-      const cursor = event.target.result;
-      if (cursor) {
-        records.push(cursor.value);
-        cursor.continue();
-      } else {
-        // nada mais
-        resolve(records);
-      }
-    };
-
-    request.onerror = function () {
-      reject(request.error);
-    };
-  });
+  return (data || []).map(mapDbRowToLegacyRecord);
 }
 
 // Busca um registro específico pelo id
 async function getCifragemRecordById(id) {
-  const db = await openCifreiDb();
+  const { supabase, user } = await getAuthenticatedUserOrThrow();
 
-  return new Promise((resolve, reject) => {
-    const tx    = db.transaction(CIFREI_STORE_NAME, 'readonly');
-    const store = tx.objectStore(CIFREI_STORE_NAME);
+  if (id == null || id === '') {
+    return null;
+  }
 
-    const req = store.get(Number(id));
+  const { data, error } = await supabase
+    .from(CIFREI_TABLE_NAME)
+    .select('id, name, key75, ciphertext, notes, created_at, updated_at')
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .maybeSingle();
 
-    req.onsuccess = function () {
-      // se não achar, devolve null
-      resolve(req.result || null);
-    };
+  if (error) {
+    throw error;
+  }
 
-    req.onerror = function () {
-      reject(req.error);
-    };
-  });
+  return mapDbRowToLegacyRecord(data || null);
 }
