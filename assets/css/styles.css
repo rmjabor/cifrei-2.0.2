@@ -3,31 +3,42 @@ textarea {
   line-height: 1.2;
 }
 
-textarea.chave {
-  resize: none;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  word-break: break-all;
-}
-
 textarea.mensagem {
   overflow-y: hidden;
   overflow-x: hidden;
   word-break: normal;
 }
 
-textarea.chave::placeholder {
+textarea.codigo {
+  word-break: break-all;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+input.chave::placeholder {
   word-break: normal;
   overflow-wrap: break-word;
   color: #aeaeae;
   opacity: 1;
-  font-size: 13px;
+  font-size: 14px;
+}
+
+input.nome::placeholder {
+  color: #aeaeae;
+  opacity: 1;
+  font-size: 14px;
 }
 
 textarea.mensagem::placeholder {
   color: #aeaeae;
   opacity: 1;
-  font-size: 13px;
+  font-size: 14px;
+}
+
+textarea.codigo::placeholder {
+  color: #aeaeae;
+  opacity: 1;
+  font-size: 14px;
 }
 
 .clickable {
@@ -54,6 +65,19 @@ textarea.mensagem::placeholder {
   position: relative;
 }
 
+/* Containers = campo visual */
+
+#divChave, #divMsgEntrada, #divInputMdlObsSalvarCifragem, #divInputObsCifraAberta {
+  background-color: #f4f4f4;
+  transition: background-color 0.2s ease;
+}
+
+/* Estado de foco */
+
+#divChave:focus-within, #divMsgEntrada:focus-within, #divInputMdlObsSalvarCifragem:focus-within, #divInputObsCifraAberta:focus-within {
+  background-color: #eeeeee;
+}
+
 textarea.form-control:focus {
   background-color: #eeeeee !important;
   border-color: inherit !important;
@@ -61,9 +85,23 @@ textarea.form-control:focus {
 }
 
 textarea.deadinput:focus {
-  /*border-color: none !important;*/
   box-shadow: none !important;
   outline: none !important;
+}
+
+input.deadinput:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#txtMsgBottom {
+  field-sizing: content !important;
+  resize: none !important;
+}
+
+#txtMsgAberta {
+  field-sizing: content !important;
+  resize: none !important;
 }
 
 textarea.form-control {
@@ -71,9 +109,10 @@ textarea.form-control {
 }
 
 input.form-control:focus {
-  background-color: #dadada !important;
+  background-color: #eeeeee !important;
   border-color: inherit !important;
   box-shadow: none !important;
+  outline: 0;
 }
 
 .w-340 {
@@ -113,6 +152,12 @@ input.form-control:focus {
 #txtMsgEntrada {
   word-break: break-word;
   overflow-wrap: break-word;
+  field-sizing: content;
+  resize: none;
+}
+
+.fixedToContent {
+  resize: none;
   field-sizing: content;
 }
 

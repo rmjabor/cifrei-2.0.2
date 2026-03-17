@@ -34,20 +34,31 @@ document.addEventListener('DOMContentLoaded', function () {
   safeInit('setupCifragemPageBottom', setupCifragemPageBottom);
 });
 
-function animarTextarea(element) {
+function animarHighlightElemento(element, className, duration) {
   if (!element) return;
 
-  element.classList.remove('textarea-highlight'); // reinicia animação se clicado várias vezes
+  element.classList.remove(className);
 
   // força relayout para permitir re-disparo da animação
   void element.offsetWidth;
 
-  element.classList.add('textarea-highlight');
+  element.classList.add(className);
 
-  // remove após a animação terminar
   setTimeout(() => {
-    element.classList.remove('textarea-highlight');
-  }, 450);
+    element.classList.remove(className);
+  }, duration);
+}
+
+function animarTextarea(element) {
+  animarHighlightElemento(element, 'textarea-highlight', 450);
+}
+
+function animarApagando(element) {
+  animarHighlightElemento(element, 'apagando', 200);
+}
+
+function animarCopiado(element) {
+  animarHighlightElemento(element, 'copiado', 200);
 }
 
 //
@@ -58,6 +69,8 @@ function setupApagarMensagem() {
   const icone = document.getElementById('icnApagarMsg');
 
   if (!campo || !icone) return;
+
+  const container = document.getElementById('divMsgEntrada') || campo;
 
   function atualizarIcone() {
     icone.style.display = campo.value.trim() === "" ? "none" : "block";
@@ -70,8 +83,7 @@ function setupApagarMensagem() {
   icone.addEventListener('click', function () {
     campo.value = "";
     atualizarIcone();
-    campo.classList.add('apagando');
-    setTimeout(() => campo.classList.remove('apagando'), 200);
+    animarApagando(container);
     campo.dispatchEvent(new Event('input'));
   });
 }
@@ -85,6 +97,8 @@ function setupApagarMsgEditar() {
 
   // Se não estamos na editarcifra.html, simplesmente sai
   if (!campo || !icone) return;
+
+  const container = document.getElementById('divMsgBottom') || campo;
 
   function atualizarIcone() {
     icone.style.display = campo.value.trim() === "" ? "none" : "block";
@@ -102,8 +116,7 @@ function setupApagarMsgEditar() {
     atualizarIcone();
 
     // mesmo efeito das outras lixeiras (.apagando já existe no CSS)
-    campo.classList.add('apagando');
-    setTimeout(() => campo.classList.remove('apagando'), 200);
+    animarApagando(container);
 
     // dispara input pra qualquer lógica que dependa do conteúdo
     campo.dispatchEvent(new Event('input'));
@@ -119,6 +132,8 @@ function setupApagarChave() {
   const dropdown = document.getElementById('dpdownChave');
 
   if (!campo || !icone) return;
+
+  const container = document.getElementById('divChave') || campo;
 
   function atualizarIcone() {
     const vazio = campo.value.trim() === "";
@@ -140,8 +155,7 @@ function setupApagarChave() {
   icone.addEventListener('click', function () {
     campo.value = "";
     atualizarIcone();
-    campo.classList.add('apagando');
-    setTimeout(() => campo.classList.remove('apagando'), 200);
+    animarApagando(container);
     campo.dispatchEvent(new Event('input'));
   });
 }
@@ -454,15 +468,15 @@ function setupCifragemPageBottom() {
   // 5.2 Copiar chave e mensagem
   if (icnCopiarChave && txtChaveBottom) {
     icnCopiarChave.addEventListener('click', function () {
-      copiarTextoDoTextarea(txtChaveBottom);
-      animarTextarea(txtChaveBottom);
+      const container = document.getElementById('divChaveBottom') || txtChaveBottom;
+      copiarTextoDoTextarea(txtChaveBottom, container);
     });
   }
 
   if (icnCopiarMsg && txtMsgBottom) {
     icnCopiarMsg.addEventListener('click', function () {
-      copiarTextoDoTextarea(txtMsgBottom);
-      animarTextarea(txtMsgBottom);
+      const container = document.getElementById('divMsgBottom') || txtMsgBottom;
+      copiarTextoDoTextarea(txtMsgBottom, container);
     });
   }
 
@@ -557,10 +571,11 @@ function setupCifragemPageBottom() {
 //
 // Funções auxiliares para copiar texto de textarea com animação simples
 //
-function copiarTextoDoTextarea(textarea) {  // Copiar chave e mensagem na página Cifragem
+function copiarTextoDoTextarea(textarea, highlightElement) {  // Copiar chave e mensagem na página Cifragem
   if (!textarea) return;
 
   const valor = textarea.value || '';
+  const target = highlightElement || textarea;
 
   if (!navigator.clipboard) {
     textarea.select();
@@ -571,8 +586,7 @@ function copiarTextoDoTextarea(textarea) {  // Copiar chave e mensagem na págin
     });
   }
 
-  textarea.classList.add('copiado');
-  setTimeout(() => textarea.classList.remove('copiado'), 200);
+  animarCopiado(target);
 }
 
 function setupCopiarMsgAberta() { // Copiar chave e mensagem da página Cifra aberta
@@ -585,7 +599,10 @@ function setupCopiarMsgAberta() { // Copiar chave e mensagem da página Cifra ab
     return;
   }
 
-  btn.addEventListener('click', () => copiarTextoDoTextarea(txt));
+  btn.addEventListener('click', () => {
+    const container = document.getElementById('divMsgAberta') || txt;
+    copiarTextoDoTextarea(txt, container);
+  });
 }
 
 
