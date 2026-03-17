@@ -11,7 +11,6 @@ textarea.chave {
 }
 
 textarea.mensagem {
-  resize: none;
   overflow-y: hidden;
   overflow-x: hidden;
   word-break: normal;
@@ -114,6 +113,7 @@ input.form-control:focus {
 #txtMsgEntrada {
   word-break: break-word;
   overflow-wrap: break-word;
+  field-sizing: content;
 }
 
 #inputFraseSegredo {
