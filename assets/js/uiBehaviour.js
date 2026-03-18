@@ -2577,20 +2577,21 @@ function setupPasswordGeneratorModal() {
     bsModal.show();
   });
 
-modalEl.addEventListener("shown.bs.modal", function () {
+  modalEl.addEventListener("shown.bs.modal", async function () {
+    if (typeof initPasswordGenerator === "function") {
+      initPasswordGenerator();
+    }
 
-  if (typeof resetPasswordPopup === "function") {
-    resetPasswordPopup();
-  }
-
-  if (typeof initPasswordGenerator === "function") {
-    initPasswordGenerator();
-  }
-
-});
-
-  modalEl.addEventListener("hidden.bs.modal", function () {
-    if (typeof resetPasswordPopup === "function") {
+    if (typeof loadPasswordGeneratorParams === "function") {
+      try {
+        await loadPasswordGeneratorParams();
+      } catch (err) {
+        console.warn('[Cifrei] Não foi possível carregar as preferências do gerador de senha:', err);
+        if (typeof resetPasswordPopup === "function") {
+          resetPasswordPopup();
+        }
+      }
+    } else if (typeof resetPasswordPopup === "function") {
       resetPasswordPopup();
     }
   });
