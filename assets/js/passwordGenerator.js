@@ -4,6 +4,13 @@ const NUM   = "0123456789";
 const SPEC  = "!@#$%&*-_";
 
 let passwordGeneratorInitialized = false;
+let passwordGeneratorParamsLoaded = false;
+const PASSWORD_GEN_DEFAULTS = Object.freeze({
+  total: 8,
+  upper: 1,
+  number: 1,
+  special: 1
+});
 
 function secureRandom(max) {
   const array = new Uint32Array(1);
@@ -32,6 +39,48 @@ function num(id) {
 function setVal(id, val) {
   const el = document.getElementById(id);
   if (el) el.value = val;
+}
+
+function getCurrentPasswordGenParams() {
+  return {
+    total: num("inputCaracTotais"),
+    upper: num("inputMaiusc"),
+    number: num("inputNumero"),
+    special: num("inputEspec")
+  };
+}
+
+function normalizePasswordGenParamsLocal(params) {
+  const src = params && typeof params === "object" ? params : {};
+
+  let total = Number.parseInt(src.total, 10);
+  let upper = Number.parseInt(src.upper, 10);
+  let number = Number.parseInt(src.number, 10);
+  let special = Number.parseInt(src.special, 10);
+
+  if (!Number.isFinite(total)) total = PASSWORD_GEN_DEFAULTS.total;
+  if (!Number.isFinite(upper)) upper = PASSWORD_GEN_DEFAULTS.upper;
+  if (!Number.isFinite(number)) number = PASSWORD_GEN_DEFAULTS.number;
+  if (!Number.isFinite(special)) special = PASSWORD_GEN_DEFAULTS.special;
+
+  total = Math.min(30, Math.max(4, total));
+  upper = Math.min(9, Math.max(0, upper));
+  number = Math.min(9, Math.max(0, number));
+  special = Math.min(9, Math.max(0, special));
+
+  const sum = upper + number + special;
+  if (sum > total) total = Math.min(30, sum);
+
+  return { total, upper, number, special };
+}
+
+function applyPasswordGenParams(params) {
+  const normalized = normalizePasswordGenParamsLocal(params);
+  setVal("inputCaracTotais", normalized.total);
+  setVal("inputMaiusc", normalized.upper);
+  setVal("inputNumero", normalized.number);
+  setVal("inputEspec", normalized.special);
+  return normalized;
 }
 
 function sanitizeNumericInput(id, maxDigits, options = {}) {
@@ -65,7 +114,7 @@ function sanitizeNumericInput(id, maxDigits, options = {}) {
   if (clampOnBlur) {
     el.addEventListener("blur", function () {
       if (this.value === "") {
-        if (id === "inputCaracTotais") this.value = "8";
+        if (id === "inputCaracTotais") this.value = String(PASSWORD_GEN_DEFAULTS.total);
         else this.value = "0";
       }
 
@@ -76,34 +125,16 @@ function sanitizeNumericInput(id, maxDigits, options = {}) {
 }
 
 function enforcePasswordRules() {
-  let total   = Math.min(30, Math.max(4, num("inputCaracTotais")));
-  let upper   = Math.min(9, Math.max(0, num("inputMaiusc")));
-  let number  = Math.min(9, Math.max(0, num("inputNumero")));
-  let special = Math.min(9, Math.max(0, num("inputEspec")));
-
-  const sum = upper + number + special;
-
-  if (sum > total) {
-    total = sum;
-  }
-
-  if (total > 30) {
-    total = 30;
-  }
-
-  setVal("inputCaracTotais", total);
-  setVal("inputMaiusc", upper);
-  setVal("inputNumero", number);
-  setVal("inputEspec", special);
+  return applyPasswordGenParams(getCurrentPasswordGenParams());
 }
 
 function generatePassword() {
-  enforcePasswordRules();
+  const params = enforcePasswordRules();
 
-  const total   = num("inputCaracTotais");
-  const upper   = num("inputMaiusc");
-  const number  = num("inputNumero");
-  const special = num("inputEspec");
+  const total   = params.total;
+  const upper   = params.upper;
+  const number  = params.number;
+  const special = params.special;
   const lower   = total - upper - number - special;
 
   let chars = [];
@@ -149,10 +180,7 @@ function decGeneric(id) {
 }
 
 function resetPasswordPopup() {
-  setVal("inputCaracTotais", 8);
-  setVal("inputMaiusc", 1);
-  setVal("inputNumero", 1);
-  setVal("inputEspec", 1);
+  applyPasswordGenParams(PASSWORD_GEN_DEFAULTS);
   generatePassword();
 }
 
@@ -164,6 +192,38 @@ function useGeneratedPassword() {
     destEl.value = senhaEl.value;
     destEl.dispatchEvent(new Event("input", { bubbles: true }));
   }
+}
+
+async function loadPasswordGeneratorParams() {
+  let params = PASSWORD_GEN_DEFAULTS;
+
+  if (typeof getProfilePasswordGenParams === "function") {
+    try {
+      params = await getProfilePasswordGenParams();
+    } catch (err) {
+      console.warn("[Cifrei] Não foi possível carregar os parâmetros do gerador de senha:", err);
+    }
+  }
+
+  passwordGeneratorParamsLoaded = true;
+  applyPasswordGenParams(params);
+  generatePassword();
+  return normalizePasswordGenParamsLocal(params);
+}
+
+async function persistPasswordGeneratorParams() {
+  const params = normalizePasswordGenParamsLocal(getCurrentPasswordGenParams());
+  applyPasswordGenParams(params);
+
+  if (typeof saveProfilePasswordGenParams === "function") {
+    try {
+      await saveProfilePasswordGenParams(params);
+    } catch (err) {
+      console.warn("[Cifrei] Não foi possível salvar os parâmetros do gerador de senha:", err);
+    }
+  }
+
+  return params;
 }
 
 function initPasswordGenerator() {
@@ -195,29 +255,32 @@ function initPasswordGenerator() {
     if (!document.getElementById(id)) return;
   }
 
-sanitizeNumericInput("inputCaracTotais", 2, {
-  clampOnInput: true,
-  clampOnBlur: true,
-  clampOnlyWhenMaxDigitsReached: true
-});
+  sanitizeNumericInput("inputCaracTotais", 2, {
+    clampOnInput: true,
+    clampOnBlur: true,
+    clampOnlyWhenMaxDigitsReached: true
+  });
 
-sanitizeNumericInput("inputMaiusc", 1, {
-  clampOnInput: true,
-  clampOnBlur: true
-});
+  sanitizeNumericInput("inputMaiusc", 1, {
+    clampOnInput: true,
+    clampOnBlur: true
+  });
 
-sanitizeNumericInput("inputNumero", 1, {
-  clampOnInput: true,
-  clampOnBlur: true
-});
+  sanitizeNumericInput("inputNumero", 1, {
+    clampOnInput: true,
+    clampOnBlur: true
+  });
 
-sanitizeNumericInput("inputEspec", 1, {
-  clampOnInput: true,
-  clampOnBlur: true
-});
+  sanitizeNumericInput("inputEspec", 1, {
+    clampOnInput: true,
+    clampOnBlur: true
+  });
 
   document.getElementById("divIconeRefresh").addEventListener("click", generatePassword);
-  document.getElementById("btnUsarSenhaGerada").addEventListener("click", useGeneratedPassword);
+  document.getElementById("btnUsarSenhaGerada").addEventListener("click", async () => {
+    await persistPasswordGeneratorParams();
+    useGeneratedPassword();
+  });
 
   document.getElementById("iconPlusCaracTotais").addEventListener("click", () => inc("inputCaracTotais", 30));
   document.getElementById("iconPlusMaiusc").addEventListener("click", () => inc("inputMaiusc", 9));
@@ -230,5 +293,10 @@ sanitizeNumericInput("inputEspec", 1, {
   document.getElementById("iconMinusEspec").addEventListener("click", () => decGeneric("inputEspec"));
 
   passwordGeneratorInitialized = true;
-  generatePassword();
+
+  if (passwordGeneratorParamsLoaded) {
+    generatePassword();
+  } else {
+    resetPasswordPopup();
+  }
 }

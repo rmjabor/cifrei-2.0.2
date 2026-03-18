@@ -172,3 +172,70 @@ async function getCifragemRecordById(id) {
   if (error) throw error;
   return mapDbRecordToApp(data);
 }
+
+
+const DEFAULT_PASSWORD_GEN_PARAMS = Object.freeze({
+  total: 8,
+  upper: 1,
+  number: 1,
+  special: 1
+});
+
+function normalizePasswordGenParams(params) {
+  const src = params && typeof params === 'object' ? params : {};
+
+  let total = Number.parseInt(src.total, 10);
+  let upper = Number.parseInt(src.upper, 10);
+  let number = Number.parseInt(src.number, 10);
+  let special = Number.parseInt(src.special, 10);
+
+  if (!Number.isFinite(total)) total = DEFAULT_PASSWORD_GEN_PARAMS.total;
+  if (!Number.isFinite(upper)) upper = DEFAULT_PASSWORD_GEN_PARAMS.upper;
+  if (!Number.isFinite(number)) number = DEFAULT_PASSWORD_GEN_PARAMS.number;
+  if (!Number.isFinite(special)) special = DEFAULT_PASSWORD_GEN_PARAMS.special;
+
+  total = Math.min(30, Math.max(4, total));
+  upper = Math.min(9, Math.max(0, upper));
+  number = Math.min(9, Math.max(0, number));
+  special = Math.min(9, Math.max(0, special));
+
+  const sum = upper + number + special;
+  if (sum > total) {
+    total = Math.min(30, sum);
+  }
+
+  return { total, upper, number, special };
+}
+
+async function getProfilePasswordGenParams() {
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('password_gen_params')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return normalizePasswordGenParams(data && data.password_gen_params ? data.password_gen_params : DEFAULT_PASSWORD_GEN_PARAMS);
+}
+
+async function saveProfilePasswordGenParams(params) {
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
+  const normalized = normalizePasswordGenParams(params);
+
+  const { error } = await supabase
+    .from('profiles')
+    .upsert(
+      {
+        id: userId,
+        password_gen_params: normalized
+      },
+      { onConflict: 'id' }
+    );
+
+  if (error) throw error;
+  return normalized;
+}

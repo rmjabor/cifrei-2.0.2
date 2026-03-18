@@ -50,45 +50,12 @@ function animarTextarea(element) {
   }, 450);
 }
 
-
-function animarElementoClasse(element, className, duration = 250) {
-  if (!element || !className) return;
-  element.classList.remove(className);
-  void element.offsetWidth;
-  element.classList.add(className);
-  setTimeout(() => {
-    element.classList.remove(className);
-  }, duration);
-}
-
-function copiarTextoComEfeito(textarea, container) {
-  if (!textarea) return;
-  copiarTextoDoTextarea(textarea);
-  if (container) {
-    animarElementoClasse(container, 'copiado', 250);
-  } else {
-    animarTextarea(textarea);
-  }
-}
-
-function apagarTextoComEfeito(campo, container) {
-  if (!campo) return;
-  campo.value = "";
-  if (container) {
-    animarElementoClasse(container, 'apagando', 250);
-  } else {
-    animarElementoClasse(campo, 'apagando', 250);
-  }
-  campo.dispatchEvent(new Event('input'));
-}
-
 //
 // 1) Ícone de lixeira para txtMsgEntrada
 //
 function setupApagarMensagem() {
   const campo = document.getElementById('txtMsgEntrada');
   const icone = document.getElementById('icnApagarMsg');
-  const container = document.getElementById('divMsgEntrada');
 
   if (!campo || !icone) return;
 
@@ -101,8 +68,11 @@ function setupApagarMensagem() {
   campo.addEventListener('input', atualizarIcone);
 
   icone.addEventListener('click', function () {
-    apagarTextoComEfeito(campo, container);
+    campo.value = "";
     atualizarIcone();
+    campo.classList.add('apagando');
+    setTimeout(() => campo.classList.remove('apagando'), 200);
+    campo.dispatchEvent(new Event('input'));
   });
 }
 
@@ -110,12 +80,34 @@ function setupApagarMensagem() {
 // 1c) Ícone de lixeira para txtMsgEditar (editarcifra.html)
 //
 function setupApagarMsgEditar() {
+  const campo = document.getElementById('txtMsgBottom');
   const icone = document.getElementById('icnApagarMsgEditar');
-  if (!icone) return;
 
-  // Esta função foi descontinuada: a mensagem da cifra aberta/editável não pode mais
-  // ser apagada por esse ícone. Mantemos apenas o ícone oculto para evitar ação acidental.
-  icone.style.display = 'none';
+  // Se não estamos na editarcifra.html, simplesmente sai
+  if (!campo || !icone) return;
+
+  function atualizarIcone() {
+    icone.style.display = campo.value.trim() === "" ? "none" : "block";
+  }
+
+  // Estado inicial
+  atualizarIcone();
+
+  // Mostra/esconde o ícone conforme o usuário digita
+  campo.addEventListener('input', atualizarIcone);
+
+  // Clique no ícone: apagar + efeito visual
+  icone.addEventListener('click', function () {
+    campo.value = "";
+    atualizarIcone();
+
+    // mesmo efeito das outras lixeiras (.apagando já existe no CSS)
+    campo.classList.add('apagando');
+    setTimeout(() => campo.classList.remove('apagando'), 200);
+
+    // dispara input pra qualquer lógica que dependa do conteúdo
+    campo.dispatchEvent(new Event('input'));
+  });
 }
 
 //
@@ -125,7 +117,6 @@ function setupApagarChave() {
   const campo    = document.getElementById('txtChave');
   const icone    = document.getElementById('icnApagarChave');
   const dropdown = document.getElementById('dpdownChave');
-  const container = document.getElementById('divChave');
 
   if (!campo || !icone) return;
 
@@ -147,8 +138,11 @@ function setupApagarChave() {
   campo.addEventListener('input', atualizarIcone);
 
   icone.addEventListener('click', function () {
-    apagarTextoComEfeito(campo, container);
+    campo.value = "";
     atualizarIcone();
+    campo.classList.add('apagando');
+    setTimeout(() => campo.classList.remove('apagando'), 200);
+    campo.dispatchEvent(new Event('input'));
   });
 }
 
@@ -458,33 +452,23 @@ function setupCifragemPageBottom() {
 
 
   // 5.2 Copiar chave e mensagem
-  const divChaveBottom = document.getElementById('divChaveBottom');
-  const divMsgBottom = document.getElementById('divMsgBottom');
-
   if (icnCopiarChave && txtChaveBottom) {
     icnCopiarChave.addEventListener('click', function () {
-      copiarTextoComEfeito(txtChaveBottom, divChaveBottom);
+      copiarTextoDoTextarea(txtChaveBottom);
+      animarTextarea(txtChaveBottom);
     });
   }
 
   if (icnCopiarMsg && txtMsgBottom) {
     icnCopiarMsg.addEventListener('click', function () {
-      copiarTextoComEfeito(txtMsgBottom, divMsgBottom);
+      copiarTextoDoTextarea(txtMsgBottom);
+      animarTextarea(txtMsgBottom);
     });
   }
 
-  // 5.3 Salvar sempre a cifra completa (a opção "salvar somente a chave" foi removida)
-  if (chkSalvarChave) {
-    chkSalvarChave.checked = false;
-    const wrapSalvarChave = chkSalvarChave.closest('.form-check, .form-switch, .form-check-reverse');
-    if (wrapSalvarChave) {
-      wrapSalvarChave.style.display = 'none';
-    } else {
-      chkSalvarChave.style.display = 'none';
-    }
-  }
-
-  if (btnSalvar) {
+  // 5.3 Label do botão Salvar / Salvar somente a chave
+  if (btnSalvar && chkSalvarChave) {
+    // garante estrutura: mantém o SVG existente e recria o texto do botão
     let labelSpan = btnSalvar.querySelector('#lblBtnSalvarCifragem');
     if (!labelSpan) {
       labelSpan = document.createElement('span');
@@ -496,60 +480,73 @@ function setupCifragemPageBottom() {
         btnSalvar.appendChild(labelSpan);
       }
     }
-    labelSpan.textContent = ' Salvar Cifra';
-  }
 
-  // 5.4 Clique em Salvar -> lógica de banco de dados + modal de substituição
-  const modalSubst   = document.getElementById('mdlSubstCifra');
-  const btnOkSubst   = document.getElementById('btnOkMdlSubstCifra');
-  const btnVoltarSubst = document.getElementById('btnVoltarMdlSubstCifra');
+    function setSalvarLabel(texto) {
+      labelSpan.textContent = ' ' + texto;
+    }
 
-  let registroParaSubstituirId = null;
+    setSalvarLabel('Salvar Cifra');
 
-  if (btnSalvar) {
-    btnSalvar.addEventListener('click', async function (event) {
-      event.preventDefault();
-      await handleSalvarCifragemClick({
-        inputNome,
-        inputObs,
-        txtChaveBottom,
-        txtMsgBottom,
-        chkSalvarChave: null,
-        modalSubst,
-        setRegistroId: (id) => { registroParaSubstituirId = id; }
-      });
-    });
-  }
-
-  if (modalSubst && btnOkSubst) {
-    btnOkSubst.addEventListener('click', async function (event) {
-      event.preventDefault();
-      await handleConfirmarSubstituicaoCifraClick({
-        registroId: registroParaSubstituirId,
-        inputNome,
-        inputObs,
-        txtChaveBottom,
-        txtMsgBottom,
-        chkSalvarChave: null,
-        modalSubst
-      });
-    });
-  }
-
-  if (modalSubst && btnVoltarSubst) {
-    btnVoltarSubst.addEventListener('click', function (event) {
-      event.preventDefault();
-      const modalInstance = bootstrap.Modal.getOrCreateInstance(modalSubst);
-      modalInstance.hide();
-
-      // Foca e seleciona o nome repetido
-      if (inputNome) {
-        setTimeout(() => {
-          inputNome.focus();
-          inputNome.select();
-        }, 200);
+    chkSalvarChave.addEventListener('change', function () {
+      if (chkSalvarChave.checked) {
+        setSalvarLabel('Salvar somente a chave');
+      } else {
+        setSalvarLabel('Salvar Cifra');
       }
     });
+
+    // 5.4 Clique em Salvar -> lógica de banco de dados + modal de substituição
+    const modalSubst   = document.getElementById('mdlSubstCifra');
+    const btnOkSubst   = document.getElementById('btnOkMdlSubstCifra');
+    const btnVoltarSubst = document.getElementById('btnVoltarMdlSubstCifra');
+
+    let registroParaSubstituirId = null;
+
+    if (btnSalvar) {
+      btnSalvar.addEventListener('click', async function (event) {
+        event.preventDefault();
+        await handleSalvarCifragemClick({
+          inputNome,
+          inputObs,
+          txtChaveBottom,
+          txtMsgBottom,
+          chkSalvarChave,
+          modalSubst,
+          setRegistroId: (id) => { registroParaSubstituirId = id; }
+        });
+      });
+    }
+
+    if (modalSubst && btnOkSubst) {
+      btnOkSubst.addEventListener('click', async function (event) {
+        event.preventDefault();
+        await handleConfirmarSubstituicaoCifraClick({
+          registroId: registroParaSubstituirId,
+          inputNome,
+          inputObs,
+          txtChaveBottom,
+          txtMsgBottom,
+          chkSalvarChave,
+          modalSubst
+        });
+      });
+    }
+
+    if (modalSubst && btnVoltarSubst) {
+      btnVoltarSubst.addEventListener('click', function (event) {
+        event.preventDefault();
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalSubst);
+        modalInstance.hide();
+
+        // Foca e seleciona o nome repetido
+        if (inputNome) {
+          setTimeout(() => {
+            inputNome.focus();
+            inputNome.select();
+          }, 200);
+        }
+      });
+    }
   }
   const btnShowQr = document.getElementById('btnShowQrFromCifrar');
   if (btnShowQr) {
@@ -578,8 +575,17 @@ function copiarTextoDoTextarea(textarea) {  // Copiar chave e mensagem na págin
   setTimeout(() => textarea.classList.remove('copiado'), 200);
 }
 
-function setupCopiarMsgAberta() { // o binding específico da cifraaberta é feito em setupCifraAbertaPage
-  return;
+function setupCopiarMsgAberta() { // Copiar chave e mensagem da página Cifra aberta
+
+  const btn = document.getElementById('icnCopiarMsgAberta');
+  const txt = document.getElementById('txtMsgAberta');
+
+  if (!btn || !txt) {
+    console.warn('[Cifrei] Erro ao copiar para clipboard');
+    return;
+  }
+
+  btn.addEventListener('click', () => copiarTextoDoTextarea(txt));
 }
 
 
@@ -1151,31 +1157,6 @@ if (inputObs && divObs) {
   }
 }
 
-  const divChaveBottom = document.getElementById('divChaveBottom');
-  const divMsgBottom = document.getElementById('divMsgBottom');
-  const divMsgAberta = document.getElementById('divMsgAberta');
-  const icnCopiarChave = document.getElementById('icnCopiarChave');
-  const icnCopiarMsg = document.getElementById('icnCopiarMsg');
-  const icnCopiarMsgAberta = document.getElementById('icnCopiarMsgAberta');
-
-  if (icnCopiarChave && txtKey) {
-    icnCopiarChave.addEventListener('click', function () {
-      copiarTextoComEfeito(txtKey, divChaveBottom);
-    });
-  }
-
-  if (icnCopiarMsg && txtMsgC) {
-    icnCopiarMsg.addEventListener('click', function () {
-      copiarTextoComEfeito(txtMsgC, divMsgBottom);
-    });
-  }
-
-  if (icnCopiarMsgAberta && txtPlain) {
-    icnCopiarMsgAberta.addEventListener('click', function () {
-      copiarTextoComEfeito(txtPlain, divMsgAberta);
-    });
-  }
-
   // Botão Editar → vai para editarcifra.html com base no id salvo
   if (btnEditar) {
     const recId = (data.id != null) ? String(data.id) : null;
@@ -1215,15 +1196,10 @@ function setupEditarCifraPage() {
   const pCriada   = document.getElementById('criadaEm');
   const pEditada  = document.getElementById('editadaEm');
   const btnEditar = document.getElementById('btnEditarCifra');
-  const icnApagarMsgEditar = document.getElementById('icnApagarMsgEditar');
 
   // Só deve rodar na editarcifra.html. A cifraaberta.html reutiliza vários IDs,
   // mas não possui os parágrafos de metadados criada/editada.
   if (!inputNome || !txtChave || !txtMsg || !inputObs || !btnEditar || !pCriada || !pEditada) return;
-
-  if (icnApagarMsgEditar) {
-    icnApagarMsgEditar.style.display = 'none';
-  }
 
   let originalRecord = null;
   btnEditar.disabled = true;
@@ -1433,23 +1409,6 @@ function setupEditarCifraPage() {
 
   atualizarVisibilidadeIconeCopiar();
 
-  const divChaveBottom = document.getElementById('divChaveBottom');
-  const divMsgBottom = document.getElementById('divMsgBottom');
-  const icnCopiarChave = document.getElementById('icnCopiarChave');
-  const icnCopiarMsg = document.getElementById('icnCopiarMsg');
-
-  if (icnCopiarChave && txtChave) {
-    icnCopiarChave.addEventListener('click', function () {
-      copiarTextoComEfeito(txtChave, divChaveBottom);
-    });
-  }
-
-  if (icnCopiarMsg && txtMsg) {
-    icnCopiarMsg.addEventListener('click', function () {
-      copiarTextoComEfeito(txtMsg, divMsgBottom);
-    });
-  }
-
   // dispara carregamento inicial
   carregarDadosEdicao();
 
@@ -1502,7 +1461,8 @@ async function handleSalvarCifragemClick(opts) {
       return;
     }
 
-    const ciphertextToSave = textoCifrado;
+    const apenasChave = chkSalvarChave && chkSalvarChave.checked;
+    const ciphertextToSave = apenasChave ? '' : textoCifrado;
 
     // Nome: usa o que está no input ou gera padrão
     let nomeBruto = inputNome ? (inputNome.value || '') : '';
@@ -1602,7 +1562,8 @@ async function handleConfirmarSubstituicaoCifraClick(opts) {
       return;
     }
 
-    const ciphertextToSave = texto;
+    const apenasChave = chkSalvarChave && chkSalvarChave.checked;
+    const ciphertextToSave = apenasChave ? '' : texto;
 
     let nomeFinal = inputNome ? (inputNome.value || '').trim() : '';
 
@@ -2577,21 +2538,21 @@ function setupPasswordGeneratorModal() {
     bsModal.show();
   });
 
-modalEl.addEventListener("shown.bs.modal", function () {
+  modalEl.addEventListener("shown.bs.modal", async function () {
+    if (typeof initPasswordGenerator === "function") {
+      initPasswordGenerator();
+    }
 
-  if (typeof resetPasswordPopup === "function") {
-    resetPasswordPopup();
-  }
-
-  if (typeof initPasswordGenerator === "function") {
-    initPasswordGenerator();
-  }
-
-});
-
-  modalEl.addEventListener("hidden.bs.modal", function () {
-    if (typeof resetPasswordPopup === "function") {
+    if (typeof loadPasswordGeneratorParams === "function") {
+      await loadPasswordGeneratorParams();
+    } else if (typeof resetPasswordPopup === "function") {
       resetPasswordPopup();
+    }
+  });
+
+  modalEl.addEventListener("hidden.bs.modal", async function () {
+    if (typeof persistPasswordGeneratorParams === "function") {
+      await persistPasswordGeneratorParams();
     }
   });
 }
