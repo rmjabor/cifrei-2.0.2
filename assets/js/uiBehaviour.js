@@ -1630,22 +1630,26 @@ function openQrCodeModal() {
   // Gerar QR numa div temporária
   const tempDiv = document.createElement('div');
 
-  const qrSize     = 256; // tamanho do QR em si
-  const outerMargin = 20; // margem externa
-  const logoWidth  = 38;
-  const logoHeight = 52;
-  const logoGap    = 20;  // distância entre logo e QR
-  const textHeight = 40;  // espaço para o nome da cifra
+  const qrSize = 264;
+  const outerMargin = 18;
+  const logoWidth = 72;
+  const logoHeight = 99;
+  const logoGap = 16;
+  const textHeight = 58;
+  const displayWidth = qrSize + outerMargin * 2;
+  const qrY = outerMargin + logoHeight + logoGap;
+  const displayHeight = qrY + qrSize + textHeight + outerMargin;
+  const renderScale = Math.max(3, Math.ceil(window.devicePixelRatio || 1));
 
   new QRCode(tempDiv, {
     text: payload,
-    width: qrSize,
-    height: qrSize,
+    width: qrSize * renderScale,
+    height: qrSize * renderScale,
     correctLevel: QRCode.CorrectLevel.M
   });
 
   setTimeout(() => {
-    const qrImgEl    = tempDiv.querySelector('img');
+    const qrImgEl = tempDiv.querySelector('img');
     const qrCanvasEl = tempDiv.querySelector('canvas');
 
     if (!qrImgEl && !qrCanvasEl) {
@@ -1653,60 +1657,70 @@ function openQrCodeModal() {
       return;
     }
 
-    // Função que efetivamente desenha tudo no canvas final
     function drawAll(qrImg, logoImg) {
-      const canvasWidth  = qrSize + outerMargin * 2;
-      const qrY          = outerMargin + logoHeight + logoGap;
-      const canvasHeight = qrY + qrSize + textHeight + outerMargin;
-
-      finalCanvas.width  = canvasWidth;
-      finalCanvas.height = canvasHeight;
+      finalCanvas.width = displayWidth * renderScale;
+      finalCanvas.height = displayHeight * renderScale;
+      finalCanvas.style.width = displayWidth + 'px';
+      finalCanvas.style.height = displayHeight + 'px';
 
       const ctx = finalCanvas.getContext('2d');
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(renderScale, renderScale);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
 
       // Fundo branco
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      ctx.fillRect(0, 0, displayWidth, displayHeight);
 
-      // Desenhar logo centralizada no topo
-      const logoX = (canvasWidth - logoWidth) / 2;
+      // Logo centralizada no topo
+      const logoX = (displayWidth - logoWidth) / 2;
       const logoY = outerMargin;
-
       if (logoImg) {
         ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
       }
 
-      // Desenhar QR
+      // QR centralizado
       const qrX = outerMargin;
       ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-      // Borda em volta de tudo
+      // Linha separadora sutil acima do label
+      const separatorY = qrY + qrSize + 10;
+      ctx.strokeStyle = '#e4e4e4';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(outerMargin + 8, separatorY);
+      ctx.lineTo(displayWidth - outerMargin - 8, separatorY);
+      ctx.stroke();
+
+      // Borda externa
       ctx.strokeStyle = '#000000';
       ctx.lineWidth = 2;
-      ctx.strokeRect(
-        1,
-        1,
-        canvasWidth - 2,
-        canvasHeight - 2
-      );
+      ctx.strokeRect(1, 1, displayWidth - 2, displayHeight - 2);
 
-      // Texto (nome da cifra) abaixo do QR
-      drawQrLabelOnCanvas(ctx, label, canvasWidth, qrY, qrSize, textHeight);
+      // Nome da cifra abaixo do QR
+      drawQrLabelOnCanvas(ctx, label, displayWidth, qrY, qrSize, textHeight);
 
-      // Abre o modal no fim
       showQrModal();
     }
 
-    // Cria uma imagem do QR gerado pela lib
     const qrImg = new Image();
     qrImg.onload = function () {
-      // Agora carrega a logo
       const logoImg = new Image();
       logoImg.onload = function () {
         drawAll(qrImg, logoImg);
       };
-      // AJUSTE AQUI se o caminho da imagem for outro
-      logoImg.src = 'assets/img/Img_C_ifre_i.png';
+      logoImg.onerror = function () {
+        const fallbackLogo = new Image();
+        fallbackLogo.onload = function () {
+          drawAll(qrImg, fallbackLogo);
+        };
+        fallbackLogo.onerror = function () {
+          drawAll(qrImg, null);
+        };
+        fallbackLogo.src = 'assets/img/Img_C_ifre_i.png';
+      };
+      logoImg.src = 'assets/img/C_ifre_i_Logo_512.png';
     };
 
     if (qrCanvasEl) {
@@ -1714,30 +1728,56 @@ function openQrCodeModal() {
     } else if (qrImgEl) {
       qrImg.src = qrImgEl.src;
     }
-
   }, 0);
 }
 
 function drawQrLabelOnCanvas(ctx, label, canvasWidth, qrY, qrSize, textHeight) {
-  ctx.fillStyle = '#000000';
-  ctx.font = '12px sans-serif';
+  const centerX = canvasWidth / 2;
+  const baseY = qrY + qrSize + 14;
+  const maxTextWidth = canvasWidth - 32;
+
+  let text = (label || 'Cifra sem nome').trim();
+  if (!text) text = 'Cifra sem nome';
+
+  text = text.normalize('NFC');
+
+  const words = text.split(/\s+/);
+  let lines = [];
+  let currentLine = '';
+
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#091747';
+  ctx.font = '600 16px "Open Sans", Arial, sans-serif';
 
-  const centerX = canvasWidth / 2;
-  const y = qrY + qrSize + textHeight / 2;
+  for (const word of words) {
+    const candidate = currentLine ? currentLine + ' ' + word : word;
+    if (ctx.measureText(candidate).width <= maxTextWidth) {
+      currentLine = candidate;
+    } else {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
 
-  let text = label || 'Cifra sem nome';
-
-  // Normaliza/remover acentos se quiser evitar coisas estranhas
-  text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-  const maxChars = 40;
-  if (text.length > maxChars) {
-    text = text.slice(0, maxChars - 3) + '...';
+  if (lines.length === 0) lines = ['Cifra sem nome'];
+  if (lines.length > 2) {
+    lines = lines.slice(0, 2);
+    let last = lines[1];
+    while (ctx.measureText(last + '...').width > maxTextWidth && last.length > 1) {
+      last = last.slice(0, -1);
+    }
+    lines[1] = last + '...';
   }
 
-  ctx.fillText(text, centerX, y);
+  const lineHeight = 18;
+  const textBlockHeight = lineHeight * lines.length;
+  let startY = baseY + (textHeight - textBlockHeight) / 2;
+
+  lines.forEach((line, index) => {
+    ctx.fillText(line, centerX, startY + index * lineHeight + lineHeight / 2);
+  });
 }
 
 
@@ -1758,7 +1798,7 @@ function setupQrDownloadButton() {
   if (!btnDownload || !finalCanvas) return;
 
   btnDownload.addEventListener('click', function () {
-    const dataUrl = finalCanvas.toDataURL('image/jpeg', 0.9);
+    const dataUrl = finalCanvas.toDataURL('image/png');
 
     // Pega o nome da cifra
     let name = getCifraNameForQr() || 'cifra-sem-nome';
@@ -1769,10 +1809,10 @@ function setupQrDownloadButton() {
     // Troca espaços por hífen e remove caracteres inválidos pra arquivo
     name = name
       .trim()
-      .replace(/\s+/g, '_')               // espaços -> underline
-      .replace(/[^a-zA-Z0-9\-.]+/g, ''); // tira caracteres estranhos
+      .replace(/\s+/g, '_')
+      .replace(/[^a-zA-Z0-9\-.]+/g, '');
 
-    const filename = 'QR-Cifrei_' + name + '.jpg';
+    const filename = 'QR-Cifrei_' + name + '.png';
 
     const a = document.createElement('a');
     a.href = dataUrl;
@@ -1782,7 +1822,6 @@ function setupQrDownloadButton() {
     document.body.removeChild(a);
   });
 }
-
 
 
 // 9) Reset geral da página cifrar após salvar/atualizar
@@ -2538,20 +2577,21 @@ function setupPasswordGeneratorModal() {
     bsModal.show();
   });
 
-  modalEl.addEventListener("shown.bs.modal", async function () {
-    if (typeof initPasswordGenerator === "function") {
-      initPasswordGenerator();
-    }
+modalEl.addEventListener("shown.bs.modal", function () {
 
-    if (typeof loadPasswordGeneratorParams === "function") {
-      await loadPasswordGeneratorParams();
-    } else if (typeof resetPasswordPopup === "function") {
-      resetPasswordPopup();
-    }
-  });
+  if (typeof resetPasswordPopup === "function") {
+    resetPasswordPopup();
+  }
+
+  if (typeof initPasswordGenerator === "function") {
+    initPasswordGenerator();
+  }
+
+});
 
   modalEl.addEventListener("hidden.bs.modal", function () {
-    // Preferências do gerador são salvas apenas após validação,
-    // no clique de #btnUsarSenhaGerada.
+    if (typeof resetPasswordPopup === "function") {
+      resetPasswordPopup();
+    }
   });
 }
