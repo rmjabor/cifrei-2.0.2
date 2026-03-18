@@ -226,16 +226,22 @@ async function saveProfilePasswordGenParams(params) {
   const userId = await getAuthenticatedUserId();
   const normalized = normalizePasswordGenParams(params);
 
-  const { error } = await supabase
+  const payload = {
+    password_gen_params: normalized,
+    updated_at: new Date().toISOString()
+  };
+
+  const { data, error } = await supabase
     .from('profiles')
-    .upsert(
-      {
-        id: userId,
-        password_gen_params: normalized
-      },
-      { onConflict: 'id' }
-    );
+    .update(payload)
+    .eq('id', userId)
+    .select('id')
+    .maybeSingle();
 
   if (error) throw error;
+  if (!data || !data.id) {
+    throw new Error('Perfil do usuário não encontrado para salvar password_gen_params.');
+  }
+
   return normalized;
 }

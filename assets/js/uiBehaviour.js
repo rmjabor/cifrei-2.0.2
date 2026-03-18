@@ -2550,9 +2550,8 @@ function setupPasswordGeneratorModal() {
     }
   });
 
-  modalEl.addEventListener("hidden.bs.modal", async function () {
-    if (typeof persistPasswordGeneratorParams === "function") {
-      await persistPasswordGeneratorParams();
-    }
+  modalEl.addEventListener("hidden.bs.modal", function () {
+    // Preferências do gerador são salvas apenas após validação,
+    // no clique de #btnUsarSenhaGerada.
   });
 }
