@@ -71,12 +71,24 @@ function copiarTextoComEfeito(textarea, container) {
   }
 }
 
+function apagarTextoComEfeito(campo, container) {
+  if (!campo) return;
+  campo.value = "";
+  if (container) {
+    animarElementoClasse(container, 'apagando', 250);
+  } else {
+    animarElementoClasse(campo, 'apagando', 250);
+  }
+  campo.dispatchEvent(new Event('input'));
+}
+
 //
 // 1) Ícone de lixeira para txtMsgEntrada
 //
 function setupApagarMensagem() {
   const campo = document.getElementById('txtMsgEntrada');
   const icone = document.getElementById('icnApagarMsg');
+  const container = document.getElementById('divMsgEntrada');
 
   if (!campo || !icone) return;
 
@@ -89,11 +101,8 @@ function setupApagarMensagem() {
   campo.addEventListener('input', atualizarIcone);
 
   icone.addEventListener('click', function () {
-    campo.value = "";
+    apagarTextoComEfeito(campo, container);
     atualizarIcone();
-    campo.classList.add('apagando');
-    setTimeout(() => campo.classList.remove('apagando'), 200);
-    campo.dispatchEvent(new Event('input'));
   });
 }
 
@@ -116,6 +125,7 @@ function setupApagarChave() {
   const campo    = document.getElementById('txtChave');
   const icone    = document.getElementById('icnApagarChave');
   const dropdown = document.getElementById('dpdownChave');
+  const container = document.getElementById('divChave');
 
   if (!campo || !icone) return;
 
@@ -137,11 +147,8 @@ function setupApagarChave() {
   campo.addEventListener('input', atualizarIcone);
 
   icone.addEventListener('click', function () {
-    campo.value = "";
+    apagarTextoComEfeito(campo, container);
     atualizarIcone();
-    campo.classList.add('apagando');
-    setTimeout(() => campo.classList.remove('apagando'), 200);
-    campo.dispatchEvent(new Event('input'));
   });
 }
 
