@@ -1224,6 +1224,7 @@ if (inputObs && divObs) {
 // PÁGINA editarcifra.html
 //
 function setupEditarCifraPage() {
+  const pageRoot  = document.getElementById('cifraAberta');
   const inputNome = document.getElementById('inputlNomeCifraAberta');
   const txtChave  = document.getElementById('txtChaveBottom');
   const txtMsg    = document.getElementById('txtMsgBottom');
@@ -1234,10 +1235,15 @@ function setupEditarCifraPage() {
 
   // Só deve rodar na editarcifra.html. A cifraaberta.html reutiliza vários IDs,
   // mas não possui os parágrafos de metadados criada/editada.
-  if (!inputNome || !txtChave || !txtMsg || !inputObs || !btnEditar || !pCriada || !pEditada) return;
+  if (!pageRoot || !inputNome || !txtChave || !txtMsg || !inputObs || !btnEditar || !pCriada || !pEditada) return;
+
+  function setEditarCifraLoadingState(isLoading) {
+    pageRoot.classList.toggle('is-loading', !!isLoading);
+  }
 
   let originalRecord = null;
   btnEditar.disabled = true;
+  setEditarCifraLoadingState(true);
 
   async function carregarDadosEdicao() {
     let ctxId = null;
@@ -1257,11 +1263,13 @@ function setupEditarCifraPage() {
 
     if (!ctxId) {
       console.warn('[Cifrei] Nenhum id válido encontrado para edição.');
+      setEditarCifraLoadingState(false);
       return;
     }
 
     if (typeof getCifragemRecordById !== 'function') {
       console.error('[Cifrei] getCifragemRecordById não disponível.');
+      setEditarCifraLoadingState(false);
       return;
     }
 
@@ -1269,6 +1277,7 @@ function setupEditarCifraPage() {
       const rec = await getCifragemRecordById(ctxId);
       if (!rec) {
         console.warn('[Cifrei] Registro não encontrado para edição (id=' + ctxId + ').');
+        setEditarCifraLoadingState(false);
         return;
       }
 
@@ -1311,8 +1320,10 @@ function setupEditarCifraPage() {
       inputObs.dispatchEvent(new Event('input'));
 
       atualizarEstadoBotao();
+      setEditarCifraLoadingState(false);
     } catch (err) {
       console.error('[Cifrei] Erro ao carregar registro para edição:', err);
+      setEditarCifraLoadingState(false);
     }
   }
 

@@ -61,9 +61,9 @@ textarea.codigo::placeholder {
   transform: scale(0.99);
 }
 
-.caixa-texto {
+/* .caixa-texto {
   position: relative;
-}
+} */
 
 /* Containers = campo visual */
 
@@ -331,6 +331,10 @@ input.form-control:focus {
   align-items: center;
   display: flex;
   position: relative;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #fd641d;
+  border-radius: 6px;
 }
 
 .inputPadrao {
@@ -338,7 +342,7 @@ input.form-control:focus {
   width: 100%;
   min-width: 0;
   padding: 6px 5px 6px 45px;
-  border-style: solid;
+  border-style: none;
   border-width: 1px;
   border-color: #fd641d;
   border-radius: 6px;
@@ -395,8 +399,10 @@ input.form-control:focus {
   width: 100%;
   max-width: 600px;
   min-width: 320px;
-  padding: 0px 20px 30px 20px;
+  padding: 0px 15px 30px 15px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .icnInputPadrao {
@@ -436,5 +442,74 @@ input.form-control:focus {
   pointer-events: none;
   filter: grayscale(0.2);
   /*Opcional: tira um pouco da vibração da cor;*/
+}
+
+/* =========================
+   Skeleton — editarcifra.html
+========================= */
+
+#cifraAberta.is-loading {
+  pointer-events: none;
+}
+
+#cifraAberta.is-loading #tituloPageBottom, #cifraAberta.is-loading #divInputNomeCifraAberta, #cifraAberta.is-loading #divChaveBottom, #cifraAberta.is-loading #divMsgBottom, #cifraAberta.is-loading #divInputObsCifraAberta, #cifraAberta.is-loading #divDatas, #cifraAberta.is-loading #btnEditarCifra, #cifraAberta.is-loading #btnShowQrFromCifrar, #cifraAberta.is-loading #btnDecifrar {
+  position: relative !important;
+  overflow: hidden !important;
+  background: #dddddd !important;
+  border-color: transparent !important;
+}
+
+#cifraAberta.is-loading #tituloPageBottom::after, #cifraAberta.is-loading #divInputNomeCifraAberta::after, #cifraAberta.is-loading #divChaveBottom::after, #cifraAberta.is-loading #divMsgBottom::after, #cifraAberta.is-loading #divInputObsCifraAberta::after, #cifraAberta.is-loading #divDatas::after, #cifraAberta.is-loading #btnEditarCifra::after, #cifraAberta.is-loading #btnShowQrFromCifrar::after, #cifraAberta.is-loading #btnDecifrar::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -35%;
+  width: 35%;
+  height: 100%;
+  background: linear-gradient( 90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.48) 50%, rgba(255,255,255,0) 100% );
+  transform: skewX(-20deg);
+  animation: cifreiSkeletonShimmer 1.25s infinite;
+  pointer-events: none;
+}
+
+#cifraAberta.is-loading #tituloPageBottom {
+  min-height: 42px;
+  border-radius: 6px;
+}
+
+#cifraAberta.is-loading #divInputNomeCifraAberta, #cifraAberta.is-loading #divChaveBottom, #cifraAberta.is-loading #divMsgBottom, #cifraAberta.is-loading #divInputObsCifraAberta, #cifraAberta.is-loading #btnEditarCifra, #cifraAberta.is-loading #btnShowQrFromCifrar, #cifraAberta.is-loading #btnDecifrar {
+  border-radius: 8px !important;
+}
+
+#cifraAberta.is-loading #divDatas {
+  border-radius: 6px !important;
+}
+
+#cifraAberta.is-loading #txtCifragemBottom, #cifraAberta.is-loading #criadaEm, #cifraAberta.is-loading #editadaEm, #cifraAberta.is-loading #btnEditarCifra, #cifraAberta.is-loading #btnShowQrFromCifrar, #cifraAberta.is-loading #btnDecifrar {
+  color: transparent !important;
+}
+
+#cifraAberta.is-loading #inputlNomeCifraAberta, #cifraAberta.is-loading #txtChaveBottom, #cifraAberta.is-loading #txtMsgBottom, #cifraAberta.is-loading #inputObsCifraAberta {
+  color: transparent !important;
+  caret-color: transparent !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  pointer-events: none !important;
+}
+
+#cifraAberta.is-loading #inputlNomeCifraAberta::placeholder, #cifraAberta.is-loading #txtChaveBottom::placeholder, #cifraAberta.is-loading #txtMsgBottom::placeholder, #cifraAberta.is-loading #inputObsCifraAberta::placeholder {
+  color: transparent !important;
+}
+
+#cifraAberta.is-loading #voltarCifragemTop, #cifraAberta.is-loading #icnNomeCifra, #cifraAberta.is-loading #icnChaveBottom, #cifraAberta.is-loading #icnCopiarChave, #cifraAberta.is-loading #icnMsgBottom, #cifraAberta.is-loading #icnCopiarMsg, #cifraAberta.is-loading #icnApagarMsgEditar, #cifraAberta.is-loading #icnObservacoes, #cifraAberta.is-loading #icnSalvarChaveCifragem, #cifraAberta.is-loading #icnGerarQrCifragem-1, #cifraAberta.is-loading #icnSalvarChaveCifragem-1 {
+  opacity: 0 !important;
+}
+
+@keyframes cifreiSkeletonShimmer {
+  from {
+    left: -35%;
+  }
+  to {
+    left: 120%;
+  }
 }
 
