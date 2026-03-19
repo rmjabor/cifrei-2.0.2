@@ -19,31 +19,33 @@
     <div class="modal fade" role="dialog" tabindex="-1" data-bs-backdrop="static" id="gerarSenhaAleat" style="background: transparent;margin-top: 50px;" area-hiden="true">
         <div class="modal-dialog modal-confirma-excluir" role="document" id="dlgGerarSenhaAleat">
             <div class="modal-content modal-confirma-excluir">
-                <div class="modal-header d-flex justify-content-center" style="border-radius: 0px 0px 0px 0px;border-style: none;border-top-left-radius: 10px;border-top-right-radius: 10px;margin-top: 20px;"><img src="assets/img/Img_C_ifre_i.png" width="38" height="52"></div>
+                <div class="modal-header d-flex justify-content-center" style="border-radius: 0px 0px 0px 0px;border-style: none;border-top-left-radius: 10px;border-top-right-radius: 10px;margin-top: 20px;">
+                    <div id="divLogoSenhaAleat"><img id="logoCifreiSenhaAleat" src="assets/img/Img_C_ifre_i.png" width="38" height="52"></div>
+                </div>
                 <div class="modal-body" style="background: #ffffff;padding: 0px;padding-top: 0px;height: auto;padding-right: 20px;padding-left: 20px;">
-                    <h2 style="text-align: center;font-family: Roboto, sans-serif;letter-spacing: 0px;">Gerador de senha aleatória</h2>
-                    <div class="d-flex flex-row align-items-center" id="divCaracTotais" style="line-height: 1;margin-top: 20px;"><span class="d-block w-100" style="font-size: 14px;line-height: 14px;background: rgba(0,0,0,0);font-family: 'Open Sans', sans-serif;">Caracteres totais:</span>
+                    <h2 id="lblGerSenhaAleat" style="text-align: center;font-family: Roboto, sans-serif;letter-spacing: 0px;border-radius: 6px;">Gerador de senha aleatória</h2>
+                    <div id="divCaracTotais" class="divAleatPwGen" style="line-height: 1;margin-top: 20px;"><span class="d-block w-100" style="font-size: 14px;line-height: 14px;background: rgba(0,0,0,0);font-family: 'Open Sans', sans-serif;">Caracteres totais:</span>
                         <div style="width: 115px;min-width: 115px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" id="iconMinusCaracTotais" style="font-size: 24px;">
                                 <path d="M15 12H9M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                             </svg><input type="text" id="inputCaracTotais" class="inputGerarSenha" style="margin-right: 10px;margin-left: 10px;text-align: center;" value="8" inputmode="numeric" maxlenght="2"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" id="iconPlusCaracTotais" style="font-size: 24px;">
                                 <path d="M12 9V12M12 12V15M12 12H15M12 12H9M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                             </svg></div>
                     </div>
-                    <div class="d-flex flex-row align-items-center" id="divMaiusc" style="line-height: 1;margin-top: 20px;"><span class="d-block w-100" style="font-size: 14px;line-height: 14px;background: rgba(0,0,0,0);font-family: 'Open Sans', sans-serif;">Letras maiúsculas:&nbsp;</span>
+                    <div id="divMaiusc" class="divAleatPwGen" style="line-height: 1;margin-top: 15px;"><span class="d-block w-100" style="font-size: 14px;line-height: 14px;background: rgba(0,0,0,0);font-family: 'Open Sans', sans-serif;">Letras maiúsculas:&nbsp;</span>
                         <div style="width: 115px;min-width: 115px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" id="iconMinusMaiusc" style="font-size: 24px;">
                                 <path d="M15 12H9M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                             </svg><input type="text" id="inputMaiusc" class="inputGerarSenha" style="margin-right: 10px;margin-left: 10px;text-align: center;" value="1" inputmode="numeric" maxlenght="1"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" id="iconPlusMaiusc" style="font-size: 24px;">
                                 <path d="M12 9V12M12 12V15M12 12H15M12 12H9M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                             </svg></div>
                     </div>
-                    <div class="d-flex flex-row align-items-center" id="divNumeros" style="line-height: 1;margin-top: 15px;"><span class="d-block w-100" style="font-size: 14px;line-height: 14px;background: rgba(0,0,0,0);font-family: 'Open Sans', sans-serif;">Caracteres numéricos:&nbsp;</span>
+                    <div id="divNumeros" class="divAleatPwGen" style="line-height: 1;margin-top: 15px;"><span class="d-block w-100" style="font-size: 14px;line-height: 14px;background: rgba(0,0,0,0);font-family: 'Open Sans', sans-serif;">Caracteres numéricos:&nbsp;</span>
                         <div style="width: 115px;min-width: 115px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" id="iconMinusNumero" style="font-size: 24px;">
                                 <path d="M15 12H9M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                             </svg><input type="text" id="inputNumero" class="inputGerarSenha" style="margin-right: 10px;margin-left: 10px;text-align: center;" value="1" inputmode="numeric" maxlenght="1"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" id="iconPlusNumero" style="font-size: 24px;">
                                 <path d="M12 9V12M12 12V15M12 12H15M12 12H9M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                             </svg></div>
                     </div>
-                    <div class="d-flex flex-row align-items-center" id="divEspec" style="line-height: 1;margin-top: 15px;"><span class="d-block w-100" style="font-size: 14px;line-height: 14px;background: rgba(0,0,0,0);font-family: 'Open Sans', sans-serif;">Caracteres especiais:&nbsp;</span>
+                    <div id="divEspec" class="divAleatPwGen" style="line-height: 1;margin-top: 15px;"><span class="d-block w-100" style="font-size: 14px;line-height: 14px;background: rgba(0,0,0,0);font-family: 'Open Sans', sans-serif;">Caracteres especiais:&nbsp;</span>
                         <div style="width: 115px;min-width: 115px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" id="iconMinusEspec" style="font-size: 24px;">
                                 <path d="M15 12H9M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                             </svg><input type="text" id="inputEspec" class="inputGerarSenha" style="margin-right: 10px;margin-left: 10px;text-align: center;" value="1" inputmode="numeric" maxlenght="1"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" id="iconPlusEspec" style="font-size: 24px;">
@@ -51,13 +53,14 @@
                             </svg></div>
                     </div>
                 </div>
-                <div class="d-flex align-items-center" id="divSenhaAleat" style="margin-top: 25px;padding-right: 20px;padding-left: 20px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="position: absolute;width: 30px;height: 30px;margin-left: 8px;color: #4b4b4b;">
-                        <path d="M6 12C6 12.5523 5.55228 13 5 13C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11C5.55228 11 6 11.4477 6 12Z" fill="currentColor"></path>
-                        <path d="M9 13C9.55228 13 10 12.5523 10 12C10 11.4477 9.55228 11 9 11C8.44771 11 8 11.4477 8 12C8 12.5523 8.44771 13 9 13Z" fill="currentColor"></path>
-                        <path d="M14 12C14 12.5523 13.5523 13 13 13C12.4477 13 12 12.5523 12 12C12 11.4477 12.4477 11 13 11C13.5523 11 14 11.4477 14 12Z" fill="currentColor"></path>
-                        <path d="M20 11H16V13H20V11Z" fill="currentColor"></path>
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M2 6C0.895431 6 0 6.89543 0 8V16C0 17.1046 0.89543 18 2 18H22C23.1046 18 24 17.1046 24 16V8C24 6.89543 23.1046 6 22 6H2ZM22 8H2L2 16H22V8Z" fill="currentColor"></path>
-                    </svg><input type="text" id="inputSenhaAleatGerada" class="inputPadrao" readonly="readonly">
+                <div id="divSenhaAleat" class="divAleatPwGen" style="margin-top: 25px;padding-bottom: 0px;margin-right: 20px;margin-left: 20px;">
+                    <div id="divInputSenhaAleat" class="divInputPadrao" style="width: 100%;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="position: absolute;width: 30px;height: 30px;margin-left: 8px;color: #4b4b4b;">
+                            <path d="M6 12C6 12.5523 5.55228 13 5 13C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11C5.55228 11 6 11.4477 6 12Z" fill="currentColor"></path>
+                            <path d="M9 13C9.55228 13 10 12.5523 10 12C10 11.4477 9.55228 11 9 11C8.44771 11 8 11.4477 8 12C8 12.5523 8.44771 13 9 13Z" fill="currentColor"></path>
+                            <path d="M14 12C14 12.5523 13.5523 13 13 13C12.4477 13 12 12.5523 12 12C12 11.4477 12.4477 11 13 11C13.5523 11 14 11.4477 14 12Z" fill="currentColor"></path>
+                            <path d="M20 11H16V13H20V11Z" fill="currentColor"></path>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M2 6C0.895431 6 0 6.89543 0 8V16C0 17.1046 0.89543 18 2 18H22C23.1046 18 24 17.1046 24 16V8C24 6.89543 23.1046 6 22 6H2ZM22 8H2L2 16H22V8Z" fill="currentColor"></path>
+                        </svg><input type="text" id="inputSenhaAleatGerada" class="inputPadrao" readonly="readonly"></div>
                     <div id="divIconeRefresh" class="botao-custom" style="width: 32px;height: 32px;border-style: none;border-radius: 25px;background: #e85c5c;box-shadow: 1px 1px 3px #a7a7a7;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" style="width: 20px;height: 20px;text-align: center;color: #ffffff;">
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M4 2C4.55228 2 5 2.44772 5 3V5.10125C6.27009 3.80489 8.04052 3 10 3C13.0494 3 15.641 4.94932 16.6014 7.66675C16.7855 8.18747 16.5126 8.75879 15.9918 8.94284C15.4711 9.12689 14.8998 8.85396 14.7157 8.33325C14.0289 6.38991 12.1755 5 10 5C8.36507 5 6.91204 5.78502 5.99935 7H9C9.55228 7 10 7.44772 10 8C10 8.55228 9.55228 9 9 9H4C3.44772 9 3 8.55228 3 8V3C3 2.44772 3.44772 2 4 2ZM4.00817 11.0572C4.52888 10.8731 5.1002 11.146 5.28425 11.6668C5.97112 13.6101 7.82453 15 10 15C11.6349 15 13.088 14.215 14.0006 13L11 13C10.4477 13 10 12.5523 10 12C10 11.4477 10.4477 11 11 11H16C16.2652 11 16.5196 11.1054 16.7071 11.2929C16.8946 11.4804 17 11.7348 17 12V17C17 17.5523 16.5523 18 16 18C15.4477 18 15 17.5523 15 17V14.8987C13.7299 16.1951 11.9595 17 10 17C6.95059 17 4.35905 15.0507 3.39857 12.3332C3.21452 11.8125 3.48745 11.2412 4.00817 11.0572Z" fill="currentColor"></path>
                         </svg></div>

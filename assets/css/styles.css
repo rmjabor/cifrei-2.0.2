@@ -444,6 +444,13 @@ input.form-control:focus {
   /*Opcional: tira um pouco da vibração da cor;*/
 }
 
+.divAleatPwGen {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 6px;
+}
+
 /* =========================
    Skeleton — editarcifra.html
 ========================= */
