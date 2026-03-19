@@ -528,3 +528,59 @@ input.form-control:focus {
   }
 }
 
+/* =========================
+   Skeleton — modal gerarSenhaAleat
+========================= */
+
+#gerarSenhaAleat.is-loading {
+  pointer-events: none;
+}
+
+#gerarSenhaAleat.is-loading #logoCifreiSenhaAleat, #gerarSenhaAleat.is-loading #divCaracTotais, #gerarSenhaAleat.is-loading #divMaiusc, #gerarSenhaAleat.is-loading #divNumeros, #gerarSenhaAleat.is-loading #divEspec, #gerarSenhaAleat.is-loading #divSenhaAleat, #gerarSenhaAleat.is-loading #lblGerSenhaAleat, #gerarSenhaAleat.is-loading #btnUsarSenhaGerada, #gerarSenhaAleat.is-loading #btnFecharSenhaAleat {
+  position: relative !important;
+  overflow: hidden !important;
+  background: #dddddd !important;
+  border-color: transparent !important;
+}
+
+#gerarSenhaAleat.is-loading #logoCifreiSenhaAleat::after, #gerarSenhaAleat.is-loading #divCaracTotais::after, #gerarSenhaAleat.is-loading #divMaiusc::after, #gerarSenhaAleat.is-loading #divNumeros::after, #gerarSenhaAleat.is-loading #divEspec::after, #gerarSenhaAleat.is-loading #divSenhaAleat::after, #gerarSenhaAleat.is-loading #lblGerSenhaAleat::after, #gerarSenhaAleat.is-loading #btnUsarSenhaGerada::after, #gerarSenhaAleat.is-loading #btnFecharSenhaAleat::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -35%;
+  width: 35%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.48) 50%, rgba(255,255,255,0) 100%);
+  transform: skewX(-20deg);
+  animation: cifreiSkeletonShimmer 1.25s infinite;
+  pointer-events: none;
+}
+
+#gerarSenhaAleat.is-loading #logoCifreiSenhaAleat {
+  display: block;
+  border-radius: 6px !important;
+}
+
+#gerarSenhaAleat.is-loading #lblGerSenhaAleat, #gerarSenhaAleat.is-loading #divCaracTotais, #gerarSenhaAleat.is-loading #divMaiusc, #gerarSenhaAleat.is-loading #divNumeros, #gerarSenhaAleat.is-loading #divEspec, #gerarSenhaAleat.is-loading #divSenhaAleat, #gerarSenhaAleat.is-loading #btnUsarSenhaGerada, #gerarSenhaAleat.is-loading #btnFecharSenhaAleat {
+  border-radius: 6px !important;
+}
+
+#gerarSenhaAleat.is-loading #lblGerSenhaAleat, #gerarSenhaAleat.is-loading #btnUsarSenhaGerada, #gerarSenhaAleat.is-loading #btnFecharSenhaAleat {
+  color: transparent !important;
+}
+
+#gerarSenhaAleat.is-loading #divCaracTotais *, #gerarSenhaAleat.is-loading #divMaiusc *, #gerarSenhaAleat.is-loading #divNumeros *, #gerarSenhaAleat.is-loading #divEspec *, #gerarSenhaAleat.is-loading #divSenhaAleat * {
+  color: transparent !important;
+  caret-color: transparent !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  pointer-events: none !important;
+}
+
+#gerarSenhaAleat.is-loading #divCaracTotais input::placeholder, #gerarSenhaAleat.is-loading #divMaiusc input::placeholder, #gerarSenhaAleat.is-loading #divNumeros input::placeholder, #gerarSenhaAleat.is-loading #divEspec input::placeholder, #gerarSenhaAleat.is-loading #divSenhaAleat input::placeholder {
+  color: transparent !important;
+}
+
+#gerarSenhaAleat.is-loading #logoCifreiSenhaAleat, #gerarSenhaAleat.is-loading #divCaracTotais svg, #gerarSenhaAleat.is-loading #divMaiusc svg, #gerarSenhaAleat.is-loading #divNumeros svg, #gerarSenhaAleat.is-loading #divEspec svg, #gerarSenhaAleat.is-loading #divSenhaAleat svg {
+  filter: grayscale(1);
+}
+

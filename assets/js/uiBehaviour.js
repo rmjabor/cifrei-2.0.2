@@ -2616,12 +2616,26 @@ function setupPasswordGeneratorModal() {
   if (!trigger || !modalEl || !window.bootstrap || !bootstrap.Modal) return;
 
   const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  const setModalLoading = (isLoading) => {
+    modalEl.classList.toggle("is-loading", !!isLoading);
+  };
 
   trigger.addEventListener("click", function () {
+    setModalLoading(true);
     bsModal.show();
   });
 
+  modalEl.addEventListener("show.bs.modal", function () {
+    setModalLoading(true);
+  });
+
+  modalEl.addEventListener("hidden.bs.modal", function () {
+    setModalLoading(false);
+  });
+
   modalEl.addEventListener("shown.bs.modal", async function () {
+    setModalLoading(true);
+
     if (typeof initPasswordGenerator === "function") {
       initPasswordGenerator();
     }
@@ -2634,9 +2648,14 @@ function setupPasswordGeneratorModal() {
         if (typeof resetPasswordPopup === "function") {
           resetPasswordPopup();
         }
+      } finally {
+        setModalLoading(false);
       }
-    } else if (typeof resetPasswordPopup === "function") {
-      resetPasswordPopup();
+    } else {
+      if (typeof resetPasswordPopup === "function") {
+        resetPasswordPopup();
+      }
+      setModalLoading(false);
     }
   });
 }
