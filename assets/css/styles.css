@@ -584,3 +584,90 @@ input.form-control:focus {
   filter: grayscale(1);
 }
 
+/* =========================
+   Skeleton — home.html
+========================= */
+
+@keyframes cifreiSkeletonBgShift {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+#divLogoCifreiHome.is-loading, #btnMaisDecifrar.is-loading, #btnMaisCifrar.is-loading, #skeletonHome.is-loading {
+  pointer-events: none !important;
+}
+
+#divLogoCifreiHome.is-loading {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 6px !important;
+  background: linear-gradient(90deg, #dddddd 25%, #efefef 50%, #dddddd 75%) !important;
+  background-size: 200% 100% !important;
+  animation: cifreiSkeletonBgShift 1.25s linear infinite !important;
+}
+
+#divLogoCifreiHome.is-loading img {
+  opacity: 0 !important;
+}
+
+#btnMaisDecifrar.is-loading, #btnMaisCifrar.is-loading {
+  position: relative !important;
+  overflow: hidden !important;
+  background: linear-gradient(90deg, #dddddd 25%, #efefef 50%, #dddddd 75%) !important;
+  background-size: 200% 100% !important;
+  animation: cifreiSkeletonBgShift 1.25s linear infinite !important;
+  color: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+#btnMaisDecifrar.is-loading *, #btnMaisCifrar.is-loading * {
+  color: transparent !important;
+  fill: transparent !important;
+  opacity: 0 !important;
+}
+
+#skeletonHome.is-loading {
+  position: relative !important;
+  min-height: 280px !important;
+}
+
+#skeletonHome.is-loading > * {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#skeletonHome.is-loading::before, #skeletonHome.is-loading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #dddddd 25%, #efefef 50%, #dddddd 75%);
+  background-size: 200% 100%;
+  animation: cifreiSkeletonBgShift 1.25s linear infinite;
+  pointer-events: none;
+}
+
+#skeletonHome.is-loading::before {
+  top: 0;
+  width: min(560px, calc(100% - 16px));
+  height: 28px;
+  border-radius: 6px;
+}
+
+#skeletonHome.is-loading::after {
+  top: 40px;
+  width: min(560px, calc(100% - 16px));
+  height: 76px;
+  border-radius: 8px;
+  box-shadow: 0 84px 0 0 #dddddd, 0 168px 0 0 #dddddd;
+}
+
+#skeletonHome.is-loading #divTmpltCardCifra, #skeletonHome.is-loading .card-cifra, #skeletonHome.is-loading #divMinhasCifras, #skeletonHome.is-loading #labelSemCifras, #skeletonHome.is-loading #lblMinhasCifras {
+  visibility: hidden !important;
+}
+

@@ -13,6 +13,15 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+
+function setHomeSkeletonLoading(isLoading) {
+  const ids = ['skeletonHome', 'divLogoCifreiHome', 'btnMaisDecifrar', 'btnMaisCifrar'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('is-loading', !!isLoading);
+  });
+}
+
 function setupHomeNavigation() {
   const btnMaisCifrar   = document.getElementById('btnMaisCifrar');
   const btnMaisDecifrar = document.getElementById('btnMaisDecifrar');
@@ -27,6 +36,8 @@ function setupHomeNavigation() {
 }
 
 async function setupHomeListaCifras() {
+  setHomeSkeletonLoading(true);
+
   const divMinhasCifras = document.getElementById('divMinhasCifras');
   const lblSemCifras    = document.getElementById('labelSemCifras');
   const lista           = document.getElementById('divListaCifra');
@@ -45,6 +56,7 @@ async function setupHomeListaCifras() {
     if (!records || !records.length) {
       lblSemCifras.classList.remove('d-none');
       divMinhasCifras.classList.add('d-none');
+      setHomeSkeletonLoading(false);
       return;
     }
 
@@ -154,14 +166,18 @@ records.forEach(rec => {
   lista.appendChild(card);
 });
 
+    setHomeSkeletonLoading(false);
 
   } catch (err) {
     console.error('[Cifrei] Erro ao carregar cifras na home:', err);
     // Em caso de erro, mostra mensagem de "sem cifras" como fallback
     lblSemCifras.classList.remove('d-none');
     divMinhasCifras.classList.add('d-none');
+  } finally {
+    setHomeSkeletonLoading(false);
   }
 }
+
 
 function setupExcluirCifraModal() {
   const modalEl = document.getElementById('confirmaExcluirCifra');
