@@ -425,7 +425,7 @@ input.form-control:focus {
   text-align: center;
   box-shadow: 1px 1px 3px 0px #a7a7a7, 1px 1px 3px 0px #a7a7a7;
   font-family: 'Open Sans', sans-serif;
-  font-size: 15 px;
+  font-size: 15px;
   color: #ffffff;
 }
 
@@ -502,6 +502,13 @@ input.form-control:focus {
 
 #cifraAberta.is-loading #voltarCifragemTop, #cifraAberta.is-loading #icnNomeCifra, #cifraAberta.is-loading #icnChaveBottom, #cifraAberta.is-loading #icnCopiarChave, #cifraAberta.is-loading #icnMsgBottom, #cifraAberta.is-loading #icnCopiarMsg, #cifraAberta.is-loading #icnApagarMsgEditar, #cifraAberta.is-loading #icnObservacoes, #cifraAberta.is-loading #icnSalvarChaveCifragem, #cifraAberta.is-loading #icnGerarQrCifragem-1, #cifraAberta.is-loading #icnSalvarChaveCifragem-1 {
   opacity: 0 !important;
+}
+
+.is-loading .btnPadrao, .is-loading .btnPadrao:disabled {
+  opacity: 1 !important;
+  filter: none !important;
+  color: transparent !important;
+  pointer-events: none !important;
 }
 
 @keyframes cifreiSkeletonShimmer {
