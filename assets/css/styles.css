@@ -509,6 +509,7 @@ input.form-control:focus {
   filter: none !important;
   color: transparent !important;
   pointer-events: none !important;
+  box-shadow: none;
 }
 
 @keyframes cifreiSkeletonShimmer {
