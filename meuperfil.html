@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html class="d-flex justify-content-center" data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>cifrei3_1</title>
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/img/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/img/icon-512.png">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
+    <link rel="stylesheet" href="assets/css/Open%20Sans.css">
+    <link rel="stylesheet" href="assets/css/Roboto.css">
+    <link rel="stylesheet" href="assets/fonts/ionicons.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body class="body-padrao">
+    <div id="divMeuPerfil" style="height: auto;padding-left: 0px;max-width: 570px;margin-right: auto;margin-left: auto;margin-bottom: auto;width: 100%;margin-top: 50px;"><img class="img-fluid clickable" width="512" height="512" id="voltarCifragemTop" src="assets/img/Icone_Home.png" style="width: 30px;height: 30px;position: absolute;">
+        <h2 id="txtMeuPerfil" style="margin-right: 0px;margin-top: 0px;margin-left: 0px;font-family: Roboto, sans-serif;width: 100%;text-align: center;color: #424242;max-width: 570px;height: auto;font-weight: bold;">Meu perfil</h2>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" data-bs-backdrop="static" id="mdlAvisosCadastro" style="background: transparent;margin-top: 80px;" area-hiden="true">
+        <div class="modal-dialog modal-confirma-excluir" role="document" id="dlgConfirmaExcluirCifra">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-center" style="background: #ffffff;border-radius: 0px 0px 0px 0px;border-style: none;border-top-left-radius: 10px;border-top-right-radius: 10px;"><img src="assets/img/Img_C_ifre_i.png" width="38" height="52"></div>
+                <div class="modal-body" style="background: #ffffff;padding: 0px;padding-top: 0px;height: auto;">
+                    <p id="txtAvisosCadastro" style="font-size: 13px;text-align: center;margin-bottom: 0px;font-family: 'Open Sans', sans-serif;width: calc(100% - 30px);min-width: 200px;max-width: 290px;margin-right: auto;margin-left: auto;line-height: 1.2;color: #383839;padding: 4px;">Já existe um usuário cadastrado com este e-mail. Digite outro e-mail, por favor.</p>
+                </div>
+                <div class="modal-footer d-flex justify-content-center" style="background: #ffffff;border-bottom-right-radius: 10px;border-bottom-left-radius: 10px;border-style: none;height: 80px;padding-top: 8px;padding-bottom: 16px;"><button class="btn btnPadrao" id="btnOkAvisosCadastro" type="button" data-bs-dismiss="modal" style="font-family: 'Open Sans', sans-serif;font-size: 16px;background: #fd641d;color: rgb(255,255,255);border-style: none;box-shadow: 1px 1px 3px #a7a7a7;margin-right: 10px;">OK</button></div>
+            </div>
+        </div>
+    </div>
+    <div id="divNomeMeuPerfil" class="divInputPadrao" style="margin-top: 10px;"><i class="icon ion-android-contact icnInputPadrao" style="font-size: 27px;"></i><input type="text" id="inputNomeMeuPerfil" class="inputPadrao" placeholder="Seu nome"></div>
+    <div id="divSobrenomeMeuPerfil" class="divInputPadrao" style="margin-top: 10px;"><i class="icon ion-android-contacts icnInputPadrao" style="font-size: 27px;"></i><input type="text" id="inputSobrenomeCadastro" class="inputPadrao" placeholder="Seu sobrenome"></div><button class="btn btn-primary btnPadrao" id="btnCadastrar" type="button" style="background: #fd641d;margin-top: 20px;height: auto;min-height: 45px;">Cadastrar usuário</button>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/cipherFunctions.js"></script>
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/home.js"></script>
+    <script src="assets/js/qrcode.min.js"></script>
+    <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
+    <script src="assets/js/uiBehaviour.js"></script>
+    <script src="assets/js/inputMask.js"></script>
+    <script src="assets/js/modal.js"></script>
+    <script src="assets/js/passwordGenerator.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabaseClient.js"></script>
+    <script src="assets/js/authPages.js"></script>
+</body>
+
+</html>
