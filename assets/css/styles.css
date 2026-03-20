@@ -702,3 +702,10 @@ input.form-control:focus {
   color: transparent !important;
 }
 
+/* Remove contorno durante skeleton */
+
+.skeleton#divNomeMeuPerfil, .skeleton#divSobrenomeMeuPerfil {
+  border: none !important;
+  box-shadow: none !important;
+}
+
