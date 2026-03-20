@@ -671,3 +671,34 @@ input.form-control:focus {
   visibility: hidden !important;
 }
 
+/* =========================
+   Skeleton — meuperfil.html
+========================= */
+
+#divMeuPerfil.is-loading, #divNomeMeuPerfil.is-loading, #divSobrenomeMeuPerfil.is-loading, #btnSalvarMeuPerfil.is-loading, #btnRedefSenhaPerfil.is-loading, #btnExcluirContaPerfil.is-loading {
+  pointer-events: none !important;
+}
+
+#divMeuPerfil.is-loading, #divNomeMeuPerfil.is-loading, #divSobrenomeMeuPerfil.is-loading, #btnSalvarMeuPerfil.is-loading, #btnRedefSenhaPerfil.is-loading, #btnExcluirContaPerfil.is-loading {
+  position: relative !important;
+  overflow: hidden !important;
+  background: linear-gradient(90deg, #dddddd 25%, #efefef 50%, #dddddd 75%) !important;
+  background-size: 200% 100% !important;
+  animation: cifreiSkeletonBgShift 1.25s linear infinite !important;
+  border-radius: 6px !important;
+  color: transparent !important;
+  box-shadow: none !important;
+}
+
+#divMeuPerfil.is-loading *, #divNomeMeuPerfil.is-loading *, #divSobrenomeMeuPerfil.is-loading *, #btnSalvarMeuPerfil.is-loading *, #btnRedefSenhaPerfil.is-loading *, #btnExcluirContaPerfil.is-loading * {
+  color: transparent !important;
+  fill: transparent !important;
+  opacity: 0 !important;
+  border-color: transparent !important;
+  caret-color: transparent !important;
+}
+
+#divNomeMeuPerfil.is-loading input::placeholder, #divSobrenomeMeuPerfil.is-loading input::placeholder {
+  color: transparent !important;
+}
+

@@ -413,6 +413,164 @@
     };
   }
 
+  function resolveProfileSurnameInput() {
+    return qs('inputSobrenomeMeuPerfil') || qs('inputSobrenomeCadastro');
+  }
+
+  function setLoadingState(elements, isLoading) {
+    elements.filter(Boolean).forEach(element => {
+      element.classList.toggle('is-loading', Boolean(isLoading));
+    });
+  }
+
+  async function initMeuPerfilPage() {
+    const supabase = getSupabaseClient();
+    const titleWrapper = qs('divMeuPerfil');
+    const firstNameWrapper = qs('divNomeMeuPerfil');
+    const lastNameWrapper = qs('divSobrenomeMeuPerfil');
+    const firstNameInput = qs('inputNomeMeuPerfil');
+    const lastNameInput = resolveProfileSurnameInput();
+    const saveButton = qs('btnSalvarMeuPerfil');
+    const resetPasswordButton = qs('btnRedefSenhaPerfil');
+    const deleteAccountButton = qs('btnExcluirContaPerfil');
+    const profileNotice = createModalNoticeController('mdlAvisosMeuPerfil', 'txtAvisosMeuPerfil');
+
+    if (!firstNameInput || !lastNameInput || !saveButton || !resetPasswordButton) return;
+
+    const loadingTargets = [
+      titleWrapper,
+      firstNameWrapper,
+      lastNameWrapper,
+      saveButton,
+      resetPasswordButton,
+      deleteAccountButton
+    ];
+
+    setLoadingState(loadingTargets, true);
+    setButtonEnabledState(saveButton, false);
+
+    if (!supabase) {
+      setLoadingState(loadingTargets, false);
+      profileNotice.show('Não foi possível inicializar a conexão com o Supabase.');
+      return;
+    }
+
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    const session = sessionData?.session || null;
+
+    if (sessionError || !session?.user) {
+      setLoadingState(loadingTargets, false);
+      profileNotice.show('Faça login para acessar seu perfil.', {
+        onClose: () => {
+          window.location.href = 'entrar.html';
+        }
+      });
+      return;
+    }
+
+    const user = session.user;
+    const userId = user.id;
+    const userEmail = String(user.email || '').trim();
+
+    let firstNameOriginal = '';
+    let lastNameOriginal = '';
+
+    function getCurrentNames() {
+      return {
+        firstName: String(firstNameInput.value || '').trim(),
+        lastName: String(lastNameInput.value || '').trim()
+      };
+    }
+
+    function updateSaveButtonState() {
+      const { firstName, lastName } = getCurrentNames();
+      const hasDifference = firstName !== firstNameOriginal || lastName !== lastNameOriginal;
+      const hasValues = firstName !== '' && lastName !== '';
+      setButtonEnabledState(saveButton, hasDifference && hasValues);
+      setButtonText(saveButton, 'Salvar');
+    }
+
+    try {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (profileError) throw profileError;
+
+      firstNameOriginal = String(profile?.first_name || user.user_metadata?.first_name || '').trim();
+      lastNameOriginal = String(profile?.last_name || user.user_metadata?.last_name || '').trim();
+
+      firstNameInput.value = firstNameOriginal;
+      lastNameInput.value = lastNameOriginal;
+    } catch (error) {
+      console.error('[Cifrei] Erro ao carregar perfil:', error);
+      profileNotice.show('Não foi possível carregar os dados do seu perfil.');
+    } finally {
+      setLoadingState(loadingTargets, false);
+      updateSaveButtonState();
+    }
+
+    firstNameInput.addEventListener('input', updateSaveButtonState);
+    lastNameInput.addEventListener('input', updateSaveButtonState);
+
+    saveButton.addEventListener('click', async () => {
+      updateSaveButtonState();
+      if (saveButton.disabled) return;
+
+      const { firstName, lastName } = getCurrentNames();
+      setButtonEnabledState(saveButton, false);
+      setButtonText(saveButton, 'Salvando...');
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: firstName,
+          last_name: lastName
+        })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('[Cifrei] Erro ao salvar perfil:', error);
+        profileNotice.show('Não foi possível salvar as alterações do seu perfil.');
+        updateSaveButtonState();
+        return;
+      }
+
+      firstNameOriginal = firstName;
+      lastNameOriginal = lastName;
+      profileNotice.show('Dados do perfil atualizados com sucesso.');
+      updateSaveButtonState();
+    });
+
+    resetPasswordButton.addEventListener('click', async () => {
+      if (!looksLikeEmail(userEmail)) {
+        profileNotice.show('Não foi possível identificar o e-mail de cadastro deste usuário.');
+        return;
+      }
+
+      setButtonEnabledState(resetPasswordButton, false);
+      setButtonText(resetPasswordButton, 'Enviando...');
+
+      const { error } = await supabase.auth.resetPasswordForEmail(userEmail, {
+        redirectTo: buildPageUrl('resetpw.html')
+      });
+
+      setButtonEnabledState(resetPasswordButton, true);
+      setButtonText(resetPasswordButton, 'Redefinir senha');
+
+      if (error) {
+        console.error('[Cifrei] Erro ao enviar e-mail de redefinição:', error);
+        profileNotice.show(getFriendlyAuthErrorMessage(error, 'Não foi possível enviar o e-mail de redefinição de senha.'));
+        return;
+      }
+
+      sessionStorage.setItem(STORAGE_KEYS.RESET_EMAIL, userEmail);
+      profileNotice.show('Enviamos o link de redefinição de senha para o seu e-mail de cadastro.');
+    });
+  }
+
   async function initCadastroPage() {
     const supabase = getSupabaseClient();
     const emailInput = qs('inputEmailCadastro');
@@ -715,6 +873,7 @@
     const passwordWatcher = createPasswordWatcher({
       inputId: 'inputSenhaResetPw',
       warningLabelId: 'lblAvisoProbResetPw',
+      spacesLabelId: 'lblAvisoMultEspacosResetPw',
       onStateChange: updateButtonState
     });
 
@@ -794,6 +953,7 @@
     await initCadastroPage();
     await initEntrarPage();
     await initResetPage();
+    await initMeuPerfilPage();
   });
 })();
 
