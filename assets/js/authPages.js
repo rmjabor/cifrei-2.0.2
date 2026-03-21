@@ -424,28 +424,6 @@
   }
 
 
-  function initMeuPerfilLogout() {
-    const supabase = getSupabaseClient();
-    const logoutContainer = qs('divLogoutPerfil');
-    if (!logoutContainer || !supabase) return;
-
-    logoutContainer.style.cursor = 'pointer';
-
-    logoutContainer.addEventListener('click', async (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      try {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-        window.location.href = 'entrar.html';
-      } catch (error) {
-        console.error('[Cifrei] Erro ao fazer logout:', error);
-        window.alert('Não foi possível encerrar a sessão no momento.');
-      }
-    });
-  }
-
   async function initMeuPerfilPage() {
     const supabase = getSupabaseClient();
     const titleWrapper = qs('divMeuPerfil');
@@ -456,7 +434,15 @@
     const saveButton = qs('btnSalvarMeuPerfil');
     const resetPasswordButton = qs('btnRedefSenhaPerfil');
     const deleteAccountButton = qs('btnExcluirContaPerfil');
+    const logoutContainer = qs('divLogoutPerfil');
     const profileNotice = createModalNoticeController('mdlAvisosMeuPerfil', 'txtAvisosMeuPerfil');
+    const deleteModalElement = qs('mdlConfirmExclConta');
+    const deleteModal = getBootstrapModal(deleteModalElement);
+    const deletePasswordInput = qs('inputSenhaExclConta');
+    const deletePasswordToggle = qs('icnMostrarExclConta');
+    const deleteConfirmButton = qs('btnExclConta');
+    const deleteCancelButton = qs('btnDesistirExclConta');
+    const wrongPasswordLabel = qs('txtAvisoPwErradaExclConta');
 
     if (!firstNameInput || !lastNameInput || !saveButton || !resetPasswordButton) return;
 
@@ -513,6 +499,32 @@
       setButtonText(saveButton, 'Salvar');
     }
 
+    function resetDeleteAccountModalState() {
+      if (deletePasswordInput) {
+        deletePasswordInput.value = '';
+        deletePasswordInput.type = 'password';
+      }
+      if (deletePasswordToggle) {
+        deletePasswordToggle.classList.add('ion-eye');
+        deletePasswordToggle.classList.remove('ion-eye-disabled');
+      }
+      setHtmlVisibility(wrongPasswordLabel, false);
+      if (deleteConfirmButton) {
+        setButtonEnabledState(deleteConfirmButton, false);
+        setButtonText(deleteConfirmButton, 'Excluir');
+      }
+    }
+
+    function updateDeleteButtonState() {
+      if (!deleteConfirmButton || !deletePasswordInput) return;
+      sanitizePasswordInput(deletePasswordInput);
+      const length = getPasswordLengthForPolicy(deletePasswordInput.value);
+      setButtonEnabledState(deleteConfirmButton, length >= 12 && length <= 64);
+      if (!deleteConfirmButton.disabled) {
+        setButtonText(deleteConfirmButton, 'Excluir');
+      }
+    }
+
     try {
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
@@ -533,7 +545,22 @@
     } finally {
       setLoadingState(loadingTargets, false);
       updateSaveButtonState();
+      updateDeleteButtonState();
     }
+
+    logoutContainer?.addEventListener('click', async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+        window.location.href = 'entrar.html';
+      } catch (error) {
+        console.error('[Cifrei] Erro ao fazer logout:', error);
+        profileNotice.show('Não foi possível encerrar a sessão no momento.');
+      }
+    });
 
     firstNameInput.addEventListener('input', updateSaveButtonState);
     lastNameInput.addEventListener('input', updateSaveButtonState);
@@ -591,6 +618,69 @@
 
       sessionStorage.setItem(STORAGE_KEYS.RESET_EMAIL, userEmail);
       profileNotice.show('Enviamos o link de redefinição de senha para o seu e-mail de cadastro.');
+    });
+
+    deleteAccountButton?.addEventListener('click', () => {
+      resetDeleteAccountModalState();
+      deleteModal?.show();
+      window.setTimeout(() => deletePasswordInput?.focus(), 180);
+    });
+
+    deletePasswordToggle?.addEventListener('click', () => {
+      togglePasswordVisibility(deletePasswordInput, deletePasswordToggle);
+      deletePasswordInput?.focus();
+    });
+
+    deletePasswordInput?.addEventListener('input', () => {
+      setHtmlVisibility(wrongPasswordLabel, false);
+      updateDeleteButtonState();
+    });
+
+    deleteCancelButton?.addEventListener('click', () => {
+      resetDeleteAccountModalState();
+      deleteModal?.hide();
+    });
+
+    deleteModalElement?.addEventListener('hidden.bs.modal', resetDeleteAccountModalState);
+
+    deleteConfirmButton?.addEventListener('click', async () => {
+      updateDeleteButtonState();
+      if (deleteConfirmButton.disabled || !deletePasswordInput) return;
+
+      const password = getTrimmedPassword(deletePasswordInput.value);
+      setButtonEnabledState(deleteConfirmButton, false);
+      setButtonText(deleteConfirmButton, 'Excluindo...');
+      setHtmlVisibility(wrongPasswordLabel, false);
+
+      const { data, error } = await supabase.functions.invoke('anonymize-account', {
+        body: { password }
+      });
+
+      if (error) {
+        console.error('[Cifrei] Erro ao invocar anonymize-account:', error);
+        profileNotice.show('Não foi possível excluir a conta no momento. Tente novamente.');
+        updateDeleteButtonState();
+        return;
+      }
+
+      if (!data?.success) {
+        if (data?.code === 'invalid_password') {
+          setHtmlVisibility(wrongPasswordLabel, true);
+          deletePasswordInput.focus();
+          deletePasswordInput.select();
+          updateDeleteButtonState();
+          return;
+        }
+
+        profileNotice.show(data?.message || 'Não foi possível excluir a conta no momento. Tente novamente.');
+        updateDeleteButtonState();
+        return;
+      }
+
+      deleteModal?.hide();
+      resetDeleteAccountModalState();
+      await supabase.auth.signOut();
+      window.location.href = 'index.html';
     });
   }
 
@@ -977,7 +1067,6 @@
     await initEntrarPage();
     await initResetPage();
     await initMeuPerfilPage();
-    initMeuPerfilLogout();
   });
 })();
 
