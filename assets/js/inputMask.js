@@ -25,11 +25,27 @@ document.addEventListener('DOMContentLoaded', function () {
   if (!campo) return;
 
   campo.addEventListener('input', function () {
-    let valor = this.value;
-    valor = valor.replace(/ /g, '_');
-    valor = valor.replace(/[^a-zA-Z0-9_]/g, '');
-    valor = valor.replace(/_+/g, '_');
-    this.value = valor;
+    const cursorStart = this.selectionStart;
+    const cursorEnd = this.selectionEnd;
+    const valorOriginal = String(this.value || '');
+    const valorFiltrado = Array.from(valorOriginal)
+      .filter(ch => {
+        const code = ch.charCodeAt(0);
+        return code >= 0x20 && code <= 0x7E;
+      })
+      .join('');
+
+    if (valorFiltrado !== valorOriginal) {
+      const removidosAntesDoCursor = Array.from(valorOriginal.slice(0, cursorStart))
+        .filter(ch => {
+          const code = ch.charCodeAt(0);
+          return !(code >= 0x20 && code <= 0x7E);
+        }).length;
+
+      this.value = valorFiltrado;
+      const novoCursor = Math.max(0, (cursorStart || 0) - removidosAntesDoCursor);
+      this.setSelectionRange(novoCursor, novoCursor);
+    }
   });
 });
 
@@ -38,11 +54,27 @@ document.addEventListener('DOMContentLoaded', function () {
   if (!campo) return;
 
   campo.addEventListener('input', function () {
-    let valor = this.value;
-    valor = valor.replace(/ /g, '_');
-    valor = valor.replace(/[^a-zA-Z0-9_]/g, '');
-    valor = valor.replace(/_+/g, '_');
-    this.value = valor;
+    const cursorStart = this.selectionStart;
+    const cursorEnd = this.selectionEnd;
+    const valorOriginal = String(this.value || '');
+    const valorFiltrado = Array.from(valorOriginal)
+      .filter(ch => {
+        const code = ch.charCodeAt(0);
+        return code >= 0x20 && code <= 0x7E;
+      })
+      .join('');
+
+    if (valorFiltrado !== valorOriginal) {
+      const removidosAntesDoCursor = Array.from(valorOriginal.slice(0, cursorStart))
+        .filter(ch => {
+          const code = ch.charCodeAt(0);
+          return !(code >= 0x20 && code <= 0x7E);
+        }).length;
+
+      this.value = valorFiltrado;
+      const novoCursor = Math.max(0, (cursorStart || 0) - removidosAntesDoCursor);
+      this.setSelectionRange(novoCursor, novoCursor);
+    }
   });
 });
 

@@ -79,6 +79,37 @@ function animarTextarea(element) {
   flashContainer(element);
 }
 
+function isAsciiPrintableChar(ch) {
+  if (!ch) return false;
+  const code = ch.charCodeAt(0);
+  return code >= 0x20 && code <= 0x7E;
+}
+
+function sanitizeAsciiPrintable(value) {
+  return Array.from(String(value || ''))
+    .filter(isAsciiPrintableChar)
+    .join('');
+}
+
+function hasMultipleInternalSpaces(value) {
+  return / {2,}/.test(String(value || '').trim());
+}
+
+function bindMultipleSpacesWarning(input, warningEl) {
+  if (!input || !warningEl) return;
+
+  function updateWarning() {
+    warningEl.classList.toggle('d-none', !hasMultipleInternalSpaces(input.value));
+  }
+
+  if (input.dataset.cifreiBoundMultiSpaceWarning !== '1') {
+    input.dataset.cifreiBoundMultiSpaceWarning = '1';
+    input.addEventListener('input', updateWarning);
+  }
+
+  updateWarning();
+}
+
 //
 // 1) Ícone de lixeira para txtMsgEntrada
 //
@@ -639,14 +670,17 @@ function setupPassphraseStrength() {
   const wrapper = document.getElementById('passphraseStrengthWrapper'); // <-- NOVO
   const fill    = document.getElementById('passphraseStrengthFill');
   const label   = document.getElementById('passphraseStrengthLabel');
+  const warningMultiSpaces = document.getElementById('lblAvisoMultEspacFsegredo');
+
+  bindMultipleSpacesWarning(input, warningMultiSpaces);
 
   const strengthClasses = ['strength-0', 'strength-1', 'strength-2', 'strength-3', 'strength-4'];
   const strengthColors  = ['#e63946', '#f77f00', '#ffbf00', '#4ce15b', '#9bb9d6'];
 
   function updateStrength() {
-    const normalized  = (input.value || '').replace(/ /g, '_');
+    const normalized  = sanitizeAsciiPrintable(input.value || '');
     const length      = normalized.length;
-    const charsetSize = 27;
+    const charsetSize = 95;
     const bits        = length > 0 ? Math.round(length * Math.log2(charsetSize)) : 0;
 
     let categoria = 'Muito fraca';
@@ -749,6 +783,7 @@ function setupFraseSegredoModal() {
   const btnOk      = document.getElementById('btnOkModalFraseSegredo');
   const btnSair    = document.getElementById('btnSairModalFraseSegredo');
   const campoPass  = document.getElementById('inputFraseSegredo');
+  const avisoMultEspacos = document.getElementById('lblAvisoMultEspacFsegredo');
 
   const txtChave      = document.getElementById('txtChave');
   const txtMsgEntrada = document.getElementById('txtMsgEntrada');
@@ -761,6 +796,8 @@ function setupFraseSegredoModal() {
   if (!modalEl || !btnOk || !btnSair || !campoPass) return;
 
   const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+  bindMultipleSpacesWarning(campoPass, avisoMultEspacos);
 
   // Botão Sair: resetar estado do modal
   btnSair.addEventListener('click', function (event) {
@@ -790,7 +827,10 @@ function setupFraseSegredoModal() {
   btnOk.addEventListener('click', async function (event) {
     event.preventDefault();
 
-    const passphrase   = (campoPass.value || '').trim();
+    campoPass.value = sanitizeAsciiPrintable(campoPass.value || '').trim();
+    campoPass.dispatchEvent(new Event('input', { bubbles: true }));
+
+    const passphrase   = campoPass.value;
     const chave        = (txtChave.value || '').trim();
     const textoAberto  = (txtMsgEntrada.value || '').trim();
 
@@ -874,11 +914,14 @@ function setupFraseSegredoDecModal() {
   const input   = document.getElementById('inputFraseSegredoDec');
   const btnOk   = document.getElementById('btnOkModalFraseSegredoDec');
   const btnSair = document.getElementById('btnSairModalFraseSegredoDec');
+  const avisoMultEspacos = document.getElementById('lblAvisoMultEspacFsegredoDec');
 
   // Se a página não tem esse modal, não faz nada
   if (!modalEl || !input || !btnOk || !btnSair) return;
 
   const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+  bindMultipleSpacesWarning(input, avisoMultEspacos);
 
   function atualizarEstadoBotao() {
     const len = (input.value || '').trim().length;
@@ -898,8 +941,11 @@ function setupFraseSegredoDecModal() {
   btnOk.addEventListener('click', async function (event) {
     event.preventDefault();
 
-    const secret = (input.value || '').trim();
-    if (!secret) return;
+    input.value = sanitizeAsciiPrintable(input.value || '');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+
+    const secret = input.value;
+    if (!secret || secret.trim().length < MIN_DEC_SECRET_LENGTH) return;
 
     const ctx = window.cifreiDecifragemContext;
     if (!ctx || !ctx.key75 || !ctx.ciphertext) {
