@@ -489,12 +489,16 @@
     const deleteAccountButton = qs('btnExcluirContaPerfil');
     const profileNotice = createModalNoticeController('mdlAvisosMeuPerfil', 'txtAvisosMeuPerfil');
     const deleteModalElement = qs('mdlConfirmExclConta');
-    const deleteModal = getBootstrapModal(deleteModalElement);
+    const deleteModal = window.bootstrap.Modal.getOrCreateInstance(deleteModalElement, {focus: false});
     const deletePasswordInput = qs('inputSenhaExclConta');
     const deletePasswordToggle = qs('icnMostrarExclConta');
     const deleteConfirmButton = qs('btnExclConta');
     const deleteCancelButton = qs('btnDesistirExclConta');
     const wrongPasswordLabel = qs('txtAvisoPwErradaExclConta');
+
+    deleteModalElement?.addEventListener('shown.bs.modal', () => {
+      deletePasswordInput?.focus();
+    });
 
     if (!firstNameInput || !lastNameInput || !saveButton || !resetPasswordButton) return;
 
@@ -661,7 +665,6 @@
     deleteAccountButton?.addEventListener('click', () => {
       resetDeleteAccountModalState();
       deleteModal?.show();
-      window.setTimeout(() => deletePasswordInput?.focus(), 180);
     });
 
     deletePasswordToggle?.addEventListener('click', () => {
