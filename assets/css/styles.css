@@ -435,6 +435,43 @@ input.form-control:focus {
   opacity: 0.80;
 }
 
+.btnMenu:active {
+  box-shadow: none !important;
+  transform: translateY(2px);
+  opacity: 0.80;
+}
+
+.btnMenu {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  z-index: 2000;
+}
+
+.menuFlutuante {
+  position: fixed;
+  bottom: 0%;
+  right: 15px;
+  z-index: 3000;
+  padding-bottom: 20px;
+  background-color: #ffffff;
+}
+
+#overlayMenuFlutuante {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  z-index: 2500;
+  background-color: #424242;
+  opacity: 70%;
+}
+
+.mLineOpacity {
+  opacity: 50%;
+}
+
 .btnPadrao:disabled {
   opacity: 0.4;
   box-shadow: none;
