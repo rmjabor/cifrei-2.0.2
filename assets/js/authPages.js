@@ -333,6 +333,37 @@
     return fallback || 'Não foi possível concluir a operação no momento.';
   }
 
+  function getInvokeErrorDetails(error) {
+    const pieces = [
+      error?.message,
+      error?.name,
+      error?.details,
+      error?.hint,
+      error?.context ? JSON.stringify(error.context) : '',
+      error?.originalError ? JSON.stringify(error.originalError) : ''
+    ].filter(Boolean);
+
+    const normalized = String(pieces.join(' | ') || '').toLowerCase();
+
+    return {
+      raw: normalized,
+      isInvalidPassword: normalized.includes('invalid_password')
+        || normalized.includes('invalid login credentials')
+        || normalized.includes('senha incorreta')
+        || normalized.includes('wrong password'),
+      isFunctionMissing: normalized.includes('functionsfetcherror')
+        || normalized.includes('failed to send a request to the edge function')
+        || normalized.includes('edge function returned a non-2xx status code')
+        || normalized.includes('404')
+        || normalized.includes('not found'),
+      isAuthIssue: normalized.includes('401')
+        || normalized.includes('403')
+        || normalized.includes('jwt')
+        || normalized.includes('authorization')
+    };
+  }
+
+
   function createPasswordWatcher(config) {
     const input = qs(config.inputId);
     const warningLabel = qs(config.warningLabelId);
@@ -424,6 +455,28 @@
   }
 
 
+  function initMeuPerfilLogout() {
+    const supabase = getSupabaseClient();
+    const logoutContainer = qs('divLogoutPerfil');
+    if (!logoutContainer || !supabase) return;
+
+    logoutContainer.style.cursor = 'pointer';
+
+    logoutContainer.addEventListener('click', async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+        window.location.href = 'entrar.html';
+      } catch (error) {
+        console.error('[Cifrei] Erro ao fazer logout:', error);
+        window.alert('Não foi possível encerrar a sessão no momento.');
+      }
+    });
+  }
+
   async function initMeuPerfilPage() {
     const supabase = getSupabaseClient();
     const titleWrapper = qs('divMeuPerfil');
@@ -434,7 +487,6 @@
     const saveButton = qs('btnSalvarMeuPerfil');
     const resetPasswordButton = qs('btnRedefSenhaPerfil');
     const deleteAccountButton = qs('btnExcluirContaPerfil');
-    const logoutContainer = qs('divLogoutPerfil');
     const profileNotice = createModalNoticeController('mdlAvisosMeuPerfil', 'txtAvisosMeuPerfil');
     const deleteModalElement = qs('mdlConfirmExclConta');
     const deleteModal = getBootstrapModal(deleteModalElement);
@@ -548,20 +600,6 @@
       updateDeleteButtonState();
     }
 
-    logoutContainer?.addEventListener('click', async (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      try {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-        window.location.href = 'entrar.html';
-      } catch (error) {
-        console.error('[Cifrei] Erro ao fazer logout:', error);
-        profileNotice.show('Não foi possível encerrar a sessão no momento.');
-      }
-    });
-
     firstNameInput.addEventListener('input', updateSaveButtonState);
     lastNameInput.addEventListener('input', updateSaveButtonState);
 
@@ -658,6 +696,28 @@
 
       if (error) {
         console.error('[Cifrei] Erro ao invocar anonymize-account:', error);
+        const invokeError = getInvokeErrorDetails(error);
+
+        if (invokeError.isInvalidPassword) {
+          setHtmlVisibility(wrongPasswordLabel, true);
+          deletePasswordInput.focus();
+          deletePasswordInput.select();
+          updateDeleteButtonState();
+          return;
+        }
+
+        if (invokeError.isFunctionMissing) {
+          profileNotice.show('A Edge Function anonymize-account não respondeu. Verifique se ela foi criada, implantada e publicada com esse nome no Supabase.');
+          updateDeleteButtonState();
+          return;
+        }
+
+        if (invokeError.isAuthIssue) {
+          profileNotice.show('Não foi possível autenticar a solicitação de exclusão de conta. Entre novamente e tente de novo.');
+          updateDeleteButtonState();
+          return;
+        }
+
         profileNotice.show('Não foi possível excluir a conta no momento. Tente novamente.');
         updateDeleteButtonState();
         return;
@@ -1067,6 +1127,7 @@
     await initEntrarPage();
     await initResetPage();
     await initMeuPerfilPage();
+    initMeuPerfilLogout();
   });
 })();
 
