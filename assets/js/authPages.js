@@ -423,6 +423,29 @@
     });
   }
 
+
+  function initMeuPerfilLogout() {
+    const supabase = getSupabaseClient();
+    const logoutContainer = qs('divLogoutPerfil');
+    if (!logoutContainer || !supabase) return;
+
+    logoutContainer.style.cursor = 'pointer';
+
+    logoutContainer.addEventListener('click', async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+        window.location.href = 'entrar.html';
+      } catch (error) {
+        console.error('[Cifrei] Erro ao fazer logout:', error);
+        window.alert('Não foi possível encerrar a sessão no momento.');
+      }
+    });
+  }
+
   async function initMeuPerfilPage() {
     const supabase = getSupabaseClient();
     const titleWrapper = qs('divMeuPerfil');
@@ -954,6 +977,7 @@
     await initEntrarPage();
     await initResetPage();
     await initMeuPerfilPage();
+    initMeuPerfilLogout();
   });
 })();
 
