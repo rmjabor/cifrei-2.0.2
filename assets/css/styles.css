@@ -449,6 +449,7 @@ input.form-control:focus {
   height: 45px;
   border-radius: 45px;
   z-index: 2000;
+  background-color: rgb(66, 66, 66, 0.85);
 }
 
 .menuFlutuante {
@@ -465,7 +466,7 @@ input.form-control:focus {
   top: 0px;
   right: 0px;
   z-index: 2500;
-  background-color: rgb(66, 66, 66, 0.7);
+  background-color: rgb(66, 66, 66, 0.85);
 }
 
 .menuLine {
