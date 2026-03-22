@@ -238,7 +238,7 @@ input.form-control:focus {
 
 .modal-confirma-excluir {
   max-width: 340px;
-  width: 340px;
+  min-width: 300px;
   margin-top: 80px;
   margin-left: auto;
   margin-right: auto;
