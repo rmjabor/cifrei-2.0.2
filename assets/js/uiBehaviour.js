@@ -2724,6 +2724,7 @@ function setupMenuFlutuante() {
     'menuLineDecifrar',
     'menuLineMeuperfil',
     'menuLineTermos',
+    'menuLineTermosLegais',
     'menuLineSuporte',
     'menuLineLogout'
   ];
