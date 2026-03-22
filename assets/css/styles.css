@@ -465,7 +465,7 @@ input.form-control:focus {
   right: 0px;
   z-index: 2500;
   background-color: #424242;
-  opacity: 70%;
+  opacity: 40%;
 }
 
 .mLineOpacity {
