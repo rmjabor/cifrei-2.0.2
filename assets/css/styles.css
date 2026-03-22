@@ -465,11 +465,11 @@ input.form-control:focus {
   right: 0px;
   z-index: 2500;
   background-color: #424242;
-  opacity: 0.6;
+  opacity: 0.4;
 }
 
 .mLineOpacity {
-  opacity: 50%;
+  opacity: 0.5;
 }
 
 .btnPadrao:disabled {
