@@ -445,8 +445,8 @@ input.form-control:focus {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  width: 56px;
-  height: 56px;
+  width: 45px;
+  height: 45px;
   z-index: 2000;
 }
 
