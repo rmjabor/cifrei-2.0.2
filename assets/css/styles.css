@@ -457,6 +457,7 @@ input.form-control:focus {
   right: 24px;
   z-index: 3000;
   background-color: #ffffff;
+  border-radius: 6px;
 }
 
 #overlayMenuFlutuante {
@@ -464,7 +465,7 @@ input.form-control:focus {
   top: 0px;
   right: 0px;
   z-index: 2500;
-  background-color: rgb(66, 66, 66, 0.4);
+  background-color: rgb(66, 66, 66, 0.7);
 }
 
 .menuLine {
