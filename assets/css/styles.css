@@ -752,3 +752,197 @@ input.form-control:focus {
   box-shadow: none !important;
 }
 
+/* Estilos do Custom Code das páginas Suporte e Termos */
+
+:root {
+  --text: #091747;
+  --muted: #4c587f;
+  --line: #d7dceb;
+  --soft: #f6f8fc;
+  --note-important-bg: #eef3ff;
+  --note-important-bd: #bfd0ff;
+  --note-caution-bg: #fff6eb;
+  --note-caution-bd: #ffd9a6;
+  --note-attention-bg: #fff1f1;
+  --note-attention-bd: #ffc7c7;
+  --note-warning-bg: #fff7df;
+  --note-warning-bd: #f3d27b;
+  --maxw: 980px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0 20px;
+  font-family: "Open Sans", Arial, sans-serif;
+  color: var(--text);
+  background: #ffffff;
+  max-width: 600px;
+  margin: 0 auto;
+  counter-reset: chapter;
+}
+
+.page {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 28px 18px 64px;
+}
+
+.doc-title {
+  margin: 0 0 18px 0;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.toc {
+  margin: 0 0 26px 0;
+  padding: 16px 16px 8px 16px;
+  border: 1px solid rgba(9,23,71,.12);
+  border-radius: 12px;
+  background: rgba(9,23,71,.03);
+}
+
+.toc-title {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.toc ol {
+  margin: 0 0 8px 22px;
+  padding: 0;
+  font-size: 14px;
+  line-height: 2;
+}
+
+.toc a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(9,23,71,.35);
+}
+
+.toc a:hover {
+  border-bottom-style: solid;
+}
+
+section.chapter {
+  margin: 0 0 28px 0;
+  padding: 0 0 8px 0;
+  counter-increment: chapter;
+}
+
+section.chapter > h1 {
+  margin: 30px 0 12px 0;
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+section.chapter > h1::before {
+  content: counter(chapter) ". ";
+}
+
+h2 {
+  margin: 18px 0 10px 0;
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+h3 {
+  margin: 16px 0 8px 0;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+p, li {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+p {
+  margin: 0 0 10px 0;
+}
+
+ul, ol {
+  margin: 0 0 10px 22px;
+  padding: 0;
+}
+
+li {
+  margin: 0 0 2px 0;
+}
+
+.spacer {
+  height: 8px;
+}
+
+.divider {
+  letter-spacing: .3px;
+  color: #8090ba;
+  margin: 10px 0;
+}
+
+.note {
+  margin: 14px 0 14px 0;
+  padding: 14px 16px 8px 16px;
+  border-radius: 12px;
+  border: 1px solid;
+}
+
+.note h2, .note h3 {
+  margin-top: 0;
+}
+
+.note-important {
+  background: var(--note-important-bg);
+  border-color: var(--note-important-bd);
+}
+
+.note-caution {
+  background: var(--note-caution-bg);
+  border-color: var(--note-caution-bd);
+}
+
+.note-attention {
+  background: var(--note-attention-bg);
+  border-color: var(--note-attention-bd);
+}
+
+.note-warning {
+  background: var(--note-warning-bg);
+  border-color: var(--note-warning-bd);
+}
+
+.backtop {
+  margin: 12px 0 0 0;
+  font-size: 13px;
+}
+
+.backtop a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(9,23,71,.35);
+}
+
+.backtop a:hover {
+  border-bottom-style: solid;
+}
+
+strong {
+  font-weight: 700;
+}
+
+main {
+  padding: 0 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+

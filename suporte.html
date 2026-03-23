@@ -54,6 +54,484 @@
             <path d="M12 10C12 11.1046 11.1046 12 10 12C8.89543 12 8 11.1046 8 10C8 8.89543 8.89543 8 10 8C11.1046 8 12 8.89543 12 10Z" fill="currentColor"></path>
             <path d="M16 12C17.1046 12 18 11.1046 18 10C18 8.89543 17.1046 8 16 8C14.8954 8 14 8.89543 14 10C14 11.1046 14.8954 12 16 12Z" fill="currentColor"></path>
         </svg></div>
+    <header class="d-flex justify-content-center" style="margin-bottom: 30px;margin-top: 40px;">
+        <div id="divLogoCifreiHome" class="7" style="width: fit-content;"><img class="img-fluid d-flex justify-content-center" width="806" height="418" src="assets/img/Logo-Cifrei.png" style="width: 138px;height: 71px;margin-right: auto;margin-left: auto;position: static;margin-top: 0px;"></div>
+    </header>    <div class="doc-title">Guia do Aplicativo</div>
+    <nav class="toc" aria-label="Índice">
+      <div class="toc-title">Índice</div>
+      <ol>
+        <li><a href="#cap-1">Bem-vindo ao Cifrei</a></li>
+        <li><a href="#cap-2">O que é o Cifrei?</a></li>
+        <li><a href="#cap-3">Fluxo geral de uso</a></li>
+        <li><a href="#cap-4">Tela Início</a></li>
+        <li><a href="#cap-5">Tela Cifragem</a></li>
+        <li><a href="#cap-6">Tela Cifra</a></li>
+        <li><a href="#cap-7">Tela Decifragem</a></li>
+        <li><a href="#cap-8">Tela Minha Cifra</a></li>
+        <li><a href="#cap-9">Tela Meu Perfil</a></li>
+        <li><a href="#cap-10">Como o Cifrei protege suas informações</a></li>
+      </ol>
+    </nav>
+    <section class="chapter" id="cap-1">
+      <h1>Bem-vindo ao Cifrei</h1>
+<p>Este guia explica, de forma prática e objetiva, como utilizar o aplicativo Cifrei para cifrar, decifrar e gerenciar suas mensagens com segurança.</p>
+<div class="spacer"></div>
+      <p class="backtop"><a href="#topo">↑ Voltar para o topo</a></p>
+    </section>
+    <section class="chapter" id="cap-2">
+      <h1><strong>O que é o Cifrei?</strong></h1>
+<p>O Cifrei é um aplicativo de criptografia que permite transformar mensagens em códigos protegidos (cifragem) e recuperar essas mensagens quando necessário (decifragem).</p>
+<p>O processo utilizado pelo Cifrei combina três elementos principais:</p>
+<p>o <strong>texto ou mensagem</strong> que será protegida, </p>
+<p>uma <strong>chave</strong>, definida pelo usuário, </p>
+<p>e uma <strong>frase segredo</strong>, também escolhida pelo usuário. </p>
+<ul>
+<li>Ao realizar a cifragem, o aplicativo aplica um processo criptográfico que utiliza esses três elementos para gerar uma <strong>cifra</strong>, que é uma representação protegida da mensagem original.</li>
+<li>Essa cifra é composta, basicamente, por:</li>
+<li><strong>chave</strong>, </li>
+</ul>
+<p>e <strong>código</strong> (texto cifrado gerado pelo sistema). </p>
+<p>A cifra pode ser salva pelo usuário e utilizada posteriormente.</p>
+<ul>
+<li>Para recuperar a mensagem original (decifrar), é necessário informar, além da chave e do código, a <strong>mesma frase segredo</strong> usada no momento da criação da cifra.</li>
+<li>Sem a combinação correta desses elementos, não é possível reconstruir o conteúdo original da mensagem.</li>
+</ul>
+<p>Esse modelo garante que apenas quem possui as três informações corretas consiga acessar o conteúdo protegido.</p>
+<div class="spacer"></div>
+      <p class="backtop"><a href="#topo">↑ Voltar para o topo</a></p>
+    </section>
+    <section class="chapter" id="cap-3">
+      <h1><strong>Fluxo geral de uso</strong></h1>
+<div class="spacer"></div>
+<p>Após se cadastrar e acessar o aplicativo, o usuário percorre normalmente as seguintes telas:</p>
+<ul>
+<li>Início</li>
+<li>Cifragem</li>
+<li>Cifra</li>
+<li>Decifragem</li>
+<li>Minha cifra</li>
+<li>Meu perfil</li>
+</ul>
+<div class="spacer"></div>
+      <p class="backtop"><a href="#topo">↑ Voltar para o topo</a></p>
+    </section>
+    <section class="chapter" id="cap-4">
+      <h1><strong>Tela Início</strong></h1>
+<p>A tela Início exibe todas as cifras salvas pelo usuário. Uma cifra é um conjunto de informações </p>
+<p>Nela você pode:</p>
+<ul>
+<li>Visualizar suas cifras na lista Minhas Cifras</li>
+<li>Criar uma nova cifra ao clicar em ‘+ Cifrar’</li>
+<li>Decifrar uma cifra ao clicar em ‘+ Decifrar’ ou no card da cifra correspondente</li>
+<li>Acessar uma cifra existente para visualizar ou editar, clicando no ícone de edição</li>
+<li>Excluir uma cifra existente ao clicar no ícone de exclusão</li>
+</ul>
+<p>Caso ainda não existam cifras, o aplicativo exibirá uma mensagem indicando que não há registros.</p>
+<p>Cada cifra é exibida em formato de card, contendo:</p>
+<ul>
+<li>Nome da cifra</li>
+<li>Parte da chave (o que couber no card)</li>
+<li>Parte do código (o que couber no card)</li>
+</ul>
+<div class="spacer"></div>
+      <p class="backtop"><a href="#topo">↑ Voltar para o topo</a></p>
+    </section>
+    <section class="chapter" id="cap-5">
+      <h1><strong>Tela Cifra</strong><strong>gem</strong></h1>
+<p>A tela <strong>Cifra</strong><strong>gem</strong> é utilizada para transformar um texto aberto em um código protegido (cifra).</p>
+<p>Nela, você deverá preencher três elementos principais: <strong>mensagem</strong>, <strong>chave</strong> e <strong>frase segredo</strong>.</p>
+<h2><strong>Mensagem (texto a ser cifrado)</strong></h2>
+<p>Este é o conteúdo que você deseja proteger.</p>
+<p>Você pode digitar ou colar qualquer texto:</p>
+<ul>
+<li>sem limite prático de tamanho, </li>
+<li>utilizando letras, números, símbolos comuns do teclado (não aceita acento, til etc.), </li>
+<li>e também com quebras de linha (várias linhas de texto). </li>
+</ul>
+<p>Em termos simples: você pode escrever normalmente, como faria em um editor de texto, exceto acentuações.</p>
+<h2><strong>Chave</strong></h2>
+<p>A chave é um dos elementos fundamentais da cifragem.</p>
+<p>Ela funciona como um “identificador técnico” da cifra e participa diretamente do processo criptográfico.</p>
+<p>Regras para a chave:</p>
+<ul>
+<li>Deve ter entre <strong>8 e 25 caracteres</strong>, </li>
+<li>Pode conter letras, números e símbolos comuns do teclado. </li>
+</ul>
+<p>Dicas importantes:</p>
+<ul>
+<li>Evite chaves muito óbvias (como “12345678” ou “senha123”), </li>
+<li>Use combinações variadas (letras maiúsculas, minúsculas, números e símbolos), </li>
+<li>Não reutilize a mesma chave em todas as cifras, se possível. </li>
+</ul>
+<p>Não se preocupe em memorizar a chave, pois ela será salva junto com a sua cifra.</p>
+<h2><strong>Frase segredo</strong></h2>
+<p>A frase segredo é um elemento essencial para a segurança da sua cifra.</p>
+<p>Ela funciona como uma camada adicional de proteção, combinada com a chave e a mensagem no processo de criptografia.</p>
+<p>Diferente da chave, a frase segredo <strong>não é armazenada pelo aplicativo em nenhum momento</strong>.</p>
+<p>Isso significa que:</p>
+<ul>
+<li>o sistema <strong>não guarda</strong>, <strong>não registra</strong> e <strong>não tem como recuperar</strong> essa informação, </li>
+<li>apenas você conhece a frase segredo utilizada. </li>
+</ul>
+<div class="note note-important">
+<h2><strong>Importante:</strong></h2>
+<p>Se você esquecer a frase segredo, não será possível decifrar a mensagem.</p>
+<p>Por isso, você deve:</p>
+<ul>
+<li>memorizar a frase segredo, ou </li>
+<li>anotá-la em um local seguro. </li>
+</ul>
+<p>Você também pode utilizar uma frase segredo diferente para cada cifra, aumentando ainda mais a segurança. </p>
+</div>
+<h2><strong>Como escolher uma boa frase segredo</strong></h2>
+<p>Uma boa frase segredo deve ser:</p>
+<ul>
+<li>fácil para você lembrar, </li>
+<li>mas difícil para outras pessoas adivinharem. </li>
+</ul>
+<p>Recomendações:</p>
+<ul>
+<li>Utilize <strong>pelo menos 3 palavras</strong> (mínimo recomendado), </li>
+<li>O ideal é entre <strong>4 e 5 palavras</strong>, </li>
+<li>Um total de cerca de <strong>20 caracteres ou mais</strong> já oferece uma boa segurança. </li>
+</ul>
+<p>Sugestões do que usar:</p>
+<ul>
+<li>Nome de uma pessoa famosa, </li>
+<li>Trecho ou título de uma música, </li>
+<li>Nome de um filme, </li>
+<li>Trecho ou título de um livro, </li>
+<li>Nome de autor, cantor ou artista, </li>
+<li>Uma frase que você goste ou que tenha significado para você. </li>
+</ul>
+<div class="note note-caution">
+<h2><strong>Cuidados importantes</strong></h2>
+<p>Evite escolher frases que sejam facilmente associadas a você.</p>
+<p>Exemplo:<br>Se você é conhecido por gostar muito de uma música específica, usar um trecho dessa música pode facilitar que alguém tente adivinhar sua frase segredo.</p>
+<p>A ideia é encontrar um equilíbrio:</p>
+<ul>
+<li>algo que seja <strong>memorizável para você</strong>, </li>
+<li>mas <strong>não óbvio para outras pessoas</strong>.</li>
+</ul>
+</div>
+<h2><strong>Opções de Chave</strong></h2>
+<p>Na tela <strong>Cifrar</strong>, você pode definir a chave de diferentes formas, utilizando as opções disponíveis. Isso permite escolher entre praticidade, reutilização ou maior controle manual.</p>
+<h2><strong>Digitar, colar ou gerar chave</strong></h2>
+<p>Esta é a forma mais direta de definir a chave.</p>
+<p>Você pode:</p>
+<ul>
+<li><strong>Digitar manualmente</strong> a chave no campo, </li>
+<li><strong>Colar</strong> um texto do seu <em>clipboard</em>, </li>
+<li>Ou utilizar o botão <strong>“Gerar senha aleatória”</strong>. </li>
+</ul>
+<p>Ao optar por gerar uma chave automaticamente, o aplicativo cria uma sequência <strong>aleatória de 20 caracteres</strong><strong> </strong>utilizando letras, números e símbolos. </p>
+<p>Essa é uma excelente opção para quem deseja:</p>
+<ul>
+<li>máxima segurança, </li>
+<li>evitar padrões previsíveis, </li>
+<li>e não precisa memorizar a chave (caso esteja salvando a cifra no aplicativo). </li>
+</ul>
+<div class="spacer"></div>
+<h2><strong>Leitura por QR Cod</strong><strong>e</strong></h2>
+<p>O Cifrei também permite utilizar uma chave por meio da leitura de um <strong>QR Code</strong>.</p>
+<p>Funciona assim:</p>
+<ul>
+<li>O aplicativo pode gerar um QR Code associado a uma cifra, </li>
+<li>Você pode salvar esse QR Code no seu celular ou computador, </li>
+<li>E, posteriormente, utilizá-lo para preencher a chave automaticamente na tela de cifragem. </li>
+</ul>
+<p>Para isso, selecione a opção de leitura por QR Code e utilize a câmera do dispositivo para ler o código. </p>
+<p>Essa opção é útil quando você deseja:</p>
+<ul>
+<li>evitar digitação manual, </li>
+<li>reduzir erros, </li>
+<li>ou utilizar chaves complexas de forma prática. </li>
+</ul>
+<div class="spacer"></div>
+<h2><strong>Selecionar chave de uma cifra salva</strong></h2>
+<p>Você também pode reutilizar a chave de uma cifra já existente.</p>
+<p>Ao escolher essa opção, o aplicativo lista suas cifras salvas e você pode selecionar uma delas para utilizar a mesma chave. </p>
+<p>Essa funcionalidade é útil quando:</p>
+<ul>
+<li>você trabalha com um conjunto de cifras relacionadas, </li>
+<li>deseja manter um padrão de chave, </li>
+<li>ou quer agilizar o processo de cifragem. </li>
+</ul>
+<div class="spacer"></div>
+<h2><strong>Considerações gerais</strong></h2>
+<p>Cada forma de definir a chave atende a um perfil de uso:</p>
+<ul>
+<li><strong>Manual/gerada:</strong> mais flexível e segura </li>
+<li><strong>QR Code:</strong> mais prática e precisa </li>
+<li><strong>Cifra salva:</strong> mais rápida e consistente </li>
+</ul>
+<p>A escolha depende do seu fluxo de uso e do nível de segurança desejado.</p>
+<h2><strong>Uso prático: armazenamento seguro de senhas</strong></h2>
+<p>O Cifrei também pode ser utilizado como uma ferramenta para armazenar senhas de forma segura.</p>
+<p>Nesse caso, em vez de cifrar um texto comum, você pode gerar e proteger <strong>senhas de acesso a sites e aplicativos</strong>.</p>
+<h2><strong>Gerando uma senha segura</strong></h2>
+<p>Na tela <strong>Cifrar</strong>, no campo de mensagem, você pode utilizar o gerador de senha do aplicativo.</p>
+<p>Para isso, clique no ícone localizado no canto superior direito do campo de mensagem (representado por um campo de senha com caracteres ocultos). Será aberta uma janela de configuração. </p>
+<p>Nessa janela, você poderá definir:</p>
+<ul>
+<li>o <strong>tamanho da senha</strong> (quantidade de caracteres), </li>
+<li>se deseja incluir <strong>letras maiúsculas</strong>, </li>
+<li><strong>números</strong>, </li>
+<li>e <strong>caracteres especiais</strong>. </li>
+</ul>
+<p>Isso permite adaptar a senha exatamente às exigências do site ou aplicativo em que ela será utilizada.</p>
+<p>Após configurar, o aplicativo gera automaticamente uma senha forte e aleatória, que será inserida no campo de mensagem.</p>
+<h2><strong>Salvando a senha como cifra</strong></h2>
+<p>Depois de gerar a senha:</p>
+<ul>
+<li>você realiza a cifragem normalmente, </li>
+<li>atribui um nome à cifra (por exemplo, o nome do site ou aplicativo), </li>
+<li>e salva. </li>
+</ul>
+<p>A senha ficará armazenada de forma protegida dentro do Cifrei.</p>
+<h2><strong>Recuperando a senha</strong></h2>
+<p>Caso você esqueça a senha de um site ou aplicativo:</p>
+<ul>
+<li>Acesse a tela <strong>Início</strong>, </li>
+<li>Localize a cifra correspondente, </li>
+<li>Clique no card para abrir a tela de decifragem, </li>
+<li>Realize a <strong>decifragem</strong> utilizando a chave e a frase segredo, </li>
+<li>Copie a senha exibida, </li>
+<li>E cole no campo de senha do site ou aplicativo desejado. </li>
+</ul>
+<h2><strong>Vantagens desse uso</strong></h2>
+<ul>
+<li>Você pode utilizar <strong>senhas fortes e aleatórias</strong>, sem precisar memorizá-las </li>
+<li>As senhas ficam <strong>protegidas por criptografia</strong> </li>
+<li>Você reduz o risco de reutilizar senhas fracas ou repetidas </li>
+<li>O acesso às senhas depende da <strong>chave e da frase segredo</strong>, aumentando a segurança</li>
+</ul>
+<div class="spacer"></div>
+      <p class="backtop"><a href="#topo">↑ Voltar para o topo</a></p>
+    </section>
+    <section class="chapter" id="cap-6">
+      <h1><strong>Tela Cifra</strong></h1>
+<p>Após realizar a cifragem, o aplicativo gera uma <strong>cifra</strong>, que pode ser salva para uso futuro.</p>
+<p>Essa cifra é composta, basicamente, por:</p>
+<ul>
+<li>a <strong>chave</strong> utilizada na cifragem, </li>
+<li>e o <strong>código</strong> (texto criptografado gerado pelo sistema). </li>
+</ul>
+<p>Esses dois elementos são suficientes para armazenar a cifra. No entanto, para recuperar a mensagem original, será necessário informar também a <strong>frase segredo</strong> utilizada no momento da criação.</p>
+<h2><strong>Informações adicionais da cifra</strong></h2>
+<p>Ao salvar uma cifra, você pode complementar com:</p>
+<ul>
+<li>um <strong>título</strong> (nome da cifra), </li>
+<li>e uma <strong>descrição</strong> (campo opcional para observações). </li>
+</ul>
+<p>Esses campos ajudam na organização e na identificação das suas cifras ao longo do tempo.</p>
+<div class="note note-caution">
+<h2><strong>⚠️</strong><strong> Cuidados ao definir título e descrição</strong></h2>
+<p>É importante ter atenção ao conteúdo dessas informações.</p>
+<p>Evite incluir no título ou na descrição:</p>
+<ul>
+<li>partes da mensagem original, </li>
+<li>ou qualquer indicação direta ou indireta da frase segredo. </li>
+</ul>
+<p>Mesmo informações aparentemente inofensivas podem ajudar alguém mal-intencionado a reduzir o espaço de tentativa para descobrir os dados corretos.</p>
+</div>
+<h2><strong>Exemplo de risco</strong></h2>
+<p>Se você indicar, ainda que indiretamente, que duas cifras utilizam a <strong>mesma frase segredo</strong>,<br>isso já aumenta a probabilidade de essa frase ser descoberta por alguém com conhecimento técnico, mesmo que esse risco ainda seja baixo. </p>
+<p>Da mesma forma, mencionar temas, referências ou padrões pode facilitar tentativas direcionadas de quebra. </p>
+<h2><strong>Boa prática</strong></h2>
+<p>Use títulos e descrições que:</p>
+<ul>
+<li>ajudem você a identificar a cifra, </li>
+<li>mas que <strong>não revelem informações sensíveis</strong>. </li>
+</ul>
+<p>O ideal é que esses campos funcionem apenas como referência pessoal, sem expor detalhes relevantes sobre o conteúdo protegido.</p>
+      <p class="backtop"><a href="#topo">↑ Voltar para o topo</a></p>
+    </section>
+    <section class="chapter" id="cap-7">
+      <h1><strong>Tela Decifra</strong><strong>gem</strong></h1>
+<p>A tela <strong>Decifra</strong><strong>gem</strong> é utilizada para recuperar uma mensagem protegida anteriormente no Cifrei.</p>
+<p>Para isso, o usuário deve informar os elementos necessários da cifra, especialmente a <strong>chave</strong>, o <strong>código</strong> e a <strong>frase segredo</strong> correspondente.</p>
+<p>Assim como na tela de cifragem, o preenchimento da chave pode ser feito de diferentes formas.</p>
+<h2><strong>Formas de informar a chave e o código</strong></h2>
+<p>Na tela <strong>Decifra</strong><strong>gem</strong>, o usuário pode optar por diferentes caminhos para fornecer os dados da cifra:</p>
+<h2><strong>Digitação manual</strong></h2>
+<p>O usuário pode:</p>
+<ul>
+<li>digitar manualmente a <strong>chave</strong>, </li>
+<li>colar a <strong>chave</strong> e o <strong>código</strong> a partir da área de transferência, </li>
+<li>e então informar a <strong>frase segredo</strong> utilizada no momento da cifragem. </li>
+</ul>
+<p>Essa opção é útil quando a cifra foi armazenada fora do aplicativo ou quando o usuário deseja inserir os dados diretamente.</p>
+<h2><strong>Leitura por QR Code</strong></h2>
+<p>O usuário também pode utilizar a leitura de <strong>QR Code</strong> para preencher a chave de forma automática.</p>
+<p>Nesse caso:</p>
+<ul>
+<li>basta selecionar a opção correspondente, </li>
+<li>usar a câmera do dispositivo, </li>
+<li>e ler o QR Code associado à cifra. </li>
+</ul>
+<p>Essa opção reduz erros de digitação e facilita o uso de chaves mais complexas.</p>
+<h2><strong>Seleção de cifra salva</strong></h2>
+<p>Outra possibilidade é selecionar uma cifra já salva no próprio aplicativo.</p>
+<p>Ao escolher essa opção:</p>
+<ul>
+<li>o aplicativo recupera a cifra armazenada, </li>
+<li>preenchendo os dados necessários para a decifragem, </li>
+<li>restando ao usuário informar a <strong>frase segredo</strong> correta. </li>
+</ul>
+<p>Essa é a forma mais prática para quem utiliza o Cifrei como arquivo pessoal de cifras.</p>
+<h2><strong>Resultado da decifragem</strong></h2>
+<p>Após informar os dados necessários, clicar em <strong>Decifrar</strong> e informar a frase segredo, o aplicativo processa a cifra e, se as informações estiverem corretas, abre a tela com a <strong>cifra aberta</strong>.</p>
+<p>Nessa tela, o usuário poderá visualizar:</p>
+<ul>
+<li>a <strong>chave</strong>, </li>
+<li>o <strong>código</strong>, </li>
+</ul>
+<p>e a <strong>mensagem em claro</strong> (texto decifrado). </p>
+<p>Essa visualização permite:</p>
+<ul>
+<li>conferir o conteúdo original, </li>
+<li>copiar a mensagem, </li>
+</ul>
+<p>e, quando necessário, utilizá-la imediatamente em outro contexto, como no preenchimento de uma senha ou na recuperação de uma informação protegida. </p>
+<div class="note note-important">
+<h2><strong>Importante</strong></h2>
+<p>Se a <strong>frase segredo</strong> estiver incorreta, ou se houver divergência nos dados da cifra, a mensagem não será recuperada corretamente.</p>
+<p>Por isso, para decifrar uma mensagem com sucesso, é indispensável utilizar:</p>
+<ul>
+<li>a <strong>chave correta</strong>, </li>
+<li>o <strong>código correto</strong>, </li>
+<li>e a <strong>mesma frase segredo</strong> usada no momento da cifragem. </li>
+</ul>
+<div class="spacer"></div>
+</div>
+      <p class="backtop"><a href="#topo">↑ Voltar para o topo</a></p>
+    </section>
+    <section class="chapter" id="cap-8">
+      <h1><strong>Tela Minha Cifra</strong></h1>
+<p>A tela <strong>Minha Cifra</strong> permite ao usuário visualizar e gerenciar uma cifra já salva no aplicativo.</p>
+<h2><strong>Visualização da cifra</strong></h2>
+<p>Ao acessar essa tela, o usuário poderá ver todas as informações associadas à cifra:</p>
+<ul>
+<li><strong>Nome (título)</strong> </li>
+</ul>
+<h2><strong>Chave</strong> </h2>
+<ul>
+<li><strong>Código</strong> (texto cifrado) </li>
+<li><strong>Observações</strong> (campo opcional) </li>
+</ul>
+<p>Essa visualização permite identificar rapidamente a cifra e acessar seus dados principais.</p>
+<h2><strong>Edição da cifra</strong></h2>
+<p>O usuário pode editar as seguintes informações:</p>
+<ul>
+<li><strong>Nome (título)</strong> </li>
+<li><strong>Observações</strong> </li>
+</ul>
+<p>Após realizar as alterações, basta clicar em <strong>Salvar</strong> para atualizar os dados.</p>
+<p>Essas informações são utilizadas apenas para organização e identificação, não interferindo no conteúdo criptográfico da cifra.</p>
+<h2><strong>Ações disponíveis</strong></h2>
+<p>Além da visualização e edição, a tela oferece algumas ações importantes:</p>
+<p><strong>Gerar QR Code</strong><br>Permite criar um QR Code associado à cifra, que pode ser salvo e utilizado posteriormente para leitura da chave em outras telas do aplicativo. </p>
+<p><strong>Decifrar</strong><br>Permite iniciar o processo de decifragem da cifra diretamente a partir dessa tela, levando o usuário ao fluxo de abertura da mensagem. </p>
+<div class="note note-attention">
+<h2><strong>⚠️</strong><strong> Atenção</strong></h2>
+<p>Assim como no momento da criação da cifra, é importante evitar incluir informações sensíveis no nome ou nas observações, como pistas sobre a mensagem, a chave ou a frase segredo.</p>
+</div>
+      <p class="backtop"><a href="#topo">↑ Voltar para o topo</a></p>
+    </section>
+    <section class="chapter" id="cap-9">
+      <h1><strong>Tela Meu Perfil</strong></h1>
+<p>A tela <strong>Meu Perfil</strong> permite ao usuário gerenciar suas informações pessoais e configurações de conta.</p>
+<h2><strong>Dados pessoais</strong></h2>
+<p>O usuário pode visualizar e editar seu nome e sobrenome.</p>
+<p>Após realizar alterações, basta clicar em <strong>Salvar</strong> para atualizar os dados.</p>
+<h2><strong>Redefinição de senha</strong></h2>
+<p>Caso necessário, o usuário pode solicitar a redefinição de sua senha de acesso ao aplicativo.</p>
+<p>Ao iniciar esse processo:</p>
+<ul>
+<li>será enviado um link para o e-mail cadastrado, </li>
+<li>permitindo a criação de uma nova senha. </li>
+</ul>
+<div class="spacer"></div>
+<h2><strong>Exclusão de conta</strong></h2>
+<p>O usuário também pode solicitar a exclusão da sua conta.</p>
+<p>Nesse caso:</p>
+<ul>
+<li>os dados pessoais são <strong>anonimizados</strong>, </li>
+<li>e as informações deixam de estar associadas ao usuário de forma identificável. </li>
+</ul>
+<p>Essa ação é irreversível e deve ser realizada com atenção.</p>
+<div class="note note-important">
+<h2><strong>⚠️</strong><strong> Importante</strong></h2>
+<p>A exclusão da conta não garante a recuperação de dados posteriormente. Certifique-se de que não há informações importantes que você deseja manter antes de prosseguir.</p>
+</div>
+      <p class="backtop"><a href="#topo">↑ Voltar para o topo</a></p>
+    </section>
+    <section class="chapter" id="cap-10">
+      <h1><strong>Como o Cifrei protege suas informações</strong></h1>
+<p>O Cifrei utiliza um processo criptográfico moderno para proteger suas mensagens, baseado em padrões amplamente utilizados em aplicações de segurança.</p>
+<p>De forma simples, o aplicativo transforma sua mensagem em um código protegido a partir da combinação de três elementos:</p>
+<ul>
+<li>a mensagem, </li>
+<li>a chave, </li>
+<li>e a frase segredo. </li>
+</ul>
+<p class="divider">________________________________________</p>
+<h2>🔑 <strong>Transformação da chave e da frase segredo</strong></h2>
+<p>Antes de proteger a mensagem, o Cifrei combina a chave e a frase segredo em um processo matemático que gera uma chave criptográfica forte.</p>
+<p>Esse processo é feito por meio de um método chamado PBKDF2, que aplica múltiplas transformações sucessivas (310.000 vezes), utiliza elementos aleatórios próprios de cada cifra e gera uma chave robusta, adequada para criptografia moderna. </p>
+<p>Na prática, isso significa que, mesmo que a chave e a frase segredo sejam simples, o sistema as transforma em uma estrutura muito mais resistente a tentativas de quebra.</p>
+<div class="spacer"></div>
+<h2><strong>🔒</strong><strong> Criptografia da mensagem</strong></h2>
+<h3>Base técnica da criptografia utilizada</h3>
+<p>O Cifrei utiliza padrões criptográficos amplamente reconhecidos e adotados internacionalmente.</p>
+<p>Entre eles:</p>
+<p>O algoritmo <strong>AES (Advanced Encryption Standard)</strong>, padronizado pelo National Institute of Standards and Technology (NIST) no documento oficial FIPS 197, utilizado globalmente em sistemas de segurança, comunicações e armazenamento de dados. </p>
+<p>O modo de operação <strong>GCM (Galois/Counter Mode)</strong>, definido pelo NIST (SP 800-38D), que adiciona verificação de integridade à criptografia, permitindo detectar qualquer alteração indevida nos dados. </p>
+<p>O método de derivação de chave <strong>PBKDF2</strong>, especificado no padrão internacional RFC 8018 (PKCS #5) e recomendado pelo NIST (SP 800-132), utilizado para transformar senhas humanas em chaves criptográficas seguras. </p>
+<p>Esses padrões são utilizados em diversas aplicações críticas, como:</p>
+<ul>
+<li>conexões seguras na internet (HTTPS), </li>
+<li>sistemas bancários, </li>
+<li>armazenamento criptografado de dispositivos, </li>
+<li>e aplicativos de comunicação segura.</li>
+</ul>
+<p>A mensagem é protegida utilizando o algoritmo chamado AES-256, considerado um dos padrões mais seguros da atualidade e amplamente utilizado em sistemas críticos.</p>
+<p>O Cifrei utiliza esse algoritmo em um modo específico chamado GCM, que oferece duas garantias importantes:</p>
+<ul>
+<li>Confidencialidade: a mensagem se torna completamente ilegível sem os dados corretos </li>
+<li>Integridade: qualquer alteração no código é detectada automaticamente </li>
+</ul>
+<p>Isso significa que não é possível “ler parcialmente” uma mensagem cifrada e qualquer tentativa de modificação invalida o conteúdo.</p>
+<p class="divider">________________________________________</p>
+<h2>🎲 Elementos aleatórios em cada cifra</h2>
+<p>Cada cifra gerada pelo Cifrei utiliza valores aleatórios próprios, chamados de salt e IV.</p>
+<p>Esses elementos garantem que a mesma mensagem, mesmo com a mesma chave e frase segredo, possa gerar códigos diferentes, não existam padrões previsíveis entre cifras, e ataques baseados em repetição sejam evitados. </p>
+<p class="divider">________________________________________</p>
+<h2>📦 Estrutura da cifra</h2>
+<p>O código gerado pelo Cifrei contém, de forma compacta, informações técnicas da cifra (versão), os parâmetros aleatórios utilizados (salt e IV) e o conteúdo criptografado. </p>
+<p>Esses dados são organizados de forma que permitam a decifragem posterior, sem expor a mensagem original.</p>
+<p class="divider">________________________________________</p>
+<h2>🔁 Processo de decifragem</h2>
+<p>Para recuperar a mensagem original, o Cifrei reaplica o mesmo processo de geração de chave a partir da chave e da frase segredo, utiliza os parâmetros armazenados na cifra e tenta reverter a criptografia. </p>
+<p>O resultado depende diretamente da precisão das informações fornecidas. Se tudo estiver correto a mensagem é recuperada. Se houver qualquer divergência, a decifragem falha. </p>
+<p class="divider">________________________________________</p>
+<h2>🧠 A frase segredo não é armazenada</h2>
+<p>A frase segredo nunca é salva pelo aplicativo. Isso significa que ela não pode ser recuperada pelo sistema e não fica exposta, mesmo em caso de acesso indevido aos dados. </p>
+<p>Por outro lado, se a frase segredo for esquecida, a mensagem não poderá ser recuperada. </p>
+<p class="divider">________________________________________</p>
+<div class="note note-important">
+<h2><strong>⚠️</strong><strong> Importante</strong></h2>
+<p>A segurança do sistema também depende das escolhas do usuário.</p>
+<p>Para garantir o máximo de proteção:</p>
+<ul>
+<li>utilize chaves fortes, </li>
+<li>escolha frases segredo difíceis de adivinhar, </li>
+<li>e evite reutilizar padrões previsíveis.</li>
+</ul>
+</div>
+      <p class="backtop"><a href="#topo">↑ Voltar para o topo</a></p>
+    </section>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/cipherFunctions.js"></script>
     <script src="assets/js/storage.js"></script>
