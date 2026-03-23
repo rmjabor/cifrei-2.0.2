@@ -136,13 +136,26 @@
     return false;
   }
 
-  async function sha1Hex(message) {
-    const data = new TextEncoder().encode(message);
-    const hashBuffer = await crypto.subtle.digest('SHA-1', data);
-    return Array.from(new Uint8Array(hashBuffer))
+  async function digestHex(algorithm, message, { uppercase = false } = {}) {
+    const data = new TextEncoder().encode(String(message || ''));
+    const hashBuffer = await crypto.subtle.digest(algorithm, data);
+    const hex = Array.from(new Uint8Array(hashBuffer))
       .map(byte => byte.toString(16).padStart(2, '0'))
-      .join('')
-      .toUpperCase();
+      .join('');
+
+    return uppercase ? hex.toUpperCase() : hex;
+  }
+
+  async function sha1Hex(message) {
+    return digestHex('SHA-1', message, { uppercase: true });
+  }
+
+  async function sha256Hex(message) {
+    return digestHex('SHA-256', message);
+  }
+
+  async function hashNormalizedEmail(email) {
+    return sha256Hex(normalizeEmail(email));
   }
 
   async function isPwnedPassword(password) {
@@ -839,6 +852,7 @@
       setButtonEnabledState(submitButton, false);
       setButtonText(submitButton, 'Cadastrando...');
 
+      const normalizedSignupEmail = normalizeEmail(emailInput.value);
       const payload = {
         email: String(emailInput.value || '').trim(),
         password: getTrimmedPassword(passwordInput.value),
@@ -846,7 +860,8 @@
           emailRedirectTo: buildPageUrl('entrar.html'),
           data: {
             first_name: String(firstNameInput.value || '').trim(),
-            last_name: String(lastNameInput.value || '').trim()
+            last_name: String(lastNameInput.value || '').trim(),
+            email_hash: await hashNormalizedEmail(normalizedSignupEmail)
           }
         }
       };
