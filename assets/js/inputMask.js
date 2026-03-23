@@ -1,94 +1,76 @@
 // inputMask.js
 
-document.addEventListener('DOMContentLoaded', function () {
+function sanitizeAsciiPrintable(value) {
+  return Array.from(String(value || ''))
+    .filter((ch) => {
+      const code = ch.charCodeAt(0);
+      return code >= 0x20 && code <= 0x7E;
+    })
+    .join('');
+}
 
-  if (typeof setupInputFraseSegredo === 'function') {
-    setupInputFraseSegredo();
+function sanitizeAsciiPrintableWithNewlines(value) {
+  const normalized = String(value || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
+
+  let result = '';
+  for (const ch of normalized) {
+    const code = ch.charCodeAt(0);
+    const isPrintableAscii = code >= 0x20 && code <= 0x7E;
+    const isNewline = ch === '\n';
+
+    if (!isPrintableAscii && !isNewline) continue;
+    if (isNewline && result.length === 0) continue; // não permite return como 1º caractere
+
+    result += ch;
   }
 
-  if (typeof setupTxtMsgEntradaMask === 'function') {
-    setupTxtMsgEntradaMask();
+  return result;
+}
+
+function preserveCursorAfterSanitize(input, sanitizedValue) {
+  const currentValue = String(input.value || '');
+  if (sanitizedValue === currentValue) return;
+
+  const cursorStart = typeof input.selectionStart === 'number' ? input.selectionStart : currentValue.length;
+  const beforeCursorOriginal = currentValue.slice(0, cursorStart);
+  const beforeCursorSanitized = input.id === 'txtMsgEntrada'
+    ? sanitizeAsciiPrintableWithNewlines(beforeCursorOriginal)
+    : sanitizeAsciiPrintable(beforeCursorOriginal);
+
+  input.value = sanitizedValue;
+
+  const newCursor = beforeCursorSanitized.length;
+  if (typeof input.setSelectionRange === 'function') {
+    input.setSelectionRange(newCursor, newCursor);
   }
+}
 
-  if (typeof setupChaveEMsgEBtnCifrarValidation === 'function') {
-    setupChaveEMsgEBtnCifrarValidation();
-  }
-
-  if (typeof setupChaveEMsgEBtnDecifrarValidation === 'function') {
-    setupChaveEMsgEBtnDecifrarValidation();
-  }
-
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-  const campo = document.getElementById('inputFraseSegredo');
+function setupAsciiPrintableInput(inputId) {
+  const campo = document.getElementById(inputId);
   if (!campo) return;
 
   campo.addEventListener('input', function () {
-    const cursorStart = this.selectionStart;
-    const cursorEnd = this.selectionEnd;
-    const valorOriginal = String(this.value || '');
-    const valorFiltrado = Array.from(valorOriginal)
-      .filter(ch => {
-        const code = ch.charCodeAt(0);
-        return code >= 0x20 && code <= 0x7E;
-      })
-      .join('');
-
-    if (valorFiltrado !== valorOriginal) {
-      const removidosAntesDoCursor = Array.from(valorOriginal.slice(0, cursorStart))
-        .filter(ch => {
-          const code = ch.charCodeAt(0);
-          return !(code >= 0x20 && code <= 0x7E);
-        }).length;
-
-      this.value = valorFiltrado;
-      const novoCursor = Math.max(0, (cursorStart || 0) - removidosAntesDoCursor);
-      this.setSelectionRange(novoCursor, novoCursor);
-    }
+    preserveCursorAfterSanitize(this, sanitizeAsciiPrintable(this.value));
   });
-});
+}
 
-document.addEventListener('DOMContentLoaded', function () {
-  const campo = document.getElementById('inputFraseSegredoDec');
-  if (!campo) return;
-
-  campo.addEventListener('input', function () {
-    const cursorStart = this.selectionStart;
-    const cursorEnd = this.selectionEnd;
-    const valorOriginal = String(this.value || '');
-    const valorFiltrado = Array.from(valorOriginal)
-      .filter(ch => {
-        const code = ch.charCodeAt(0);
-        return code >= 0x20 && code <= 0x7E;
-      })
-      .join('');
-
-    if (valorFiltrado !== valorOriginal) {
-      const removidosAntesDoCursor = Array.from(valorOriginal.slice(0, cursorStart))
-        .filter(ch => {
-          const code = ch.charCodeAt(0);
-          return !(code >= 0x20 && code <= 0x7E);
-        }).length;
-
-      this.value = valorFiltrado;
-      const novoCursor = Math.max(0, (cursorStart || 0) - removidosAntesDoCursor);
-      this.setSelectionRange(novoCursor, novoCursor);
-    }
-  });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
+function setupTxtMsgEntradaMask() {
   const campo = document.getElementById('txtMsgEntrada');
   if (!campo) return;
 
   campo.addEventListener('input', function () {
-    // A mensagem/código pode conter qualquer caractere Unicode.
-    // Mantemos o listener apenas para preservar o fluxo de eventos do app,
-    // sem aplicar filtros ou substituições no conteúdo digitado/colado.
-    this.value = this.value;
+    preserveCursorAfterSanitize(this, sanitizeAsciiPrintableWithNewlines(this.value));
   });
-});
+
+  campo.addEventListener('paste', function () {
+    requestAnimationFrame(() => {
+      preserveCursorAfterSanitize(campo, sanitizeAsciiPrintableWithNewlines(campo.value));
+      campo.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  });
+}
 
 function sanitizeCifreiKeyInput(value) {
   return String(value || '')
@@ -145,7 +127,7 @@ function setupSharedKeyValidation(config) {
       return;
     }
 
-    const msgTemConteudo = (txtMsgEntrada.value || '').trim().length > 0;
+    const msgTemConteudo = String(txtMsgEntrada.value || '').trim().length > 0;
     if (!msgTemConteudo) {
       button.disabled = true;
       setLabel(config.emptyMessageLabel);
@@ -178,3 +160,11 @@ function setupChaveEMsgEBtnDecifrarValidation() {
     emptyMessageLabel: ' Digite um código'
   });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  setupAsciiPrintableInput('inputFraseSegredo');
+  setupAsciiPrintableInput('inputFraseSegredoDec');
+  setupTxtMsgEntradaMask();
+  setupChaveEMsgEBtnCifrarValidation();
+  setupChaveEMsgEBtnDecifrarValidation();
+});
