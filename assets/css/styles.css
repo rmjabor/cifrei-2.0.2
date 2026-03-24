@@ -1,5 +1,8 @@
 .titulo-pagina {
   font-size: 22px;
+  height: fit-content;
+  align-content: center;
+  margin-bottom: 0px;
 }
 
 textarea {
