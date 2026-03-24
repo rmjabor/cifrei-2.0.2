@@ -14,7 +14,6 @@ textarea.mensagem {
   overflow-y: hidden;
   overflow-x: hidden;
   word-break: normal;
-  resize: none;
 }
 
 textarea.codigo {
