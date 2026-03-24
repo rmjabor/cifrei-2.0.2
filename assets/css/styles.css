@@ -1,3 +1,7 @@
+.titulo-pagina {
+  font-size: 22px;
+}
+
 textarea {
   /*resize: vertical;*/
   line-height: 1.2;
