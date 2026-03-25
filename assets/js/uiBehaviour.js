@@ -1204,12 +1204,17 @@ function setupCifraAbertaPage() {
     return;
   }
 
+  const redirectToCifrar = () => {
+    window.location.replace('cifrar.html');
+  };
+
   const data = getDecifragemTempData();
   if (!data) {
     if (btnEditar) {
       btnEditar.classList.add('d-none');  // 🔹 some com o botão se não há dados
     }
     console.warn('[Cifrei] Nenhum dado de decifragem encontrado para cifraaberta.html.');
+    redirectToCifrar();
     return;
   }
 

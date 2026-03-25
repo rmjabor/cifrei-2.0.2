@@ -315,6 +315,53 @@
     return `${getBaseRedirectUrl()}${page}`;
   }
 
+  function getCurrentPageName() {
+    const bodyPage = String(document.body?.getAttribute('page') || '').trim().toLowerCase();
+    if (bodyPage) return bodyPage;
+
+    const fileName = String(window.location.pathname || '').split('/').pop() || '';
+    return fileName.replace(/\.html?$/i, '').trim().toLowerCase();
+  }
+
+  async function enforcePageAccess() {
+    const supabase = getSupabaseClient();
+    const currentPage = getCurrentPageName();
+    const protectedPages = new Set(['home', 'cifrar', 'decifrar', 'editarcifra', 'cifraaberta', 'resetpw', 'meuperfil']);
+    const guestOnlyPages = new Set(['entrar', 'cadastrar']);
+
+    if (!currentPage || !supabase) {
+      return { redirected: false, hasSession: false, currentPage };
+    }
+
+    let hasSession = false;
+
+    try {
+      const { data } = await supabase.auth.getSession();
+      hasSession = Boolean(data?.session);
+    } catch (error) {
+      console.error('[Cifrei] Não foi possível verificar a sessão atual:', error);
+    }
+
+    if (!hasSession && protectedPages.has(currentPage)) {
+      window.location.replace('entrar.html');
+      return { redirected: true, hasSession, currentPage };
+    }
+
+    if (hasSession && guestOnlyPages.has(currentPage)) {
+      window.location.replace('home.html');
+      return { redirected: true, hasSession, currentPage };
+    }
+
+    if (currentPage === 'suporte' || currentPage === 'termos') {
+      const floatingMenuButton = document.getElementById('btnMenuFlutuante');
+      if (floatingMenuButton) {
+        floatingMenuButton.classList.toggle('d-none', !hasSession);
+      }
+    }
+
+    return { redirected: false, hasSession, currentPage };
+  }
+
   function getFriendlyAuthErrorMessage(error, fallback) {
     const message = String(error?.message || '').toLowerCase();
 
@@ -949,7 +996,14 @@
     }
 
     function showLoginError(text, options = {}) {
-      showEnterNotice(text, options);
+      setButtonText(submitButton, 'Entrar');
+      showEnterNotice(text, {
+        ...options,
+        onClose: () => {
+          setButtonText(submitButton, 'Entrar');
+          if (typeof options.onClose === 'function') options.onClose();
+        }
+      });
     }
 
     emailInput.addEventListener('input', updateLoginButton);
@@ -1141,6 +1195,9 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
+    const accessState = await enforcePageAccess();
+    if (accessState.redirected) return;
+
     await initCadastroPage();
     await initEntrarPage();
     await initResetPage();
