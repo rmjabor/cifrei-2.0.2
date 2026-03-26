@@ -953,3 +953,71 @@ main {
   margin: 0 auto;
 }
 
+.legal-doc-meta {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin: -6px 0 18px 0;
+}
+
+.legal-doc-version {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(9,23,71,.12);
+  background: rgba(103,63,133,.08);
+  color: #673f85;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.legal-doc-loading {
+  margin: 0 0 26px 0;
+  padding: 18px 16px;
+  border: 1px solid rgba(9,23,71,.08);
+  border-radius: 12px;
+  background: rgba(9,23,71,.03);
+}
+
+.legal-doc-loading-line {
+  height: 12px;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(103,63,133,.08) 0%, rgba(253,100,29,.18) 50%, rgba(103,63,133,.08) 100%);
+  background-size: 200% 100%;
+  animation: legalDocShimmer 1.4s linear infinite;
+}
+
+.legal-doc-loading-line:last-child {
+  margin-bottom: 0;
+}
+
+.legal-doc-loading-line.w-90 {
+  width: 90%;
+}
+
+.legal-doc-loading-line.w-75 {
+  width: 75%;
+}
+
+.legal-doc-loading-line.w-60 {
+  width: 60%;
+}
+
+.legal-doc-loading-line.w-45 {
+  width: 45%;
+}
+
+@keyframes legalDocShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
