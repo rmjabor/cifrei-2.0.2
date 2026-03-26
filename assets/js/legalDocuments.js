@@ -95,22 +95,27 @@
     }
   }
 
-  function renderDocumentHtml(htmlContent) {
-    const contentTarget = ensureElement('legalDocContent');
-    if (!contentTarget) return;
+function renderDocumentHtml(htmlContent) {
+  const contentTarget = ensureElement('legalDocContent');
+  if (!contentTarget) return;
 
-    contentTarget.innerHTML = htmlContent;
-    setVisible(contentTarget, true);
+  contentTarget.innerHTML = htmlContent;
 
-    if (window.location.hash) {
-      const target = document.querySelector(window.location.hash);
-      if (target) {
-        requestAnimationFrame(() => {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-      }
+  // 🔥 REMOVE TÍTULO DUPLICADO
+  const internalTitle = contentTarget.querySelector('.doc-title');
+  if (internalTitle) internalTitle.remove();
+
+  setVisible(contentTarget, true);
+
+  if (window.location.hash) {
+    const target = document.querySelector(window.location.hash);
+    if (target) {
+      requestAnimationFrame(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     }
   }
+}
 
   function renderError(message) {
     const errorTarget = ensureElement('legalDocError');
