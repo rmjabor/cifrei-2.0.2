@@ -455,7 +455,7 @@ input.form-control:focus {
   width: 45px;
   height: 45px;
   border-radius: 45px;
-  z-index: 2000;
+  z-index: 500;
   background-color: rgb(66, 66, 66, 0.85);
 }
 
