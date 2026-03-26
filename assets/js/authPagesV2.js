@@ -1017,7 +1017,19 @@
 
     updateButtonState();
     passwordWatcher.refresh();
+
+    if (termsLink) {
+      termsLink.addEventListener('click', () => {
+        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_EMAIL, emailInput.value);
+        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_FIRST_NAME, firstNameInput.value);
+        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_LAST_NAME, lastNameInput.value);
+        saveCadastroLegalReturnContext();
+      });
+    }
+
   }
+
+
 
   async function initEntrarPage() {
     const supabase = getSupabaseClient();
@@ -1214,14 +1226,6 @@
 
     passwordInput.addEventListener('input', updateButtonState);
 
-    if (termsLink) {
-      termsLink.addEventListener('click', () => {
-        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_EMAIL, emailInput.value);
-        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_FIRST_NAME, firstNameInput.value);
-        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_LAST_NAME, lastNameInput.value);
-        saveCadastroLegalReturnContext();
-      });
-    }
 
     if (showPasswordIcon) {
       showPasswordIcon.addEventListener('click', () => togglePasswordVisibility(passwordInput, showPasswordIcon));
