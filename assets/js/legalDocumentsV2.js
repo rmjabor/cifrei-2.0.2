@@ -92,13 +92,10 @@
     removeSessionStorageValue('cifrei_legal_return_bypass_clear_v1');
   }
 
-  function shouldShowCadastroBackButton() {
-    const context = getLegalReturnContext();
-    if (!context || context.source !== 'cadastrar') return false;
-
-    const referrer = String(document.referrer || '').toLowerCase();
-    return referrer.includes('cadastrar.html');
-  }
+function shouldShowCadastroBackButton() {
+  const context = getLegalReturnContext();
+  return Boolean(context && context.source === 'cadastrar');
+}
 
   function setupCadastroBackButton() {
     const wrapper = ensureElement('wrapBtnVoltarCadastroTermos');
