@@ -1088,3 +1088,11 @@ main {
   display: none;
 }
 
+.modal {
+  z-index: 5500 !important;
+}
+
+.modal-backdrop {
+  z-index: 5000 !important;
+}
+
