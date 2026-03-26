@@ -1088,3 +1088,15 @@ main {
   display: none;
 }
 
+/* Modal acima de tudo */
+
+#mdlNovosTermos {
+  z-index: 2500 !important;
+}
+
+/* Backdrop logo abaixo do modal */
+
+.modal-backdrop {
+  z-index: 2490 !important;
+}
+
