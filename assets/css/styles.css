@@ -1028,7 +1028,7 @@ main {
 #wrapBtnVoltarCadastroTermos {
   position: fixed;
   left: 16px;
-  bottom: 16px;
+  bottom: 20px;
   z-index: 1080;
   display: none;
 }
@@ -1037,9 +1037,9 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: 45px;
   padding: 10px 16px;
-  border-radius: 999px;
+  border-radius: 6px;
   background: rgba(103,63,133,0.96);
   color: #ffffff;
   font-family: 'Open Sans', sans-serif;
