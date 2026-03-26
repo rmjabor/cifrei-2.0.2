@@ -1070,3 +1070,21 @@ main {
   }
 }
 
+#legalDocument {
+  display: block;
+}
+
+#htmlLegalContent {
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#htmlLegalContent::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+

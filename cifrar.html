@@ -19,6 +19,29 @@
 </head>
 
 <body class="pt-0" style="background: #ffffff;border-width: 1px;height: auto;min-height: 0;margin-top: 80px;" page="cifrar">
+    <div class="modal fade" role="dialog" tabindex="-1" data-bs-backdrop="static" id="mdlNovosTermos" style="background: transparent;margin-top: 80px;" area-hiden="true">
+        <div class="modal-dialog modal-confirma-excluir" role="document" id="dlgConfirmaExcluirCifra">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-center" style="background: #ffffff;border-radius: 0px 0px 0px 0px;border-style: none;border-top-left-radius: 10px;border-top-right-radius: 10px;"><img src="assets/img/Img_C_ifre_i.png" width="38" height="52"></div>
+                <div class="modal-body" style="background: #ffffff;padding: 0px;padding-top: 0px;height: auto;padding-right: 15px;padding-left: 15px;">
+                    <p id="txtConfirmExclConta" style="font-size: 13px;text-align: center;margin-bottom: 0px;font-family: 'Open Sans', sans-serif;min-width: 200px;max-width: 290px;margin-right: auto;margin-left: auto;line-height: 1.2;color: #383839;">Há novos Termos de Uso e Política de Privacidade. Você precisa concordar com eles para continuar a usar o app.</p>
+                    <p id="txtLerTermos" style="font-size: 13px;text-align: left;margin: 0px;margin-bottom: 0px;font-family: 'Open Sans', sans-serif;min-width: 200px;max-width: 290px;line-height: 1.2;color: red;padding-left: 6px;margin-top: 10px;"><strong><span style="text-decoration: underline; color: rgb(0, 41, 255);">Clique aqui</span></strong> <span style="color: rgb(66, 66, 66);">para ler os novos Termos.</span></p>
+                    <div id="legalDocument" style="margin-top: 10px;margin-bottom: 10px;">
+                        <div>
+                            <p id="legalTitle"></p>
+                        </div>
+                        <div>
+                            <p id="legalVersion"></p>
+                        </div>
+                        <div id="htmlLegalContent" style="height: 300px;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-center" style="background: #ffffff;border-bottom-right-radius: 10px;border-bottom-left-radius: 10px;border-style: none;padding-top: 12px;padding-bottom: 25px;padding-right: 15px;padding-left: 15px;"><button class="btn btn-primary btnPadrao" id="btnLiEConcordo" type="button" style="background: #673f85;font-family: 'Open Sans', sans-serif;box-shadow: 1px 1px 3px #a7a7a7, 1px 1px 3px #a7a7a7, 1px 1px 3px #a7a7a7;width: 100%;height: auto;" data-bs-dismiss="modal">Li e concordo com os novos Termos de Uso e Política de Privacidade</button>
+                    <div class="d-flex flex-row justify-content-center gap-3" style="width: 100%;"><button class="btn btnPadrao" id="btnSairNovosTermos" type="button" style="font-family: 'Open Sans', sans-serif;font-size: 16px;background: #fd641d;color: rgb(255,255,255);border-style: none;box-shadow: 1px 1px 3px #a7a7a7;width: 100%;">Sair</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" role="dialog" tabindex="-1" data-bs-backdrop="static" id="gerarSenhaAleat" style="background: transparent;margin-top: 50px;" area-hiden="true">
         <div class="modal-dialog modal-confirma-excluir" role="document" id="dlgGerarSenhaAleat">
             <div class="modal-content modal-confirma-excluir">
