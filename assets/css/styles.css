@@ -1012,6 +1012,10 @@ main {
   width: 45%;
 }
 
+#legalDocContent .doc-title {
+  display: none !important;
+}
+
 @keyframes legalDocShimmer {
   0% {
     background-position: 200% 0;
