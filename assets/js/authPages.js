@@ -4,7 +4,12 @@
   const STORAGE_KEYS = {
     RESET_EMAIL: 'cifrei_mock_reset_email_v1',
     LOGIN_GUARD: 'cifrei_login_guard_v1',
-    PENDING_LOGIN_EMAIL: 'cifrei_pending_login_email_v1'
+    PENDING_LOGIN_EMAIL: 'cifrei_pending_login_email_v1',
+    LEGAL_RETURN_CONTEXT: 'cifrei_legal_return_context_v1',
+    LEGAL_RETURN_BYPASS_CLEAR: 'cifrei_legal_return_bypass_clear_v1',
+    CADASTRO_DRAFT_EMAIL: 'cifrei_cadastro_draft_email_v1',
+    CADASTRO_DRAFT_FIRST_NAME: 'cifrei_cadastro_draft_first_name_v1',
+    CADASTRO_DRAFT_LAST_NAME: 'cifrei_cadastro_draft_last_name_v1'
   };
 
   const LOGIN_MAX_ATTEMPTS = 5;
@@ -47,6 +52,58 @@
 
   function normalizeEmail(email) {
     return String(email || '').trim().toLowerCase();
+  }
+
+  function setSessionStorageValue(key, value) {
+    try {
+      sessionStorage.setItem(key, value);
+    } catch (error) {
+      console.warn('[Cifrei] Não foi possível gravar dados temporários na sessão:', error);
+    }
+  }
+
+  function getSessionStorageValue(key) {
+    try {
+      return sessionStorage.getItem(key);
+    } catch (error) {
+      console.warn('[Cifrei] Não foi possível ler dados temporários da sessão:', error);
+      return null;
+    }
+  }
+
+  function removeSessionStorageValue(key) {
+    try {
+      sessionStorage.removeItem(key);
+    } catch (error) {
+      console.warn('[Cifrei] Não foi possível limpar dados temporários da sessão:', error);
+    }
+  }
+
+  function persistCadastroDraftField(key, value) {
+    setSessionStorageValue(key, String(value || ''));
+  }
+
+  function restoreCadastroDraftField(key, input) {
+    if (!input || String(input.value || '') !== '') return;
+    const savedValue = getSessionStorageValue(key);
+    if (savedValue !== null) {
+      input.value = savedValue;
+    }
+  }
+
+  function clearCadastroDraft() {
+    removeSessionStorageValue(STORAGE_KEYS.CADASTRO_DRAFT_EMAIL);
+    removeSessionStorageValue(STORAGE_KEYS.CADASTRO_DRAFT_FIRST_NAME);
+    removeSessionStorageValue(STORAGE_KEYS.CADASTRO_DRAFT_LAST_NAME);
+  }
+
+  function saveCadastroLegalReturnContext() {
+    setSessionStorageValue(STORAGE_KEYS.LEGAL_RETURN_CONTEXT, JSON.stringify({
+      source: 'cadastrar',
+      sourceUrl: window.location.href,
+      createdAt: Date.now()
+    }));
+    removeSessionStorageValue(STORAGE_KEYS.LEGAL_RETURN_BYPASS_CLEAR);
   }
 
   function looksLikeEmail(email) {
@@ -815,6 +872,7 @@
     const passwordInput = qs('inputSenhaCadastro');
     const showPasswordIcon = qs('icnMostrarSenhaCadastro');
     const generatePasswordButton = qs('btnGeneratePw');
+    const termsLink = qs('linkLeiaTermos');
     const termsCheck = qs('checkLiEconcordo');
     const submitButton = qs('btnCadastrar');
     const signupNotice = createModalNoticeController('mdlAvisosCadastro', 'txtAvisosCadastro');
@@ -831,6 +889,10 @@
       window.location.href = 'home.html';
       return;
     }
+
+    restoreCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_EMAIL, emailInput);
+    restoreCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_FIRST_NAME, firstNameInput);
+    restoreCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_LAST_NAME, lastNameInput);
 
     const passwordWatcher = createPasswordWatcher({
       inputId: 'inputSenhaCadastro',
@@ -876,9 +938,29 @@
       }
     }
 
-    [emailInput, firstNameInput, lastNameInput].forEach(input => input.addEventListener('input', updateButtonState));
+    emailInput.addEventListener('input', () => {
+      persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_EMAIL, emailInput.value);
+      updateButtonState();
+    });
+    firstNameInput.addEventListener('input', () => {
+      persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_FIRST_NAME, firstNameInput.value);
+      updateButtonState();
+    });
+    lastNameInput.addEventListener('input', () => {
+      persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_LAST_NAME, lastNameInput.value);
+      updateButtonState();
+    });
     termsCheck.addEventListener('change', updateButtonState);
     passwordInput.addEventListener('input', updateButtonState);
+
+    if (termsLink) {
+      termsLink.addEventListener('click', () => {
+        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_EMAIL, emailInput.value);
+        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_FIRST_NAME, firstNameInput.value);
+        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_LAST_NAME, lastNameInput.value);
+        saveCadastroLegalReturnContext();
+      });
+    }
 
     if (showPasswordIcon) {
       showPasswordIcon.addEventListener('click', () => togglePasswordVisibility(passwordInput, showPasswordIcon));
@@ -933,7 +1015,10 @@
         return;
       }
 
-      sessionStorage.setItem(STORAGE_KEYS.PENDING_LOGIN_EMAIL, payload.email);
+      setSessionStorageValue(STORAGE_KEYS.PENDING_LOGIN_EMAIL, payload.email);
+      clearCadastroDraft();
+      removeSessionStorageValue(STORAGE_KEYS.LEGAL_RETURN_CONTEXT);
+      removeSessionStorageValue(STORAGE_KEYS.LEGAL_RETURN_BYPASS_CLEAR);
       showSignupNotice('Cadastro realizado. Verifique seu e-mail para confirmar a conta antes de entrar.', {
         redirectToLogin: true
       });
@@ -970,10 +1055,10 @@
       return;
     }
 
-    const prefilledEmail = sessionStorage.getItem(STORAGE_KEYS.PENDING_LOGIN_EMAIL);
+    const prefilledEmail = getSessionStorageValue(STORAGE_KEYS.PENDING_LOGIN_EMAIL);
     if (prefilledEmail && !emailInput.value) {
       emailInput.value = prefilledEmail;
-      sessionStorage.removeItem(STORAGE_KEYS.PENDING_LOGIN_EMAIL);
+      removeSessionStorageValue(STORAGE_KEYS.PENDING_LOGIN_EMAIL);
     }
 
     function isPasswordValid() {
@@ -1013,6 +1098,15 @@
     });
     resetEmailInput?.addEventListener('input', updateResetButton);
 
+    if (termsLink) {
+      termsLink.addEventListener('click', () => {
+        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_EMAIL, emailInput.value);
+        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_FIRST_NAME, firstNameInput.value);
+        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_LAST_NAME, lastNameInput.value);
+        saveCadastroLegalReturnContext();
+      });
+    }
+
     if (showPasswordIcon) {
       showPasswordIcon.addEventListener('click', () => togglePasswordVisibility(passwordInput, showPasswordIcon));
     }
@@ -1051,7 +1145,7 @@
         return;
       }
 
-      sessionStorage.setItem(STORAGE_KEYS.RESET_EMAIL, email);
+      setSessionStorageValue(STORAGE_KEYS.RESET_EMAIL, email);
       resetModal?.hide();
       showEnterNotice('Enviamos o link de redefinição de senha para o e-mail informado.');
     });
@@ -1138,6 +1232,15 @@
 
     passwordInput.addEventListener('input', updateButtonState);
 
+    if (termsLink) {
+      termsLink.addEventListener('click', () => {
+        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_EMAIL, emailInput.value);
+        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_FIRST_NAME, firstNameInput.value);
+        persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_LAST_NAME, lastNameInput.value);
+        saveCadastroLegalReturnContext();
+      });
+    }
+
     if (showPasswordIcon) {
       showPasswordIcon.addEventListener('click', () => togglePasswordVisibility(passwordInput, showPasswordIcon));
     }
@@ -1177,10 +1280,10 @@
         return;
       }
 
-      const resetEmail = sessionStorage.getItem(STORAGE_KEYS.RESET_EMAIL);
+      const resetEmail = getSessionStorageValue(STORAGE_KEYS.RESET_EMAIL);
       if (resetEmail) {
-        sessionStorage.setItem(STORAGE_KEYS.PENDING_LOGIN_EMAIL, resetEmail);
-        sessionStorage.removeItem(STORAGE_KEYS.RESET_EMAIL);
+        setSessionStorageValue(STORAGE_KEYS.PENDING_LOGIN_EMAIL, resetEmail);
+        removeSessionStorageValue(STORAGE_KEYS.RESET_EMAIL);
       }
       await supabase.auth.signOut();
       showResetNotice('Senha redefinida com sucesso. Faça login novamente.', {

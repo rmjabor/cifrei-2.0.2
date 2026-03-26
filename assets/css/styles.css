@@ -1025,3 +1025,48 @@ main {
   }
 }
 
+#wrapBtnVoltarCadastroTermos {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 1080;
+  display: none;
+}
+
+#btnVoltarCadastroTermos {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(103,63,133,0.96);
+  color: #ffffff;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 1px 1px 4px 0 rgba(0,0,0,0.18);
+  border: none;
+}
+
+#btnVoltarCadastroTermos:hover, #btnVoltarCadastroTermos:focus {
+  color: #ffffff;
+  text-decoration: none;
+  background: rgba(103,63,133,1);
+}
+
+@media (max-width: 575.98px) {
+  #wrapBtnVoltarCadastroTermos {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #btnVoltarCadastroTermos {
+    width: 100%;
+  }
+}
+

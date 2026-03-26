@@ -48,6 +48,96 @@
     ].join('');
   }
 
+
+  function getSessionStorageValue(key) {
+    try {
+      return sessionStorage.getItem(key);
+    } catch (error) {
+      console.warn('[Cifrei] Não foi possível ler dados temporários da sessão:', error);
+      return null;
+    }
+  }
+
+  function setSessionStorageValue(key, value) {
+    try {
+      sessionStorage.setItem(key, value);
+    } catch (error) {
+      console.warn('[Cifrei] Não foi possível gravar dados temporários na sessão:', error);
+    }
+  }
+
+  function removeSessionStorageValue(key) {
+    try {
+      sessionStorage.removeItem(key);
+    } catch (error) {
+      console.warn('[Cifrei] Não foi possível limpar dados temporários da sessão:', error);
+    }
+  }
+
+  function getLegalReturnContext() {
+    const rawContext = getSessionStorageValue('cifrei_legal_return_context_v1');
+    if (!rawContext) return null;
+
+    try {
+      return JSON.parse(rawContext);
+    } catch (error) {
+      console.warn('[Cifrei] Contexto de retorno dos termos inválido:', error);
+      removeSessionStorageValue('cifrei_legal_return_context_v1');
+      return null;
+    }
+  }
+
+  function clearLegalReturnContext() {
+    removeSessionStorageValue('cifrei_legal_return_context_v1');
+    removeSessionStorageValue('cifrei_legal_return_bypass_clear_v1');
+  }
+
+  function shouldShowCadastroBackButton() {
+    const context = getLegalReturnContext();
+    if (!context || context.source !== 'cadastrar') return false;
+
+    const referrer = String(document.referrer || '').toLowerCase();
+    return referrer.includes('cadastrar.html');
+  }
+
+  function setupCadastroBackButton() {
+    const wrapper = ensureElement('wrapBtnVoltarCadastroTermos');
+    const button = ensureElement('btnVoltarCadastroTermos');
+    if (!wrapper || !button) return;
+
+    if (!shouldShowCadastroBackButton()) {
+      setVisible(wrapper, false);
+      return;
+    }
+
+    setVisible(wrapper, true, 'flex');
+
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      setSessionStorageValue('cifrei_legal_return_bypass_clear_v1', '1');
+
+      if (window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+
+      const context = getLegalReturnContext();
+      window.location.href = context?.sourceUrl || 'cadastrar.html';
+    });
+  }
+
+  function setupTermsContextAutoClearOnExit() {
+    window.addEventListener('pagehide', () => {
+      const bypassClear = getSessionStorageValue('cifrei_legal_return_bypass_clear_v1') === '1';
+      if (bypassClear) {
+        removeSessionStorageValue('cifrei_legal_return_bypass_clear_v1');
+        return;
+      }
+
+      clearLegalReturnContext();
+    });
+  }
+
   async function fetchActiveLegalDocument() {
     const supabase = getSupabaseClient();
     if (!supabase) {
@@ -163,6 +253,11 @@ function renderDocumentHtml(htmlContent) {
   };
 
   document.addEventListener('DOMContentLoaded', () => {
+    if (getCurrentPageName() === PAGE_NAME) {
+      setupCadastroBackButton();
+      setupTermsContextAutoClearOnExit();
+    }
+
     loadTermsPageDocument();
   });
 })();
