@@ -345,7 +345,7 @@ input.form-control:focus {
 }
 
 .inputPadrao {
-  height: 45px;
+  min-height: 45px;
   width: 100%;
   min-width: 0;
   padding: 6px 5px 6px 45px;
@@ -1094,5 +1094,15 @@ main {
 
 .modal-backdrop {
   z-index: 5000 !important;
+}
+
+.star-unselected {
+  color: #424242;
+  opacity: 0.15;
+}
+
+.star-selected {
+  color: #fd641d;
+  opacity: 1;
 }
 

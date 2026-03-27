@@ -968,6 +968,14 @@ function setupFraseSegredoDecModal() {
         plaintext: plaintext
       });
 
+      if (typeof incrementProfileRelevantUsage === 'function') {
+        try {
+          await incrementProfileRelevantUsage();
+        } catch (usageErr) {
+          console.error('[Cifrei] Erro ao incrementar uso relevante após decifragem:', usageErr);
+        }
+      }
+
       // limpa contexto e modal
       window.cifreiDecifragemContext = null;
       input.value = '';
@@ -1592,6 +1600,15 @@ async function handleSalvarCifragemClick(opts) {
           ciphertext: ciphertextToSave,
           notes:      observacoes
         });
+
+        if (typeof incrementProfileRelevantUsage === 'function') {
+          try {
+            await incrementProfileRelevantUsage();
+          } catch (usageErr) {
+            console.error('[Cifrei] Erro ao incrementar uso relevante após salvar cifra:', usageErr);
+          }
+        }
+
         console.log('[Cifrei] Nova cifra salva com sucesso.');
         resetCifrarPageAfterSave();
       } else {
@@ -1680,6 +1697,15 @@ async function handleConfirmarSubstituicaoCifraClick(opts) {
         ciphertext: ciphertextToSave,
         notes:      observacoes
       });
+
+      if (typeof incrementProfileRelevantUsage === 'function') {
+        try {
+          await incrementProfileRelevantUsage();
+        } catch (usageErr) {
+          console.error('[Cifrei] Erro ao incrementar uso relevante após atualizar cifra:', usageErr);
+        }
+      }
+
       console.log('[Cifrei] Cifra existente atualizada com sucesso.');
     } else {
       console.error('[Cifrei] updateCifragemRecord não disponível.');

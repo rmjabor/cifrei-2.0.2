@@ -245,3 +245,131 @@ async function saveProfilePasswordGenParams(params) {
 
   return normalized;
 }
+
+
+function addDaysToIsoString(baseDate, daysToAdd) {
+  const date = baseDate ? new Date(baseDate) : new Date();
+  if (Number.isNaN(date.getTime())) {
+    throw new Error('Data inválida para cálculo de próxima solicitação de avaliação.');
+  }
+
+  date.setDate(date.getDate() + Number(daysToAdd || 0));
+  return date.toISOString();
+}
+
+async function getProfileAvaliacaoPromptState() {
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('prox_pedido_avalia, contador_uso_relevante')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return {
+    userId,
+    proxPedidoAvalia: data && data.prox_pedido_avalia ? data.prox_pedido_avalia : null,
+    contadorUsoRelevante: data && Number.isFinite(Number(data.contador_uso_relevante))
+      ? Number(data.contador_uso_relevante)
+      : 0
+  };
+}
+
+async function incrementProfileRelevantUsage() {
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
+
+  const { data: current, error: selectError } = await supabase
+    .from('profiles')
+    .select('contador_uso_relevante')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (selectError) throw selectError;
+
+  const currentCount = current && Number.isFinite(Number(current.contador_uso_relevante))
+    ? Number(current.contador_uso_relevante)
+    : 0;
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
+      contador_uso_relevante: currentCount + 1,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', userId)
+    .select('contador_uso_relevante')
+    .maybeSingle();
+
+  if (error) throw error;
+  return data && Number.isFinite(Number(data.contador_uso_relevante))
+    ? Number(data.contador_uso_relevante)
+    : currentCount + 1;
+}
+
+async function deferProfileAvaliacaoPrompt(daysToAdd) {
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
+  const proxPedidoAvalia = addDaysToIsoString(null, daysToAdd);
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
+      prox_pedido_avalia: proxPedidoAvalia,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', userId)
+    .select('id, prox_pedido_avalia')
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+async function submitUserEvaluation(payload) {
+  const supabase = ensureSupabaseClient();
+  const userId = await getAuthenticatedUserId();
+
+  const nota = Number.parseInt(payload && payload.nota, 10);
+  if (!Number.isFinite(nota) || nota < 1 || nota > 5) {
+    throw new Error('A nota da avaliação deve estar entre 1 e 5.');
+  }
+
+  const comentarios = payload && typeof payload.comentarios === 'string'
+    ? payload.comentarios.trim()
+    : '';
+
+  const { data: inserted, error: insertError } = await supabase
+    .from('avaliacoes')
+    .insert({
+      user_id: userId,
+      nota,
+      comentarios: comentarios || null,
+      vigente: true
+    })
+    .select('id')
+    .single();
+
+  if (insertError) throw insertError;
+
+  const { data: profileUpdate, error: updateError } = await supabase
+    .from('profiles')
+    .update({
+      prox_pedido_avalia: addDaysToIsoString(null, 45),
+      contador_uso_relevante: 0,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', userId)
+    .select('id, prox_pedido_avalia, contador_uso_relevante')
+    .maybeSingle();
+
+  if (updateError) throw updateError;
+
+  return {
+    avaliacaoId: inserted && inserted.id ? inserted.id : null,
+    profile: profileUpdate || null
+  };
+}

@@ -2,12 +2,20 @@
 let cifraIdToDelete = null;
 let cifraNameToDelete = '';
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
 
   if (document.getElementById('divListaCifra')) {
-    setupHomeListaCifras();
+    await setupHomeListaCifras();
     setupExcluirCifraModal();
     setupHomeNavigation();
+
+    if (typeof window.maybeOpenAvaliacaoModalOnHomeLoad === 'function') {
+      try {
+        await window.maybeOpenAvaliacaoModalOnHomeLoad();
+      } catch (err) {
+        console.error('[Cifrei] Erro ao verificar exibição do modal de avaliação:', err);
+      }
+    }
   }
 
 });
