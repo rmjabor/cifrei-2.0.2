@@ -1015,7 +1015,7 @@
       });
     });
 
-    updateButtonState();
+    restoreSubmitButtonState();
     passwordWatcher.refresh();
 
     if (termsLink) {
@@ -1220,9 +1220,21 @@
         && getPasswordLengthForPolicy(passwordInput.value) <= 64;
     }
 
+    function restoreSubmitButtonState() {
+      setButtonText(submitButton, 'Confirmar');
+      setButtonEnabledState(submitButton, isPasswordValid());
+    }
+
     function updateButtonState() {
       setButtonEnabledState(submitButton, isPasswordValid());
     }
+
+    resetNotice.element?.addEventListener('hidden.bs.modal', () => {
+      const noticeText = String(resetNotice.textElement?.textContent || '');
+      if (!noticeText.includes('Senha redefinida com sucesso')) {
+        restoreSubmitButtonState();
+      }
+    });
 
     passwordInput.addEventListener('input', updateButtonState);
 
@@ -1261,8 +1273,8 @@
       });
 
       if (error) {
+        restoreSubmitButtonState();
         showResetNotice(getFriendlyAuthErrorMessage(error, 'Não foi possível redefinir a senha.'));
-        updateButtonState();
         return;
       }
 
