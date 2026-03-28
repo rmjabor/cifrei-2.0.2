@@ -271,8 +271,85 @@
     return true;
   };
 
+
+
+  function ensureHelpModalExists() {
+    if (document.getElementById('mdlHelp')) return document.getElementById('mdlHelp');
+    if (!document.querySelector('.icnHelp[data-help-key]')) return null;
+
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = `
+      <div class="modal fade" role="dialog" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" id="mdlHelp" style="background: transparent;margin-top: 0px;" area-hiden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-confirma-excluir" role="document">
+          <div class="modal-content">
+            <div class="modal-header d-flex justify-content-center" style="background: #ffffff;border-radius: 0px 0px 0px 0px;border-style: none;border-top-left-radius: 10px;border-top-right-radius: 10px;"><img src="assets/img/Img_C_ifre_i.png" width="38" height="52"></div>
+            <div class="modal-body" style="background: #ffffff;padding: 0px;padding-top: 0px;height: auto;padding-right: 15px;padding-left: 15px;">
+              <div id="divHelpContent" style="max-height: 300px;min-height: 50px;"></div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center" style="background: #ffffff;border-bottom-right-radius: 10px;border-bottom-left-radius: 10px;border-style: none;padding-top: 12px;padding-bottom: 25px;padding-right: 15px;padding-left: 15px;"><button class="btn btnPadrao" id="btnEntendiHelp" type="button" style="font-family: 'Open Sans', sans-serif;font-size: 16px;background: #fd641d;color: rgb(255,255,255);border-style: none;box-shadow: 1px 1px 3px #a7a7a7;width: 100%;">Entendi</button></div>
+          </div>
+        </div>
+      </div>`;
+
+    const modalElement = wrapper.firstElementChild;
+    document.body.insertBefore(modalElement, document.body.firstChild);
+    return modalElement;
+  }
+
+  function getHelpContentContainer() {
+    return document.getElementById('divHelpContent') || document.getElementById('htmlHelpContent');
+  }
+
+  function getHelpContentMap() {
+    return window.HELP_CONTENT || (typeof HELP_CONTENT !== 'undefined' ? HELP_CONTENT : null);
+  }
+
+  function initHelpModal() {
+    const triggerElements = document.querySelectorAll('.icnHelp[data-help-key]');
+    if (!triggerElements.length) return;
+
+    const modalElement = ensureHelpModalExists();
+    const contentContainer = getHelpContentContainer();
+    const closeButton = document.getElementById('btnEntendiHelp');
+
+    if (!modalElement || !contentContainer || !closeButton) return;
+
+    const modalInstance = window.bootstrap && window.bootstrap.Modal
+      ? window.bootstrap.Modal.getOrCreateInstance(modalElement, { backdrop: 'static', keyboard: false })
+      : null;
+
+    closeButton.addEventListener('click', function () {
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+    });
+
+    modalElement.addEventListener('hidden.bs.modal', function () {
+      contentContainer.innerHTML = '';
+    });
+
+    triggerElements.forEach(function (trigger) {
+      trigger.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        const helpKey = trigger.dataset.helpKey || '';
+        const helpContentMap = getHelpContentMap();
+        const html = helpContentMap && helpContentMap[helpKey]
+          ? helpContentMap[helpKey]
+          : '<p>Ajuda indisponível para este tópico.</p>';
+
+        contentContainer.innerHTML = html;
+
+        if (modalInstance) {
+          modalInstance.show();
+        }
+      });
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initPassphraseModalReset();
     initAvaliacaoModal();
+    initHelpModal();
   });
 })();

@@ -759,6 +759,767 @@ input.form-control:focus {
   box-shadow: none !important;
 }
 
+.titulo-pagina {
+  font-size: 22px;
+  height: fit-content;
+  align-content: center;
+  margin-bottom: 0px;
+}
+
+textarea {
+  /*resize: vertical;*/
+  line-height: 1.2;
+}
+
+textarea.mensagem {
+  overflow-y: hidden;
+  overflow-x: hidden;
+  word-break: normal;
+}
+
+textarea.codigo {
+  word-break: break-all;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+input.chave::placeholder {
+  word-break: normal;
+  overflow-wrap: break-word;
+  color: #aeaeae;
+  opacity: 1;
+  font-size: 14px;
+}
+
+input.nome::placeholder {
+  color: #aeaeae;
+  opacity: 1;
+  font-size: 14px;
+}
+
+textarea.mensagem::placeholder {
+  color: #aeaeae;
+  opacity: 1;
+  font-size: 14px;
+}
+
+textarea.codigo::placeholder {
+  color: #aeaeae;
+  opacity: 1;
+  font-size: 14px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.botao-custom:active {
+  box-shadow: none !important;
+  transform: scale(0.99);
+  opacity: 0.80;
+}
+
+.icone-custom:active {
+  color: #747474;
+  transform: scale(0.95);
+}
+
+.text-pressed:active {
+  color: rgb(196, 196, 250);
+  transform: scale(0.99);
+}
+
+/* .caixa-texto {
+  position: relative;
+} */
+
+/* Containers = campo visual */
+
+#divChave, #divMsgEntrada, #divInputMdlObsSalvarCifragem, #divInputObsCifraAberta {
+  background-color: #f4f4f4;
+  transition: background-color 0.2s ease;
+}
+
+/* Estado de foco */
+
+#divChave:focus-within, #divMsgEntrada:focus-within, #divInputMdlObsSalvarCifragem:focus-within, #divInputObsCifraAberta:focus-within {
+  background-color: #eeeeee;
+}
+
+textarea.form-control:focus {
+  background-color: #eeeeee !important;
+  border-color: inherit !important;
+  box-shadow: none !important;
+}
+
+textarea.deadinput:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+input.deadinput:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#txtMsgBottom {
+  field-sizing: content !important;
+  resize: none !important;
+}
+
+#txtMsgAberta {
+  field-sizing: content !important;
+  resize: none !important;
+}
+
+textarea.form-control {
+  transition: background-color .2s ease;
+}
+
+input.form-control:focus {
+  background-color: #eeeeee !important;
+  border-color: inherit !important;
+  box-shadow: none !important;
+  outline: 0;
+}
+
+.w-340 {
+  width: 340px !important;
+  min-width: unset !important;
+  max-width: unset !important;
+}
+
+.apagando {
+  background-color: #ffe6e6 !important;
+  transition: background-color 0.25s ease;
+}
+
+.dropdown-faded:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#txtMsgEntrada, #txtChave, #txtChaveBottom, #txtMsgBottom, #inputFraseSegredo, #inputMdlNomeSalvarCifragem, #inputMdlObsSalvarCifragem, #inputlNomeCifraAberta, #inputObsCifraAberta, #txtMsgAberta {
+  cursor: text !important;
+}
+
+#formCheck-1, #formCheck-2, #formCheck-3, #formCheck-4, #fieldCheck-1, #fieldCheck-2, #fieldCheck-3, #fieldCheck-4 {
+  cursor: pointer !important;
+}
+
+#txtChave {
+  white-space: normal;
+  word-break: break-all;
+}
+
+#txtChave.digitando {
+  background-color: #f0f0f0;
+  transition: background-color 0.3s;
+}
+
+#txtMsgEntrada {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  field-sizing: content;
+  resize: none;
+}
+
+.fixedToContent {
+  resize: none;
+  field-sizing: content;
+}
+
+#inputFraseSegredo {
+  resize: none;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  word-break: normal;
+}
+
+#passphraseStrengthWrapper {
+  margin-top: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.passphrase-strength-bg {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background-color: #e0e0e0;
+  overflow: hidden;
+}
+
+#passphraseStrengthFill {
+  width: 0%;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+#passphraseStrengthFill.strength-0 {
+  background-color: #e63946;
+}
+
+#passphraseStrengthFill.strength-1 {
+  background-color: #f77f00;
+}
+
+#passphraseStrengthFill.strength-2 {
+  background-color: #ffbf00;
+}
+
+#passphraseStrengthFill.strength-3 {
+  background-color: #4ce15b;
+}
+
+#passphraseStrengthFill.strength-4 {
+  background-color: #9bb9d6;
+}
+
+#divColunaEsqCardCifra {
+  flex: 1 1 auto;
+}
+
+#divListaCifra {
+  scrollbar-width: none;
+}
+
+#divListaCifra::-webkit-scrollbar {
+  display: none;
+}
+
+#divListaCifra {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#divTmpltCardCifra.d-none {
+  display: none !important;
+}
+
+#divColunaEsqCardCifra {
+  cursor: pointer;
+}
+
+.modal-confirma-excluir {
+  max-width: 340px;
+  min-width: 300px;
+  margin-top: 80px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#divTmpltCardCifra {
+  display: none;
+}
+
+#txtCardNomeCifra, #txtCardTextoCifra, #txtCardChaveCifra {
+  cursor: pointer;
+}
+
+.card-cifra {
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+}
+
+.card-cifra input {
+  pointer-events: none;
+}
+
+.card-cifra.card-pressed {
+  background-color: #eeeeee;
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+#passphraseStrengthWrapper {
+  margin-top: 0.5rem;
+}
+
+.passphrase-strength-label {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+}
+
+#passphraseStrengthWrapper.is-active {
+  opacity: 1;
+}
+
+/* Destaque rápido quando copia texto do textarea */
+
+.textarea-highlight {
+  background-color: #fff3cd !important;
+  transition: background-color 0.4s ease-out;
+}
+
+/* (Opcional) se quiser também aproveitar a classe "copiado" usada em copiarTextoDoTextarea */
+
+.copiado {
+  background-color: #d4edda !important;
+  transition: background-color 0.3s ease-out;
+}
+
+/* Estilos para o modal QR Scanner */
+
+#qrScannerContainer {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+#qrVideo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Overlay com instrução / área de foco */
+
+#qrOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(0,0,0,0.5), transparent 60%);
+  color: #fff;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.divInputPadrao {
+  align-items: center;
+  display: flex;
+  position: relative;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #fd641d;
+  border-radius: 6px;
+}
+
+.inputPadrao {
+  min-height: 45px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 5px 6px 45px;
+  border-style: none;
+  border-width: 1px;
+  border-color: #fd641d;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Open Sans', sans-serif;
+  color: #424242;
+  flex-grow: 1;
+  box-sizing: border-box;
+  line-height: 1;
+  resize: none;
+  overflow: hidden !important;
+}
+
+.inputPadrao::placeholder {
+  color: #b5b5b5;
+  opacity: 1;
+}
+
+.inputGerarSenha {
+  height: 35px;
+  width: 45px;
+  padding: 8px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #fd641d;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1;
+  resize: none;
+  overflow: hidden !important;
+}
+
+#divIconeRefresh {
+  flex-shrink: 0;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.fade .modal-dialog {
+  transform: translate3d(0, 56px, 0) scale(0.985) !important;
+  opacity: 0;
+  transition: transform 0.7s cubic-bezier(.22,.61,.36,1), opacity 0.6s ease-out !important;
+  will-change: transform, opacity;
+}
+
+.modal.show .modal-dialog {
+  transform: translate3d(0, 0, 0) scale(1) !important;
+  opacity: 1 !important;
+}
+
+.body-padrao {
+  width: 100%;
+  max-width: 600px;
+  min-width: 320px;
+  padding: 0px 15px 30px 15px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.icnInputPadrao {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  margin-left: 10px;
+  font-size: 25px;
+  line-height: 1;
+  text-align: center;
+  color: #424242;
+  z-index: 1;
+}
+
+.btnPadrao {
+  width: 100%;
+  border-style: none;
+  border-radius: 3;
+  height: 45px;
+  text-align: center;
+  box-shadow: 1px 1px 3px 0px #a7a7a7, 1px 1px 3px 0px #a7a7a7;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 15px;
+  color: #ffffff;
+}
+
+.btnPadrao:active {
+  box-shadow: none !important;
+  transform: translateY(2px);
+  opacity: 0.80;
+}
+
+.btnMenu:active {
+  box-shadow: none !important;
+  transform: translateY(2px);
+  opacity: 0.80;
+}
+
+.btnMenu {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 45px;
+  height: 45px;
+  border-radius: 45px;
+  z-index: 500;
+  background-color: rgb(66, 66, 66, 0.85);
+}
+
+.menuFlutuante {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 3000;
+  background-color: #ffffff;
+  border-radius: 6px;
+}
+
+#overlayMenuFlutuante {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  z-index: 2500;
+  background-color: rgb(66, 66, 66, 0.85);
+}
+
+.menuLine {
+  height: 45px;
+  font-size: 16px;
+}
+
+.mLineOpacity {
+  opacity: 0.5;
+}
+
+.btnPadrao:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(0.2);
+  /*Opcional: tira um pouco da vibração da cor;*/
+}
+
+.divAleatPwGen {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 6px;
+}
+
+/* =========================
+   Skeleton — editarcifra.html
+========================= */
+
+#cifraAberta.is-loading {
+  pointer-events: none;
+}
+
+#cifraAberta.is-loading #tituloPageBottom, #cifraAberta.is-loading #divInputNomeCifraAberta, #cifraAberta.is-loading #divChaveBottom, #cifraAberta.is-loading #divMsgBottom, #cifraAberta.is-loading #divInputObsCifraAberta, #cifraAberta.is-loading #divDatas, #cifraAberta.is-loading #btnEditarCifra, #cifraAberta.is-loading #btnShowQrFromCifrar, #cifraAberta.is-loading #btnDecifrar {
+  position: relative !important;
+  overflow: hidden !important;
+  background: #dddddd !important;
+  border-color: transparent !important;
+}
+
+#cifraAberta.is-loading #tituloPageBottom::after, #cifraAberta.is-loading #divInputNomeCifraAberta::after, #cifraAberta.is-loading #divChaveBottom::after, #cifraAberta.is-loading #divMsgBottom::after, #cifraAberta.is-loading #divInputObsCifraAberta::after, #cifraAberta.is-loading #divDatas::after, #cifraAberta.is-loading #btnEditarCifra::after, #cifraAberta.is-loading #btnShowQrFromCifrar::after, #cifraAberta.is-loading #btnDecifrar::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -35%;
+  width: 35%;
+  height: 100%;
+  background: linear-gradient( 90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.48) 50%, rgba(255,255,255,0) 100% );
+  transform: skewX(-20deg);
+  animation: cifreiSkeletonShimmer 1.25s infinite;
+  pointer-events: none;
+}
+
+#cifraAberta.is-loading #tituloPageBottom {
+  min-height: 42px;
+  border-radius: 6px;
+}
+
+#cifraAberta.is-loading #divInputNomeCifraAberta, #cifraAberta.is-loading #divChaveBottom, #cifraAberta.is-loading #divMsgBottom, #cifraAberta.is-loading #divInputObsCifraAberta, #cifraAberta.is-loading #btnEditarCifra, #cifraAberta.is-loading #btnShowQrFromCifrar, #cifraAberta.is-loading #btnDecifrar {
+  border-radius: 8px !important;
+}
+
+#cifraAberta.is-loading #divDatas {
+  border-radius: 6px !important;
+}
+
+#cifraAberta.is-loading #txtCifragemBottom, #cifraAberta.is-loading #criadaEm, #cifraAberta.is-loading #editadaEm, #cifraAberta.is-loading #btnEditarCifra, #cifraAberta.is-loading #btnShowQrFromCifrar, #cifraAberta.is-loading #btnDecifrar {
+  color: transparent !important;
+}
+
+#cifraAberta.is-loading #inputlNomeCifraAberta, #cifraAberta.is-loading #txtChaveBottom, #cifraAberta.is-loading #txtMsgBottom, #cifraAberta.is-loading #inputObsCifraAberta {
+  color: transparent !important;
+  caret-color: transparent !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  pointer-events: none !important;
+}
+
+#cifraAberta.is-loading #inputlNomeCifraAberta::placeholder, #cifraAberta.is-loading #txtChaveBottom::placeholder, #cifraAberta.is-loading #txtMsgBottom::placeholder, #cifraAberta.is-loading #inputObsCifraAberta::placeholder {
+  color: transparent !important;
+}
+
+#cifraAberta.is-loading #voltarCifragemTop, #cifraAberta.is-loading #icnNomeCifra, #cifraAberta.is-loading #icnChaveBottom, #cifraAberta.is-loading #icnCopiarChave, #cifraAberta.is-loading #icnMsgBottom, #cifraAberta.is-loading #icnCopiarMsg, #cifraAberta.is-loading #icnApagarMsgEditar, #cifraAberta.is-loading #icnObservacoes, #cifraAberta.is-loading #icnSalvarChaveCifragem, #cifraAberta.is-loading #icnGerarQrCifragem-1, #cifraAberta.is-loading #icnSalvarChaveCifragem-1 {
+  opacity: 0 !important;
+}
+
+.is-loading .btnPadrao, .is-loading .btnPadrao:disabled {
+  opacity: 1 !important;
+  filter: none !important;
+  color: transparent !important;
+  pointer-events: none !important;
+  box-shadow: none;
+}
+
+@keyframes cifreiSkeletonShimmer {
+  from {
+    left: -35%;
+  }
+  to {
+    left: 120%;
+  }
+}
+
+/* =========================
+   Skeleton — modal gerarSenhaAleat
+========================= */
+
+#gerarSenhaAleat.is-loading {
+  pointer-events: none;
+}
+
+#gerarSenhaAleat.is-loading #logoCifreiSenhaAleat, #gerarSenhaAleat.is-loading #divCaracTotais, #gerarSenhaAleat.is-loading #divMaiusc, #gerarSenhaAleat.is-loading #divNumeros, #gerarSenhaAleat.is-loading #divEspec, #gerarSenhaAleat.is-loading #divSenhaAleat, #gerarSenhaAleat.is-loading #lblGerSenhaAleat, #gerarSenhaAleat.is-loading #btnUsarSenhaGerada, #gerarSenhaAleat.is-loading #btnFecharSenhaAleat {
+  position: relative !important;
+  overflow: hidden !important;
+  background: #dddddd !important;
+  border-color: transparent !important;
+}
+
+#gerarSenhaAleat.is-loading #logoCifreiSenhaAleat::after, #gerarSenhaAleat.is-loading #divCaracTotais::after, #gerarSenhaAleat.is-loading #divMaiusc::after, #gerarSenhaAleat.is-loading #divNumeros::after, #gerarSenhaAleat.is-loading #divEspec::after, #gerarSenhaAleat.is-loading #divSenhaAleat::after, #gerarSenhaAleat.is-loading #lblGerSenhaAleat::after, #gerarSenhaAleat.is-loading #btnUsarSenhaGerada::after, #gerarSenhaAleat.is-loading #btnFecharSenhaAleat::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -35%;
+  width: 35%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.48) 50%, rgba(255,255,255,0) 100%);
+  transform: skewX(-20deg);
+  animation: cifreiSkeletonShimmer 1.25s infinite;
+  pointer-events: none;
+}
+
+#gerarSenhaAleat.is-loading #logoCifreiSenhaAleat {
+  display: block;
+  border-radius: 6px !important;
+}
+
+#gerarSenhaAleat.is-loading #lblGerSenhaAleat, #gerarSenhaAleat.is-loading #divCaracTotais, #gerarSenhaAleat.is-loading #divMaiusc, #gerarSenhaAleat.is-loading #divNumeros, #gerarSenhaAleat.is-loading #divEspec, #gerarSenhaAleat.is-loading #divSenhaAleat, #gerarSenhaAleat.is-loading #btnUsarSenhaGerada, #gerarSenhaAleat.is-loading #btnFecharSenhaAleat {
+  border-radius: 6px !important;
+}
+
+#gerarSenhaAleat.is-loading #lblGerSenhaAleat, #gerarSenhaAleat.is-loading #btnUsarSenhaGerada, #gerarSenhaAleat.is-loading #btnFecharSenhaAleat {
+  color: transparent !important;
+}
+
+#gerarSenhaAleat.is-loading #divCaracTotais *, #gerarSenhaAleat.is-loading #divMaiusc *, #gerarSenhaAleat.is-loading #divNumeros *, #gerarSenhaAleat.is-loading #divEspec *, #gerarSenhaAleat.is-loading #divSenhaAleat * {
+  color: transparent !important;
+  caret-color: transparent !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  pointer-events: none !important;
+}
+
+#gerarSenhaAleat.is-loading #divCaracTotais input::placeholder, #gerarSenhaAleat.is-loading #divMaiusc input::placeholder, #gerarSenhaAleat.is-loading #divNumeros input::placeholder, #gerarSenhaAleat.is-loading #divEspec input::placeholder, #gerarSenhaAleat.is-loading #divSenhaAleat input::placeholder {
+  color: transparent !important;
+}
+
+#gerarSenhaAleat.is-loading #logoCifreiSenhaAleat, #gerarSenhaAleat.is-loading #divCaracTotais svg, #gerarSenhaAleat.is-loading #divMaiusc svg, #gerarSenhaAleat.is-loading #divNumeros svg, #gerarSenhaAleat.is-loading #divEspec svg, #gerarSenhaAleat.is-loading #divSenhaAleat svg {
+  filter: grayscale(1);
+}
+
+/* =========================
+   Skeleton — home.html
+========================= */
+
+@keyframes cifreiSkeletonBgShift {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+#divLogoCifreiHome.is-loading, #btnMaisDecifrar.is-loading, #btnMaisCifrar.is-loading, #skeletonHome.is-loading {
+  pointer-events: none !important;
+}
+
+#divLogoCifreiHome.is-loading {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 6px !important;
+  background: linear-gradient(90deg, #dddddd 25%, #efefef 50%, #dddddd 75%) !important;
+  background-size: 200% 100% !important;
+  animation: cifreiSkeletonBgShift 1.25s linear infinite !important;
+}
+
+#divLogoCifreiHome.is-loading img {
+  opacity: 0 !important;
+}
+
+#btnMaisDecifrar.is-loading, #btnMaisCifrar.is-loading {
+  position: relative !important;
+  overflow: hidden !important;
+  background: linear-gradient(90deg, #dddddd 25%, #efefef 50%, #dddddd 75%) !important;
+  background-size: 200% 100% !important;
+  animation: cifreiSkeletonBgShift 1.25s linear infinite !important;
+  color: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+#btnMaisDecifrar.is-loading *, #btnMaisCifrar.is-loading * {
+  color: transparent !important;
+  fill: transparent !important;
+  opacity: 0 !important;
+}
+
+#skeletonHome.is-loading {
+  position: relative !important;
+  min-height: 280px !important;
+}
+
+#skeletonHome.is-loading > * {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#skeletonHome.is-loading::before, #skeletonHome.is-loading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #dddddd 25%, #efefef 50%, #dddddd 75%);
+  background-size: 200% 100%;
+  animation: cifreiSkeletonBgShift 1.25s linear infinite;
+  pointer-events: none;
+}
+
+#skeletonHome.is-loading::before {
+  top: 0;
+  width: min(560px, calc(100% - 16px));
+  height: 28px;
+  border-radius: 6px;
+}
+
+#skeletonHome.is-loading::after {
+  top: 40px;
+  width: min(560px, calc(100% - 16px));
+  height: 76px;
+  border-radius: 8px;
+  box-shadow: 0 84px 0 0 #dddddd, 0 168px 0 0 #dddddd;
+}
+
+#skeletonHome.is-loading #divTmpltCardCifra, #skeletonHome.is-loading .card-cifra, #skeletonHome.is-loading #divMinhasCifras, #skeletonHome.is-loading #labelSemCifras, #skeletonHome.is-loading #lblMinhasCifras {
+  visibility: hidden !important;
+}
+
+/* =========================
+   Skeleton — meuperfil.html
+========================= */
+
+#divMeuPerfil.is-loading, #divNomeMeuPerfil.is-loading, #divSobrenomeMeuPerfil.is-loading, #btnSalvarMeuPerfil.is-loading, #btnRedefSenhaPerfil.is-loading, #btnExcluirContaPerfil.is-loading {
+  pointer-events: none !important;
+}
+
+#divMeuPerfil.is-loading, #divNomeMeuPerfil.is-loading, #divSobrenomeMeuPerfil.is-loading, #btnSalvarMeuPerfil.is-loading, #btnRedefSenhaPerfil.is-loading, #btnExcluirContaPerfil.is-loading {
+  position: relative !important;
+  overflow: hidden !important;
+  background: linear-gradient(90deg, #dddddd 25%, #efefef 50%, #dddddd 75%) !important;
+  background-size: 200% 100% !important;
+  animation: cifreiSkeletonBgShift 1.25s linear infinite !important;
+  border-radius: 6px !important;
+  color: transparent !important;
+  box-shadow: none !important;
+}
+
+#divMeuPerfil.is-loading *, #divNomeMeuPerfil.is-loading *, #divSobrenomeMeuPerfil.is-loading *, #btnSalvarMeuPerfil.is-loading *, #btnRedefSenhaPerfil.is-loading *, #btnExcluirContaPerfil.is-loading * {
+  color: transparent !important;
+  fill: transparent !important;
+  opacity: 0 !important;
+  border-color: transparent !important;
+  caret-color: transparent !important;
+}
+
+#divNomeMeuPerfil.is-loading input::placeholder, #divSobrenomeMeuPerfil.is-loading input::placeholder {
+  color: transparent !important;
+}
+
+/* Remove contorno durante skeleton */
+
+.skeleton#divNomeMeuPerfil, .skeleton#divSobrenomeMeuPerfil {
+  border: none !important;
+  box-shadow: none !important;
+}
+
 /* Estilos do Custom Code das páginas Suporte e Termos */
 
 :root {
@@ -1104,5 +1865,250 @@ main {
 .star-selected {
   color: #fd641d;
   opacity: 1;
+}
+
+.icnHelp {
+  height: 25px;
+  width: auto;
+  font-size: 22px;
+  font-weight: 400;
+  color: #424242;
+}
+
+.icnInsideHelp {
+  width: 1em;
+  height: 1em;
+  margin: 0 4px;
+  vertical-align: middle;
+  color: #424242;
+}
+
+#divHelpContent {
+  color: var(--text);
+}
+
+#divHelpContent h2 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+#divHelpContent h3 {
+  margin: 18px 0 10px 0;
+  font-size: 16px;
+  line-height: 1.25;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+#divHelpContent h4 {
+  margin: 14px 0 8px 0;
+  font-size: 14px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+#divHelpContent p, #divHelpContent li {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#divHelpContent p {
+  margin: 0 0 10px 0;
+}
+
+#divHelpContent ul, #divHelpContent ol {
+  margin: 0 0 10px 22px;
+  padding: 0;
+}
+
+#divHelpContent li {
+  margin: 0 0 2px 0;
+}
+
+#divHelpContent .note {
+  margin: 14px 0 14px 0;
+  padding: 14px 16px 8px 16px;
+  border-radius: 12px;
+  border: 1px solid;
+}
+
+#divHelpContent .note h3, #divHelpContent .note h4 {
+  margin-top: 0;
+}
+
+#divHelpContent .spacer {
+  height: 8px;
+}
+
+.legal-doc-meta {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin: -6px 0 18px 0;
+}
+
+.legal-doc-version {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(9,23,71,.12);
+  background: rgba(103,63,133,.08);
+  color: #673f85;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.legal-doc-loading {
+  margin: 0 0 26px 0;
+  padding: 18px 16px;
+  border: 1px solid rgba(9,23,71,.08);
+  border-radius: 12px;
+  background: rgba(9,23,71,.03);
+}
+
+.legal-doc-loading-line {
+  height: 12px;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(103,63,133,.08) 0%, rgba(253,100,29,.18) 50%, rgba(103,63,133,.08) 100%);
+  background-size: 200% 100%;
+  animation: legalDocShimmer 1.4s linear infinite;
+}
+
+.legal-doc-loading-line:last-child {
+  margin-bottom: 0;
+}
+
+.legal-doc-loading-line.w-90 {
+  width: 90%;
+}
+
+.legal-doc-loading-line.w-75 {
+  width: 75%;
+}
+
+.legal-doc-loading-line.w-60 {
+  width: 60%;
+}
+
+.legal-doc-loading-line.w-45 {
+  width: 45%;
+}
+
+#legalDocContent .doc-title {
+  display: none !important;
+}
+
+@keyframes legalDocShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+#wrapBtnVoltarCadastroTermos {
+  position: fixed;
+  left: 16px;
+  bottom: 20px;
+  z-index: 1080;
+  display: none;
+}
+
+#btnVoltarCadastroTermos {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 45px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: rgba(103,63,133,0.96);
+  color: #ffffff;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 1px 1px 4px 0 rgba(0,0,0,0.18);
+  border: none;
+}
+
+#btnVoltarCadastroTermos:hover, #btnVoltarCadastroTermos:focus {
+  color: #ffffff;
+  text-decoration: none;
+  background: rgba(103,63,133,1);
+}
+
+@media (max-width: 575.98px) {
+  #wrapBtnVoltarCadastroTermos {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #btnVoltarCadastroTermos {
+    width: 100%;
+  }
+}
+
+#legalDocument {
+  display: block;
+}
+
+#htmlLegalContent {
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#htmlLegalContent::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.modal {
+  z-index: 5500 !important;
+}
+
+.modal-backdrop {
+  z-index: 5000 !important;
+}
+
+.star-unselected {
+  color: #424242;
+  opacity: 0.15;
+}
+
+.star-selected {
+  color: #fd641d;
+  opacity: 1;
+}
+
+.icnHelp {
+  height: 25px;
+  width: auto;
+  font-size: 22px;
+  font-weight: 400;
+  color: #424242;
+}
+
+.icnInsideHelp {
+  width: 1em;
+  height: 1em;
+  margin: 0 4px;
+  vertical-align: middle;
+  color: #424242;
 }
 

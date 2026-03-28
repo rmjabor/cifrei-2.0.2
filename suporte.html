@@ -136,8 +136,8 @@ Sem a combinação correta desses elementos, não é possível reconstruir o con
       <p class="backtop"><a href="#topo">↑ Voltar para o topo</a></p>
     </section>
     <section class="chapter" id="cap-5">
-      <h1><strong>Tela Cifra</strong><strong>gem</strong></h1>
-<p>A tela <strong>Cifra</strong><strong>gem</strong> é utilizada para transformar um texto aberto em um código protegido (cifra).</p>
+      <h1><strong>Tela Cifragem</strong></h1>
+<p>A tela <strong>Cifragem</strong> é utilizada para transformar um texto aberto em um código protegido (cifra).</p>
 <p>Nela, você deverá preencher três elementos principais: <strong>chave</strong>, <strong>mensagem</strong> e <strong>frase segredo</strong>.</p>
 
 <h2><strong>Chave</strong></h2>
@@ -345,18 +345,19 @@ Sem a combinação correta desses elementos, não é possível reconstruir o con
       <p class="backtop"><a href="#topo">↑ Voltar para o topo</a></p>
     </section>
     <section class="chapter" id="cap-7">
-      <h1><strong>Tela Decifra</strong><strong>gem</strong></h1>
-<p>A tela <strong>Decifra</strong><strong>gem</strong> é utilizada para recuperar uma mensagem protegida anteriormente no Cifrei.</p>
+      <h1><strong>Tela Decifragem</strong></h1>
+<p>A tela <strong>Decifragem</strong> é utilizada para recuperar uma mensagem protegida anteriormente no Cifrei.</p>
 <p>Para isso, o usuário deve informar os elementos necessários da cifra, especialmente a <strong>chave</strong>, o <strong>código</strong> e a <strong>frase segredo</strong> correspondente.</p>
 <p>Assim como na tela de cifragem, o preenchimento da chave pode ser feito de diferentes formas.</p>
 <h2><strong>Formas de informar a chave e o código</strong></h2>
-<p>Na tela <strong>Decifra</strong><strong>gem</strong>, o usuário pode optar por diferentes caminhos para fornecer os dados da cifra:</p>
+<p>Na tela <strong>Decifragem</strong>, o usuário pode optar por diferentes caminhos para fornecer os dados da cifra:</p>
 <h3><strong>Digitação manual</strong></h3>
-<p>O usuário pode:</p>
+<p>O usuário precisa:</p>
 <ul>
 <li>digitar manualmente a <strong>chave</strong>, </li>
-<li>colar a <strong>chave</strong> e o <strong>código</strong> a partir da área de transferência, </li>
-<li>e então informar a <strong>frase segredo</strong> utilizada no momento da cifragem. </li>
+<li>ou colar a <strong>chave</strong> e o <strong>código</strong> a partir da área de transferência, </li>
+<li>clicar no botão <strong>Decifrar</strong></li>
+<li>e então informar na janela que se abre a <strong>frase segredo</strong> utilizada no momento da cifragem. </li>
 </ul>
 <p>Essa opção é útil quando a cifra foi armazenada fora do aplicativo ou quando o usuário deseja inserir os dados diretamente.</p>
 <h3><strong>Leitura por QR Code</strong></h3>
@@ -365,7 +366,9 @@ Sem a combinação correta desses elementos, não é possível reconstruir o con
 <ul>
 <li>basta selecionar a opção correspondente, </li>
 <li>usar a câmera do dispositivo, </li>
-<li>e ler o QR Code associado à cifra. </li>
+<li>ler o QR Code associado à cifra, </li>
+<li>clicar no botão <strong>Decifrar</strong></li>
+<li>e então informar na janela que se abre a <strong>frase segredo</strong> utilizada no momento da cifragem. </li>
 </ul>
 <p>Essa opção reduz erros de digitação e facilita o uso de chaves mais complexas.</p>
 <h3><strong>Seleção de cifra salva</strong></h3>
@@ -374,8 +377,9 @@ Sem a combinação correta desses elementos, não é possível reconstruir o con
 <ul>
 <li>o aplicativo recupera a cifra armazenada, </li>
 <li>preenchendo os dados necessários para a decifragem, </li>
-<li>restando ao usuário informar a <strong>frase segredo</strong> correta. </li>
-</ul>
+<li>restando ao usuário clicar no botão <strong>Decifrar</strong></li>
+<li>e informar na janela que se abre a <strong>frase segredo</strong> utilizada no momento da cifragem. </li>
+
 <p>Essa é a forma mais prática para quem utiliza o Cifrei como arquivo pessoal de cifras.</p>
 <h2><strong>Resultado da decifragem</strong></h2>
 <p>Após informar os dados necessários, clicar em <strong>Decifrar</strong> e informar a frase segredo, o aplicativo processa a cifra e, se as informações estiverem corretas, abre a tela com a <strong>cifra aberta</strong>.</p>
@@ -532,6 +536,7 @@ Sem a combinação correta desses elementos, não é possível reconstruir o con
     <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
     <script src="assets/js/uiBehaviour.js"></script>
     <script src="assets/js/inputMask.js"></script>
+    <script src="assets/js/helpContent.js"></script>
     <script src="assets/js/modal.js"></script>
     <script src="assets/js/passwordGenerator.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
