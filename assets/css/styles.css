@@ -1616,14 +1616,14 @@ section.chapter > h1::before {
   content: counter(chapter) ". ";
 }
 
-h2 {
+.suporte-scope h2 {
   margin: 18px 0 10px 0;
   font-size: 17px;
   line-height: 1.25;
   font-weight: 700;
 }
 
-h3 {
+.suporte-scope h3 {
   margin: 16px 0 8px 0;
   font-size: 15px;
   line-height: 1.25;
