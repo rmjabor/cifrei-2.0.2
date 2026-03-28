@@ -1542,24 +1542,28 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
-  margin: 0;
+/* Escopo do guia de suporte */
+
+.suporte-scope {
   padding: 0 20px;
-  font-family: "Open Sans", Arial, sans-serif;
-  color: var(--text);
-  background: #ffffff;
   max-width: 600px;
   margin: 0 auto;
+  color: var(--text);
+  font-family: "Open Sans", Arial, sans-serif;
   counter-reset: chapter;
 }
 
-.page {
+#legalDocContent {
+  counter-reset: chapter;
+}
+
+.suporte-scope .page {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: 28px 18px 64px;
 }
 
-.doc-title {
+.suporte-scope .doc-title {
   margin: 0 0 18px 0;
   font-size: 28px;
   line-height: 1.2;
@@ -1567,7 +1571,7 @@ body {
   letter-spacing: -0.2px;
 }
 
-.toc {
+.suporte-scope .toc {
   margin: 0 0 26px 0;
   padding: 16px 16px 8px 16px;
   border: 1px solid rgba(9,23,71,.12);
@@ -1575,44 +1579,44 @@ body {
   background: rgba(9,23,71,.03);
 }
 
-.toc-title {
+.suporte-scope .toc-title {
   margin: 0 0 10px 0;
   font-size: 18px;
   line-height: 1.25;
   font-weight: 700;
 }
 
-.toc ol {
+.suporte-scope .toc ol {
   margin: 0 0 8px 22px;
   padding: 0;
   font-size: 14px;
   line-height: 2;
 }
 
-.toc a {
+.suporte-scope .toc a {
   color: var(--text);
   text-decoration: none;
   border-bottom: 1px dotted rgba(9,23,71,.35);
 }
 
-.toc a:hover {
+.suporte-scope .toc a:hover {
   border-bottom-style: solid;
 }
 
-section.chapter {
+.suporte-scope section.chapter {
   margin: 0 0 28px 0;
   padding: 0 0 8px 0;
   counter-increment: chapter;
 }
 
-section.chapter > h1 {
+.suporte-scope section.chapter > h1 {
   margin: 30px 0 12px 0;
   font-size: 22px;
   line-height: 1.25;
   font-weight: 700;
 }
 
-section.chapter > h1::before {
+.suporte-scope section.chapter > h1::before {
   content: counter(chapter) ". ";
 }
 
@@ -1630,42 +1634,73 @@ section.chapter > h1::before {
   font-weight: 700;
 }
 
-p, li {
+#legalDocContent section.chapter {
+  margin: 0 0 28px 0;
+  padding: 0 0 8px 0;
+  counter-increment: chapter;
+}
+
+#legalDocContent section.chapter > h1 {
+  margin: 30px 0 12px 0;
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+#legalDocContent section.chapter > h1::before {
+  content: counter(chapter) ". ";
+}
+
+#legalDocContent h2 {
+  margin: 18px 0 10px 0;
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+#legalDocContent h3 {
+  margin: 16px 0 8px 0;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.suporte-scope p, .suporte-scope li, #legalDocContent p, #legalDocContent li {
   font-size: 14px;
   line-height: 1.5;
 }
 
-p {
+.suporte-scope p, #legalDocContent p {
   margin: 0 0 10px 0;
 }
 
-ul, ol {
+.suporte-scope ul, .suporte-scope ol, #legalDocContent ul, #legalDocContent ol {
   margin: 0 0 10px 22px;
   padding: 0;
 }
 
-li {
+.suporte-scope li, #legalDocContent li {
   margin: 0 0 2px 0;
 }
 
-.spacer {
+.suporte-scope .spacer, #legalDocContent .spacer {
   height: 8px;
 }
 
-.divider {
+.suporte-scope .divider, #legalDocContent .divider {
   letter-spacing: .3px;
   color: #8090ba;
   margin: 10px 0;
 }
 
-.note {
+.suporte-scope .note, #legalDocContent .note {
   margin: 14px 0 14px 0;
   padding: 14px 16px 8px 16px;
   border-radius: 12px;
   border: 1px solid;
 }
 
-.note h2, .note h3 {
+.suporte-scope .note h2, .suporte-scope .note h3, #legalDocContent .note h2, #legalDocContent .note h3 {
   margin-top: 0;
 }
 
@@ -1689,29 +1724,34 @@ li {
   border-color: var(--note-warning-bd);
 }
 
-.backtop {
+.suporte-scope .backtop, #legalDocContent .backtop {
   margin: 12px 0 0 0;
   font-size: 13px;
 }
 
-.backtop a {
+.suporte-scope .backtop a, #legalDocContent .backtop a {
   color: var(--text);
   text-decoration: none;
   border-bottom: 1px dotted rgba(9,23,71,.35);
 }
 
-.backtop a:hover {
+.suporte-scope .backtop a:hover, #legalDocContent .backtop a:hover {
   border-bottom-style: solid;
 }
 
-strong {
+.suporte-scope strong, #legalDocContent strong, #divHelpContent strong {
   font-weight: 700;
 }
 
-main {
+/* Layout do conteúdo de termos legais */
+
+#lblLegalDocTitle, #legalDocMeta, #legalDocLoading, #legalDocError, #legalDocContent {
   padding: 0 20px;
   max-width: 600px;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+  color: var(--text);
+  font-family: "Open Sans", Arial, sans-serif;
 }
 
 .legal-doc-meta {
