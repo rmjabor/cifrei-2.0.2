@@ -1889,14 +1889,14 @@ main {
 
 #divHelpContent h2 {
   margin: 0 0 12px 0;
-  font-size: 20px;
+  font-size: 22px !important;
   line-height: 1.25;
   font-weight: 700;
 }
 
 #divHelpContent h3 {
   margin: 18px 0 10px 0;
-  font-size: 16px;
+  font-size: 18px !important;
   line-height: 1.25;
   font-weight: 700;
   text-decoration: underline;
@@ -1905,7 +1905,7 @@ main {
 
 #divHelpContent h4 {
   margin: 14px 0 8px 0;
-  font-size: 14px;
+  font-size: 16px !important;
   line-height: 1.25;
   font-weight: 700;
 }
