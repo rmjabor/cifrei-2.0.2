@@ -1665,7 +1665,7 @@ html {
   border: 1px solid;
 }
 
-.suporte-scope .note h2, .suporte-scope .note h3, #legalDocContent .note h2, #legalDocContent .note h3, #divHelpContent .note h3, #divHelpContent .note h4 {
+.suporte-scope .note h2, .suporte-scope .note h3, #legalDocContent .note h2, #legalDocContent .note h3, #htmlHelpContent .note h3, #htmlHelpContent .note h4 {
   margin-top: 0;
 }
 
@@ -1704,7 +1704,7 @@ html {
   border-bottom-style: solid;
 }
 
-.suporte-scope strong, #legalDocContent strong, #divHelpContent strong {
+.suporte-scope strong, #legalDocContent strong, #htmlHelpContent strong {
   font-weight: 700;
 }
 
@@ -1908,18 +1908,18 @@ html {
   color: #424242;
 }
 
-#divHelpContent {
+#htmlHelpContent {
   color: var(--text);
 }
 
-#divHelpContent h2 {
+#htmlHelpContent h2 {
   margin: 0 0 12px 0;
   font-size: 22px !important;
   line-height: 1.25;
   font-weight: 700;
 }
 
-#divHelpContent h3 {
+#htmlHelpContent h3 {
   margin: 18px 0 10px 0;
   font-size: 18px !important;
   line-height: 1.25;
@@ -1928,28 +1928,28 @@ html {
   text-underline-offset: 2px;
 }
 
-#divHelpContent h4 {
+#htmlHelpContent h4 {
   margin: 14px 0 8px 0;
   font-size: 16px !important;
   line-height: 1.25;
   font-weight: 700;
 }
 
-#divHelpContent p, #divHelpContent li {
+#htmlHelpContent p, #htmlHelpContent li {
   font-size: 14px;
   line-height: 1.5;
 }
 
-#divHelpContent p {
+#htmlHelpContent p {
   margin: 0 0 10px 0;
 }
 
-#divHelpContent ul, #divHelpContent ol {
+#htmlHelpContent ul, #htmlHelpContent ol {
   margin: 0 0 10px 22px;
   padding: 0;
 }
 
-#divHelpContent li {
+#htmlHelpContent li {
   margin: 0 0 2px 0;
 }
 

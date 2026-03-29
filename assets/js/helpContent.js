@@ -29,8 +29,8 @@ const HELP_CONTENT = {
     <li>Visualizar suas cifras na lista Minhas Cifras</li>
     <li>Criar uma nova cifra ao clicar em ‘+ Cifrar’</li>
     <li>Decifrar uma cifra ao clicar em ‘+ Decifrar’ ou no <i>card</i> da cifra correspondente</li>
-    <li>Acessar uma cifra existente para visualizar ou editar, clicando no ícone ${ICONS.editar} </li>
-    <li>Excluir uma cifra existente ao clicar no ícone ${ICONS.excluir}</li>
+    <li>Acessar uma cifra existente para visualizar ou editar, clicando em ${ICONS.editar} </li>
+    <li>Excluir uma cifra existente ao clicar em ${ICONS.excluir}</li>
     </ul>
     `,
 
