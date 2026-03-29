@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
-<body class="pt-0" style="background: #ffffff;border-width: 1px;height: auto;min-height: 0;margin-top: 80px;" page="decifragem">
+<body class="pt-0 body-padrao" style="background: #ffffff;border-width: 1px;height: auto;min-height: 0;margin-top: 80px;" page="decifragem">
     <div class="modal fade" role="dialog" tabindex="-1" data-bs-backdrop="static" id="confirmaUsarCifra" style="background: transparent;margin-top: 80px;" area-hiden="true">
         <div class="modal-dialog modal-confirma-excluir" role="document" id="dlgConfirmaExcluirCifra">
             <div class="modal-content">
@@ -76,7 +76,7 @@
             </div>
         </div>
     </div>
-    <div class="d-flex align-items-end" id="tituloDecPageTop" style="height: auto;margin-top: 0;padding-left: 0px;max-width: 570px;margin-right: auto;margin-left: auto;margin-bottom: 50px;"><img class="img-fluid clickable" width="512" height="512" id="voltarCifragemTop" src="assets/img/Icone_Home.png" style="width: 30px;height: 30px;position: relative;">
+    <div class="d-flex align-items-end" id="tituloDecPageTop" style="height: auto;margin-top: 0;padding-left: 0px;max-width: 570px;margin-right: auto;margin-left: auto;margin-bottom: 50px;width: 100%;"><img class="img-fluid clickable" width="512" height="512" id="voltarCifragemTop" src="assets/img/Icone_Home.png" style="width: 30px;height: 30px;position: relative;">
         <p id="txtCifragem" class="titulo-pagina" style="font-family: Roboto, sans-serif;width: 100%;text-align: center;color: #424242;height: 30px;font-weight: bold;padding-right: 8px;">Decifragem</p><i class="far fa-question-circle icnHelp" data-help-key="decifragem"></i>
     </div>
     <div id="radioDecifragem" style="background: #ffffff;">
@@ -89,7 +89,7 @@
         </svg><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" id="icnChave" style="font-size: 53px;position: absolute;width: 30px;height: 30px;color: #525252;margin-bottom: auto;display: block;margin-left: 10px;/*transform: translateY(-50%);*/z-index: 10;margin-right: 0px;">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M18 8C18 11.3137 15.3137 14 12 14C11.3938 14 10.8087 13.9101 10.2571 13.7429L10 14L9 15L8 16H6V18H2V14L6.25707 9.74293C6.08989 9.19135 6 8.60617 6 8C6 4.68629 8.68629 2 12 2C15.3137 2 18 4.68629 18 8ZM12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6C13.1046 6 14 6.89543 14 8C14 8.55228 14.4477 9 15 9C15.5523 9 16 8.55228 16 8C16 5.79086 14.2091 4 12 4Z" fill="currentColor"></path>
         </svg></div>
-    <div id="divMsgEntrada" class="divInputPadrao" style="margin-top: 20px;margin-right: auto;margin-left: auto;max-width: 570px;min-width: 280px;padding: 0px;padding-right: 0px;padding-left: 0px;position: relative;border-radius: 8px;border: 1px solid #673f85;padding-top: 7px;padding-bottom: 7px;min-height: 60px;"><svg class="bi bi-file-earmark-lock-fill" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="icnMensagem" style="position: absolute;width: 30px;height: 30px;z-index: 10;color: #525252;margin-left: 10px;">
+    <div id="divMsgEntrada" class="divInputPadrao" style="margin-top: 20px;margin-right: auto;margin-left: auto;padding: 0px;padding-right: 0px;padding-left: 0px;position: relative;border-radius: 8px;border: 1px solid #673f85;padding-top: 7px;padding-bottom: 7px;min-height: 60px;width: 100%;"><svg class="bi bi-file-earmark-lock-fill" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="icnMensagem" style="position: absolute;width: 30px;height: 30px;z-index: 10;color: #525252;margin-left: 10px;">
             <path d="M7 7a1 1 0 0 1 2 0v1H7zM6 9.3c0-.042.02-.107.105-.175A.64.64 0 0 1 6.5 9h3a.64.64 0 0 1 .395.125c.085.068.105.133.105.175v2.4c0 .042-.02.107-.105.175A.64.64 0 0 1 9.5 12h-3a.64.64 0 0 1-.395-.125C6.02 11.807 6 11.742 6 11.7z"></path>
             <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M10 7v1.076c.54.166 1 .597 1 1.224v2.4c0 .816-.781 1.3-1.5 1.3h-3c-.719 0-1.5-.484-1.5-1.3V9.3c0-.627.46-1.058 1-1.224V7a2 2 0 1 1 4 0"></path>
         </svg><svg class="position-absolute bottom-0 end-0 z-1 clickable icone-custom" xmlns="http://www.w3.org/2000/svg" viewBox="-32 0 512 512" width="1em" height="1em" fill="currentColor" id="icnApagarMsg" style="font-size: 19px;/*position: absolute;*/margin-bottom: 4px;margin-right: 4px;color: #4b4b4b;"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc. -->

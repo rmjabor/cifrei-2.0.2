@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
-<body style="position: static;margin-top: 50px;min-width: 320px;max-width: 600px;width: 100%;padding-right: 0px;padding-left: 0px;" page="home">
+<body class="body-padrao" style="position: static;margin-top: 50px;width: 100%;padding-right: 0px;padding-left: 0px;" page="home">
     <div class="modal fade" role="dialog" tabindex="-1" data-bs-backdrop="static" id="mdlNovosTermos" style="background: transparent;margin-top: 0px;" area-hiden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-confirma-excluir" role="document">
             <div class="modal-content">
@@ -144,7 +144,7 @@
         </div>
         <p class="d-none" id="labelSemCifras" style="font-size: 16px;color: #bfbfbf;font-family: Roboto, sans-serif;text-align: center;min-width: 310px;max-width: 570px;margin-right: auto;margin-left: auto;padding: 0px;margin-bottom: 0px;">Você ainda não salvou nenhuma cifra. Clique no botão '+ Cifrar' abaixo para criar uma.</p>
     </div>
-    <div class="btn-group z-3 justify-content-center align-items-center gap-3" role="group" id="divBtnsCifrarDecifrar" style="position: fixed;display: flex;min-width: 230px;right: 100px;bottom: 24px;"><button class="btn btn-primary botao-custom" id="btnMaisDecifrar" type="button" style="width: 110px;height: 45px;border-style: none;background: #673f85;padding-top: 4px;padding-right: 0px;padding-bottom: 3px;padding-left: 0px;box-shadow: 1px 1px 3px 0px #a7a7a7;font-family: 'Open Sans', sans-serif;font-size: 14px;border-radius: 25px;margin-left: 0px;">+ Decifrar&nbsp;<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 24 24" width="1em" fill="currentColor" style="width: 20px;height: 20px;margin-bottom: 4px;">
+    <div class="btn-group z-3 justify-content-center align-items-center gap-3" role="group" id="divBtnsCifrarDecifrar" style="position: fixed;display: flex;min-width: 230px;/*left: auto;*/right: 80px;bottom: 24px;width: 230px;"><button class="btn btn-primary botao-custom" id="btnMaisDecifrar" type="button" style="width: 110px;height: 45px;border-style: none;background: #673f85;padding-top: 4px;padding-right: 0px;padding-bottom: 3px;padding-left: 0px;box-shadow: 1px 1px 3px 0px #a7a7a7;font-family: 'Open Sans', sans-serif;font-size: 14px;border-radius: 25px;margin-left: 0px;">+ Decifrar&nbsp;<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 24 24" width="1em" fill="currentColor" style="width: 20px;height: 20px;margin-bottom: 4px;">
                 <path d="M0 0h24v24H0z" fill="none"></path>
                 <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"></path>
             </svg></button><button class="btn btn-primary text-center botao-custom" id="btnMaisCifrar" type="button" style="width: 110px;background: #fd641d;border-style: none;height: 45px;padding-right: 0px;padding-left: 0px;padding-top: 4px;padding-bottom: 3px;box-shadow: 1px 1px 3px 0px #a7a7a7;font-family: 'Open Sans', sans-serif;font-size: 14px;border-radius: 25px;">&nbsp;+ Cifrar&nbsp;<svg class="ms-0" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="1em" viewBox="0 0 24 24" width="1em" fill="currentColor" style="width: 20px;height: 20px;margin-bottom: 4px;">
