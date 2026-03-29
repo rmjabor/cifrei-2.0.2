@@ -1921,10 +1921,9 @@ html {
 
 #htmlHelpContent h3 {
   margin: 18px 0 10px 0;
-  font-size: 18px !important;
+  font-size: 17px !important;
   line-height: 1.25;
   font-weight: 700;
-  text-decoration: underline;
   text-underline-offset: 2px;
 }
 
@@ -1932,7 +1931,7 @@ html {
   margin: 14px 0 8px 0;
   font-size: 16px !important;
   line-height: 1.25;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 #htmlHelpContent p, #htmlHelpContent li {
@@ -1953,7 +1952,7 @@ html {
   margin: 0 0 2px 0;
 }
 
-#divHelpContent .note {
+#htmlHelpContent .note {
   margin: 14px 0;
   padding: 14px 16px 8px 16px;
   border-radius: 12px;
