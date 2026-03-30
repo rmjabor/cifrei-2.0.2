@@ -102,9 +102,34 @@
     removeSessionStorageValue(LEGAL_RETURN_BYPASS_CLEAR_KEY);
   }
 
+  function getTermsPageOriginHint() {
+    try {
+      const url = new URL(window.location.href);
+      return String(url.searchParams.get('from') || '').trim().toLowerCase();
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function cameFromCadastroReferrer() {
+    try {
+      if (!document.referrer) return false;
+      const referrerUrl = new URL(document.referrer);
+      const currentUrl = new URL(window.location.href);
+      if (referrerUrl.origin !== currentUrl.origin) return false;
+      return /\/cadastrar\.html?$/i.test(referrerUrl.pathname);
+    } catch (error) {
+      return false;
+    }
+  }
+
   function shouldShowCadastroBackButton() {
     const context = getLegalReturnContext();
-    return Boolean(context && context.source === 'cadastrar');
+    return Boolean(
+      (context && context.source === 'cadastrar')
+      || getTermsPageOriginHint() === 'cadastrar'
+      || cameFromCadastroReferrer()
+    );
   }
 
   function setupCadastroBackButton() {
@@ -129,6 +154,20 @@
       }
 
       const context = getLegalReturnContext();
+
+      try {
+        if (document.referrer) {
+          const referrerUrl = new URL(document.referrer);
+          const currentUrl = new URL(window.location.href);
+          if (referrerUrl.origin === currentUrl.origin && /\/cadastrar\.html?$/i.test(referrerUrl.pathname)) {
+            window.location.href = referrerUrl.href;
+            return;
+          }
+        }
+      } catch (error) {
+        console.warn('[Cifrei] Não foi possível resolver o retorno para o cadastro:', error);
+      }
+
       window.location.href = context?.sourceUrl || 'cadastrar.html';
     });
   }
@@ -317,16 +356,39 @@
     setInlineTermsVisible(false);
   }
 
+
+  function extractPendingAcceptanceFromUser(user) {
+    const metadata = user?.user_metadata || user?.raw_user_meta_data || {};
+    if (!metadata || typeof metadata !== 'object') return null;
+
+    const documentId = metadata.accepted_legal_document_id;
+    const acceptedAt = metadata.accepted_legal_at;
+
+    if (documentId === null || documentId === undefined || !acceptedAt) {
+      return null;
+    }
+
+    return {
+      documentId,
+      acceptedAt: String(acceptedAt)
+    };
+  }
+
+  function doesAcceptanceMatchActiveDocument(pendingAcceptance, activeDocument) {
+    if (!pendingAcceptance || !activeDocument?.id) return false;
+    return String(pendingAcceptance.documentId) === String(activeDocument.id);
+  }
+
   function detachPreviousListener(element, handler) {
     if (!element || !handler) return;
     element.removeEventListener('click', handler);
   }
 
-  async function recordLegalAcceptance(userId, activeDocument) {
+  async function recordLegalAcceptance(userId, activeDocument, acceptedAtOverride) {
     const supabase = getSupabaseClient();
     if (!supabase) throw new Error('Cliente do Supabase não disponível.');
 
-    const acceptedAt = new Date().toISOString();
+    const acceptedAt = acceptedAtOverride || new Date().toISOString();
 
     const { error: insertError } = await supabase
       .from('legal_acceptances')
@@ -338,7 +400,13 @@
         created_at: acceptedAt
       });
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      const normalizedInsertError = String(insertError?.message || '').toLowerCase();
+      const isDuplicateAcceptance = normalizedInsertError.includes('duplicate') || normalizedInsertError.includes('unique');
+      if (!isDuplicateAcceptance) {
+        throw insertError;
+      }
+    }
 
     const { error: updateError } = await supabase
       .from('profiles')
@@ -456,8 +524,18 @@
         fetchCurrentProfileAcceptance(user.id)
       ]);
 
-      if (profileAcceptance?.accepted_legal_document_id === activeDocument.id) {
+      if (String(profileAcceptance?.accepted_legal_document_id || '') === String(activeDocument.id)) {
         return;
+      }
+
+      const pendingAcceptance = extractPendingAcceptanceFromUser(user);
+      if (doesAcceptanceMatchActiveDocument(pendingAcceptance, activeDocument)) {
+        try {
+          await recordLegalAcceptance(user.id, activeDocument, pendingAcceptance.acceptedAt);
+          return;
+        } catch (error) {
+          console.error('[Cifrei] Falha ao consolidar o aceite registrado no cadastro:', error);
+        }
       }
 
       renderEnforcementModalDocument(activeDocument);

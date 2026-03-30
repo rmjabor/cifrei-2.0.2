@@ -106,6 +106,35 @@
     removeSessionStorageValue(STORAGE_KEYS.LEGAL_RETURN_BYPASS_CLEAR);
   }
 
+
+  function buildTermsPageHrefForCadastro() {
+    try {
+      const url = new URL(buildPageUrl('termos.html'));
+      url.searchParams.set('from', 'cadastrar');
+      return url.toString();
+    } catch (error) {
+      return 'termos.html?from=cadastrar';
+    }
+  }
+
+  async function getSignupLegalAcceptanceMetadata() {
+    const legalApi = window.CifreiLegalDocuments;
+    if (!legalApi?.fetchActiveLegalDocument) {
+      throw new Error('Os Termos de Uso não puderam ser carregados no momento.');
+    }
+
+    const activeDocument = await legalApi.fetchActiveLegalDocument();
+    const acceptedAt = new Date().toISOString();
+
+    return {
+      accepted_legal_document_id: activeDocument?.id || null,
+      accepted_legal_at: acceptedAt,
+      accepted_legal_document_type: activeDocument?.document_type || null,
+      accepted_legal_document_version: activeDocument?.version || null,
+      accepted_terms_on_signup: true
+    };
+  }
+
   function looksLikeEmail(email) {
     return EMAIL_REGEX.test(String(email || '').trim());
   }
@@ -973,6 +1002,17 @@
       setButtonText(submitButton, 'Cadastrando...');
 
       const normalizedSignupEmail = normalizeEmail(emailInput.value);
+      let legalAcceptanceMetadata;
+
+      try {
+        legalAcceptanceMetadata = await getSignupLegalAcceptanceMetadata();
+      } catch (error) {
+        console.error('[Cifrei] Falha ao carregar metadados de aceite no cadastro:', error);
+        showSignupNotice('Não foi possível carregar os Termos de Uso vigentes no momento. Atualize a página e tente novamente.');
+        updateButtonState();
+        return;
+      }
+
       const payload = {
         email: String(emailInput.value || '').trim(),
         password: getTrimmedPassword(passwordInput.value),
@@ -981,7 +1021,8 @@
           data: {
             first_name: String(firstNameInput.value || '').trim(),
             last_name: String(lastNameInput.value || '').trim(),
-            email_hash: await hashNormalizedEmail(normalizedSignupEmail)
+            email_hash: await hashNormalizedEmail(normalizedSignupEmail),
+            ...legalAcceptanceMetadata
           }
         }
       };
@@ -1019,6 +1060,7 @@
     passwordWatcher.refresh();
 
     if (termsLink) {
+      termsLink.href = buildTermsPageHrefForCadastro();
       termsLink.addEventListener('click', () => {
         persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_EMAIL, emailInput.value);
         persistCadastroDraftField(STORAGE_KEYS.CADASTRO_DRAFT_FIRST_NAME, firstNameInput.value);
