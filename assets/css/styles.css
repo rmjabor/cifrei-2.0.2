@@ -1652,8 +1652,25 @@ html {
   color: #424242;
 }
 
+#mdlHelp .modal-body {
+  overflow: hidden;
+}
+
 #htmlHelpContent {
   color: var(--text);
+  max-height: 300px;
+  min-height: 50px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#htmlHelpContent::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 #htmlHelpContent h2 {
