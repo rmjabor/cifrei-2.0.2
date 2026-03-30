@@ -2937,8 +2937,24 @@ function setupMenuFlutuante() {
   syncMenuVisibilityByPage();
 }
 
-if (window.location.pathname.includes('cifraaberta.html')) {
-  (function () {
+(function () {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  if (isMobile) {
+    let lastTouchEnd = 0;
+
+    document.addEventListener('touchend', function (event) {
+      const now = Date.now();
+
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+
+      lastTouchEnd = now;
+    }, { passive: false });
+  }
+
+  if (window.location.pathname.includes('cifraaberta.html')) {
     const TIMEOUT_MS = 60 * 1000;
     let inactivityTimer;
 
@@ -2951,17 +2967,21 @@ if (window.location.pathname.includes('cifraaberta.html')) {
       inactivityTimer = setTimeout(redirectToHome, TIMEOUT_MS);
     }
 
-    const events = ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+    const events = ['click', 'mousemove', 'keydown', 'scroll', 'touchstart', 'touchmove'];
 
-    function addListeners() {
-      events.forEach(event => {
-        window.addEventListener(event, resetTimer, { passive: true });
-      });
-    }
+    window.addEventListener('load', resetTimer, { once: true });
 
-    window.addEventListener('load', () => {
-      addListeners();
-      resetTimer();
+    events.forEach(function (eventName) {
+      window.addEventListener(eventName, resetTimer, { passive: true });
     });
-  })();
-}
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(redirectToHome, TIMEOUT_MS);
+      } else {
+        resetTimer();
+      }
+    });
+  }
+})();
