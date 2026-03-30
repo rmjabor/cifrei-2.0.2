@@ -1656,10 +1656,6 @@ html {
   color: var(--text);
 }
 
-#htmlHelpContent::-webkit-scrollbar {
-  display: none;
-}
-
 #htmlHelpContent h2 {
   margin: 0 0 12px 0;
   font-size: 22px !important;
