@@ -95,12 +95,13 @@
     renderAvaliacaoStars(starsContainer, commentField, submitButton);
   }
 
-  function setAvaliacaoButtonsBusyState(submitButton, laterButton, isBusy) {
+  function setAvaliacaoButtonsBusyState(submitButton, laterButton, isBusy, starsContainer) {
     const busyValue = isBusy ? '1' : '0';
+    const notaAtual = getNotaAvalia(starsContainer);
 
     if (submitButton) {
       submitButton.dataset.isBusy = busyValue;
-      submitButton.disabled = isBusy || submitButton.disabled;
+      submitButton.disabled = isBusy ? true : notaAtual < 1;
       if (isBusy) {
         submitButton.setAttribute('aria-busy', 'true');
       } else {
@@ -117,6 +118,24 @@
         laterButton.removeAttribute('aria-busy');
       }
     }
+  }
+
+  function forceHideModalElement(modalElement) {
+    if (!modalElement) return;
+
+    modalElement.classList.remove('show');
+    modalElement.setAttribute('aria-hidden', 'true');
+    modalElement.style.display = 'none';
+    modalElement.removeAttribute('aria-modal');
+    modalElement.removeAttribute('role');
+
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('padding-right');
+
+    document.querySelectorAll('.modal-backdrop').forEach(function (backdrop) {
+      backdrop.remove();
+    });
   }
 
   function initPassphraseModalReset() {
@@ -146,10 +165,29 @@
 
     function closeAndResetModal() {
       const modalInstance = getBootstrapModalInstance(modalElement);
+      let didHideByEvent = false;
+
+      const handleHidden = function () {
+        didHideByEvent = true;
+        modalElement.removeEventListener('hidden.bs.modal', handleHidden);
+        resetAvaliacaoModalState(modalElement, starsContainer, commentField, submitButton, laterButton);
+      };
+
+      modalElement.addEventListener('hidden.bs.modal', handleHidden);
+
       if (modalInstance) {
         modalInstance.hide();
+      } else {
+        forceHideModalElement(modalElement);
       }
-      resetAvaliacaoModalState(modalElement, starsContainer, commentField, submitButton, laterButton);
+
+      window.setTimeout(function () {
+        if (didHideByEvent) return;
+
+        modalElement.removeEventListener('hidden.bs.modal', handleHidden);
+        forceHideModalElement(modalElement);
+        resetAvaliacaoModalState(modalElement, starsContainer, commentField, submitButton, laterButton);
+      }, 450);
     }
 
     starsContainer.addEventListener('click', function (event) {
@@ -185,12 +223,12 @@
       }
 
       try {
-        setAvaliacaoButtonsBusyState(submitButton, laterButton, true);
+        setAvaliacaoButtonsBusyState(submitButton, laterButton, true, starsContainer);
         await deferProfileAvaliacaoPrompt(MAIS_TARDE_DAYS);
         closeAndResetModal();
       } catch (err) {
         console.error('[Cifrei] Erro ao adiar solicitação de avaliação:', err);
-        setAvaliacaoButtonsBusyState(submitButton, laterButton, false);
+        setAvaliacaoButtonsBusyState(submitButton, laterButton, false, starsContainer);
         renderAvaliacaoStars(starsContainer, commentField, submitButton);
       }
     });
@@ -214,7 +252,7 @@
       }
 
       try {
-        setAvaliacaoButtonsBusyState(submitButton, laterButton, true);
+        setAvaliacaoButtonsBusyState(submitButton, laterButton, true, starsContainer);
         await submitUserEvaluation({
           nota,
           comentarios: commentField.value || ''
@@ -222,7 +260,7 @@
         closeAndResetModal();
       } catch (err) {
         console.error('[Cifrei] Erro ao enviar avaliação:', err);
-        setAvaliacaoButtonsBusyState(submitButton, laterButton, false);
+        setAvaliacaoButtonsBusyState(submitButton, laterButton, false, starsContainer);
         renderAvaliacaoStars(starsContainer, commentField, submitButton);
       }
     });
