@@ -2936,3 +2936,32 @@ function setupMenuFlutuante() {
 
   syncMenuVisibilityByPage();
 }
+
+if (window.location.pathname.includes('cifraaberta.html')) {
+  (function () {
+    const TIMEOUT_MS = 60 * 1000;
+    let inactivityTimer;
+
+    function redirectToHome() {
+      window.location.href = 'home.html';
+    }
+
+    function resetTimer() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(redirectToHome, TIMEOUT_MS);
+    }
+
+    const events = ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+
+    function addListeners() {
+      events.forEach(event => {
+        window.addEventListener(event, resetTimer, { passive: true });
+      });
+    }
+
+    window.addEventListener('load', () => {
+      addListeners();
+      resetTimer();
+    });
+  })();
+}
