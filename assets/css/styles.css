@@ -364,6 +364,10 @@ input.form-control:focus {
   opacity: 1;
 }
 
+inputPadrao:focus {
+  outline: none;
+}
+
 .inputGerarSenha {
   height: 35px;
   width: 45px;
