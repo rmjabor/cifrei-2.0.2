@@ -365,7 +365,8 @@ input.form-control:focus {
 }
 
 inputPadrao:focus {
-  outline: none !important;
+  outline: 0 !important;
+  border-color: inherit !important;
 }
 
 .inputGerarSenha {
